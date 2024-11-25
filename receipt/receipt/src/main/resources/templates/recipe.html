@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${recipe.theme}">Рецепт</title>
+</head>
+<body>
+<h1 th:text="${recipe.theme}">Тема блюда</h1>
+<div>
+  <label for="photoFood">Фото блюда:</label>
+  <input type="file" id="photoFood" name="photoFood" accept="image/*" required>
+  <img th:src="@{/recipes/{id}/photo(id=${recipe.id})}" alt="Фото блюда" />
+</div>
+<div>
+  <label for="stepPhoto">Фото шагов приготовления:</label>
+  <input type="file" id="stepPhoto" name="stepPhoto" accept="image/*" required>
+  <img th:src="@{/recipes/{id}/step_photo(id=${recipe.id})}" alt="Фото шагов приготовления" />
+</div>
+<p><strong>Тип блюда:</strong> <span th:text="${recipe.typeOfFood}">Тип блюда</span></p>
+<p><strong>Национальная кухня:</strong> <span th:text="${recipe.nationalKitchen}">Национальная кухня</span></p>
+<p><strong>Тип приготовления:</strong> <span th:text="${recipe.typeOfCook}">Тип приготовления</span></p>
+<p><strong>Ограничения:</strong> <span th:text="${recipe.restrictions}">Ограничения</span></p>
+<p><strong>Количество порций:</strong> <span th:text="${recipe.countPortion}">Количество порций</span></p>
+<p><strong>Калорийность (ккал):</strong> <span th:text="${recipe.kkal}">Калорийность</span></p>
+<p><strong>Время приготовления:</strong> <span th:text="${recipe.timeToCook}">Время приготовления</span> минут</p>
+
+<a href="/recipes">Назад к списку рецептов</a>
+</body>
+</html>
