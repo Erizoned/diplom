@@ -1,72 +1,21 @@
 <form action="/recipes/create_recipe" method="post" enctype="multipart/form-data">
     <div>
         <label for="name">Название рецепта:</label>
-        <input type="text" id="name" name="name" value="Омлет с овощами" required>
+        <input type="text" id="name" name="name" required>
     </div>
 
     <div>
         <label for="description">Описание:</label>
-        <textarea id="description" name="description" required>Вкусный и питательный омлет с овощами.</textarea>
+        <textarea id="description" name="description" required></textarea>
     </div>
 
     <div>
         <label for="theme">Тема блюда:</label>
         <select id="theme" name="theme" required>
-            <option value="breakfast" selected>Завтрак</option>
+            <option value="breakfast">Завтрак</option>
             <option value="lunch">Обед</option>
             <option value="dinner">Ужин</option>
-            <option value="snack">Перекус</option>
-            <option value="holiday">Праздничное блюдо</option>
         </select>
-    </div>
-
-    <div>
-        <label for="typeOfFood">Тип блюда:</label>
-        <select id="typeOfFood" name="typeOfFood">
-            <option value="soup">Суп</option>
-            <option value="meat">Мясо</option>
-            <option value="salad">Салат</option>
-            <option value="dessert">Десерт</option>
-            <option value="sideDish" selected>Гарнир</option>
-        </select>
-    </div>
-
-    <div>
-        <label for="typeOfCook">Тип приготовления:</label>
-        <select id="typeOfCook" name="typeOfCook">
-            <option value="pan" selected>Сковорода</option>
-            <option value="pot">Кастрюля</option>
-            <option value="oven">Духовка</option>
-            <option value="grill">Гриль</option>
-            <option value="steamer">Пароварка</option>
-        </select>
-    </div>
-
-    <div>
-        <label for="restrictions">Ограничения:</label>
-        <select id="restrictions" name="restrictions">
-            <option value="">Выберите ограничение</option>
-            <option value="no_sugar">Без сахара</option>
-            <option value="no_gluten">Без глютена</option>
-            <option value="no_dairy" selected>Без молочных продуктов</option>
-            <option value="vegan">Веган</option>
-            <option value="nut_allergy">Без орехов</option>
-        </select>
-    </div>
-
-    <div>
-        <label for="countPortion">Количество порций:</label>
-        <input type="number" id="countPortion" name="countPortion" value="2" required>
-    </div>
-
-    <div>
-        <label for="kkal">Калорийность (ккал):</label>
-        <input type="number" id="kkal" name="kkal" value="300" required>
-    </div>
-
-    <div>
-        <label for="timeToCook">Время приготовления (мин):</label>
-        <input type="number" id="timeToCook" name="timeToCook" value="20" required>
     </div>
 
     <div>

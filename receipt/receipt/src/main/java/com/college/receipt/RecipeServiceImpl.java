@@ -1,7 +1,5 @@
-package service;
+package com.college.receipt;
 
-import com.college.receipt.Recipe;
-import com.college.receipt.RecipeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
