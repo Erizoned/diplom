@@ -1,4 +1,6 @@
-package com.college.receipt;
+package com.college.receipt.service;
+
+import com.college.receipt.entities.Recipe;
 
 import java.util.List;
 import java.util.Optional;

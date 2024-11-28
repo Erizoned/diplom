@@ -1,8 +1,10 @@
-package com.college.receipt;
+package com.college.receipt.service;
 
+import com.college.receipt.entities.Recipe;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import com.college.receipt.repositories.RecipeRepository;
 
 import java.util.List;
 import java.util.NoSuchElementException;

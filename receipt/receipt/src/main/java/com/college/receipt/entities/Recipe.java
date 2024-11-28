@@ -1,8 +1,10 @@
-package com.college.receipt;
+package com.college.receipt.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+
+import java.util.List;
 
 @Data
 @Entity
@@ -24,14 +26,6 @@ public class Recipe {
     @NotBlank(message = "Блюдо не может быть без темы")
     private String theme;
 
-    @Column(name = "photo_food")
-    @Lob
-    private byte[] photoFood; // Фото блюда
-
-    @Column(name = "step_photo", columnDefinition = "bytea")
-    @Lob
-    private byte[] stepPhoto; // Фото шагов приготовления
-
     @Column(name = "type_of_food")
     private String typeOfFood;
 
@@ -49,4 +43,7 @@ public class Recipe {
 
     @Column(name = "time_to_cook")
     private int timeToCook;
+
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL)
+    private List<UploadedFile> photos;
 }

@@ -1,7 +1,7 @@
-package controllers;
+package com.college.receipt.controllers;
 
-import com.college.receipt.Role;
-import service.RoleService;
+import com.college.receipt.entities.Role;
+import com.college.receipt.service.RoleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

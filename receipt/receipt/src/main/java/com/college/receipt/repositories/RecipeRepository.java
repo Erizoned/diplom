@@ -1,7 +1,7 @@
-package com.college.receipt;
+package com.college.receipt.repositories;
 
+import com.college.receipt.entities.Recipe;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;
 

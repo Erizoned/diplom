@@ -1,7 +1,7 @@
-package controllers;
+package com.college.receipt.controllers;
 
-import com.college.receipt.User;
-import service.UserService;
+import com.college.receipt.entities.User;
+import com.college.receipt.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

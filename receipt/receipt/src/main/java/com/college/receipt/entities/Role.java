@@ -1,4 +1,4 @@
-package com.college.receipt;
+package com.college.receipt.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;

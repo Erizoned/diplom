@@ -1,6 +1,6 @@
-package service;
+package com.college.receipt.service;
 
-import com.college.receipt.Role;
+import com.college.receipt.entities.Role;
 
 import java.util.List;
 import java.util.Optional;

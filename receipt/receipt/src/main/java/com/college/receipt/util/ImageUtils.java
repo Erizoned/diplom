@@ -1,4 +1,4 @@
-package util;
+package com.college.receipt.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

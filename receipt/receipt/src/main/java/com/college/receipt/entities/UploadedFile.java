@@ -1,4 +1,4 @@
-package com.college.receipt;
+package com.college.receipt.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,7 +23,9 @@ public class UploadedFile {
 
     private String type; // MIME-тип файла
 
-    @Lob
-    @Column(name = "data")
-    private byte[] data; // Содержимое файла
+    private String filePath; // Содержимое файла
+
+    @ManyToOne
+    @JoinColumn(name = "recipe_id")
+    private Recipe recipe;
 }

@@ -1,12 +1,12 @@
-package service;
+package com.college.receipt.service;
 
-import com.college.receipt.Role;
-import com.college.receipt.RoleRepository;
-import com.college.receipt.User;
-import com.college.receipt.UserRepository;
+import com.college.receipt.entities.Role;
+import com.college.receipt.entities.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import com.college.receipt.repositories.RoleRepository;
+import com.college.receipt.repositories.UserRepository;
 
 import java.util.List;
 import java.util.NoSuchElementException;
