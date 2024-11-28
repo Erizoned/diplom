@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Optional;
 
 @Service
@@ -39,5 +40,12 @@ public class UploadedFileService {
         return uploadedFileRepository.save(file);
     }
 
+    public byte[] downloadImageFromFileSystem(String file) throws IOException {
+        Optional<UploadedFile> fileData = uploadedFileRepository.findByName(file);
+        String filePath = fileData.get().getFilePath();
+
+        byte[] images = Files.readAllBytes(new File(filePath).toPath());
+        return images;
+    }
 }
 

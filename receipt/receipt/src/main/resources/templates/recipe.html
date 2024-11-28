@@ -7,16 +7,28 @@
 </head>
 <body>
 <h1 th:text="${recipe.theme}">Тема блюда</h1>
-<div>
-  <label for="photoFood">Фото блюда:</label>
-  <input type="file" id="photoFood" name="photoFood" accept="image/*" required>
-  <img th:src="@{/recipes/{id}/photo(id=${recipe.id})}" alt="Фото блюда" />
-</div>
-<div>
-  <label for="stepPhoto">Фото шагов приготовления:</label>
-  <input type="file" id="stepPhoto" name="stepPhoto" accept="image/*" required>
-  <img th:src="@{/recipes/{id}/step_photo(id=${recipe.id})}" alt="Фото шагов приготовления" />
-</div>
+
+  <h2 for="photoFood">Фото блюда:</h2>
+    <div th:if="${photoFoods != null and photoFoods.size() > 0}">
+      <ul>
+        <li th:each="photo : ${photoFoods}">
+          <img th:src="@{'/files/file_system/' + ${photo.name}}" alt="Фото блюда" />
+        </li>
+      </ul>
+    </div>
+
+
+
+<h2>Фото шагов приготовления</h2>
+    <div th:if="${stepPhotos != null and stepPhotos.size() > 0}">
+      <ul>
+        <li th:each="step : ${stepPhotos}">
+          <img th:src="@{'/files/file_system/' + ${step.name}}" alt="Фото шага приготовления">
+        </li>
+      </ul>
+    </div>
+
+
 <p><strong>Тип блюда:</strong> <span th:text="${recipe.typeOfFood}">Тип блюда</span></p>
 <p><strong>Национальная кухня:</strong> <span th:text="${recipe.nationalKitchen}">Национальная кухня</span></p>
 <p><strong>Тип приготовления:</strong> <span th:text="${recipe.typeOfCook}">Тип приготовления</span></p>

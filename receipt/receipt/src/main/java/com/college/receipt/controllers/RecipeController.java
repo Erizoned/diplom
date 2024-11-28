@@ -2,6 +2,7 @@ package com.college.receipt.controllers;
 
 import com.college.receipt.entities.Recipe;
 import com.college.receipt.entities.UploadedFile;
+import com.college.receipt.repositories.UploadedFileRepository;
 import com.college.receipt.service.RecipeService;
 import com.college.receipt.service.UploadedFileService;
 import org.springframework.stereotype.Controller;
@@ -15,16 +16,20 @@ import jakarta.validation.Valid;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 
 @RequestMapping("/recipes")
 @Controller
 public class RecipeController {
     private final RecipeService recipeService;
     private final UploadedFileService uploadedFileService;
+    private final UploadedFileRepository uploadedFileRepository;
 
-    public RecipeController(RecipeService recipeService, UploadedFileService uploadedFileService) {
+    public RecipeController(RecipeService recipeService, UploadedFileService uploadedFileService, UploadedFileRepository uploadedFileRepository) {
         this.recipeService = recipeService;
         this.uploadedFileService = uploadedFileService;
+        this.uploadedFileRepository = uploadedFileRepository;
     }
 
     @GetMapping("/")
@@ -63,6 +68,7 @@ public class RecipeController {
                 photoFoodFile.setType(photoFood.getContentType());
                 photoFoodFile.setFilePath("C:/Users/Anton/Documents/photos/" + photoFood.getOriginalFilename());
                 photoFoodFile.setRecipe(savedRecipe); // Связь с рецептом
+                photoFoodFile.setPhotoFood(true);
 
                 photoFood.transferTo(new File(photoFoodFile.getFilePath()));
                 uploadedFileService.save(photoFoodFile);
@@ -75,6 +81,7 @@ public class RecipeController {
                 stepPhotoFile.setType(stepPhoto.getContentType());
                 stepPhotoFile.setFilePath("C:/Users/Anton/Documents/photos/" + stepPhoto.getOriginalFilename());
                 stepPhotoFile.setRecipe(savedRecipe); // Связь с рецептом
+                stepPhotoFile.setPhotoFood(false);
 
                 stepPhoto.transferTo(new File(stepPhotoFile.getFilePath()));
                 uploadedFileService.save(stepPhotoFile);
@@ -84,22 +91,27 @@ public class RecipeController {
             return "create_recipe";
         }
 
-        return "redirect:/recipes";
+        return "redirect:/recipes/" + recipe.getId() + "/recipe";
     }
 
     @GetMapping("/{id}/recipe")
     public String viewRecipe(@PathVariable("id") Long id, Model model) {
         Recipe recipe = recipeService.findRecipeById(id)
                 .orElseThrow(() -> new RuntimeException("Recipe not found"));
+
+        List<UploadedFile> uploadedFiles = recipe.getPhotos();
+        List<UploadedFile> photoFoods = uploadedFiles != null
+                ? uploadedFiles.stream().filter(UploadedFile::isPhotoFood).toList()
+                : List.of();
+        List<UploadedFile> stepPhotos = uploadedFiles != null
+                ? uploadedFiles.stream().filter(file -> !file.isPhotoFood()).toList()
+                : List.of();
+
         model.addAttribute("recipe", recipe);
+        model.addAttribute("photoFoods", photoFoods);
+        model.addAttribute("stepPhotos", stepPhotos);
+
         return "recipe";
     }
-//    @GetMapping("/{id}/recipe/photo")
-//    @ResponseBody
-//    public byte[] getRecipePhoto(@PathVariable("id") Long id) {
-//        Recipe recipe = recipeService.findRecipeById(id)
-//                .orElseThrow(() -> new RuntimeException("Recipe not found"));
-//        return recipe.getPhotoFood(); // Проверьте, что изображение возвращается корректно
-//    }
 
 }

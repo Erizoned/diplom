@@ -25,6 +25,10 @@ public class UploadedFile {
 
     private String filePath; // Содержимое файла
 
+    public boolean isPhotoFood;
+
+//    private int stepNumber;
+
     @ManyToOne
     @JoinColumn(name = "recipe_id")
     private Recipe recipe;

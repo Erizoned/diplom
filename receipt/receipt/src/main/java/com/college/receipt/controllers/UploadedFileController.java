@@ -26,4 +26,12 @@ public class UploadedFileController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(uploadImage);
     }
+
+    @GetMapping("/file_system/{file_name}")
+    public ResponseEntity<?> downloadImageFromFileSystem(@PathVariable String file_name) throws IOException {
+        byte[] imageData = fileService.downloadImageFromFileSystem(file_name);
+        return ResponseEntity.status(HttpStatus.OK)
+                .contentType(MediaType.valueOf("image/png"))
+                .body(imageData);
+    }
 }

@@ -38,6 +38,9 @@ public class Recipe {
     @Column(name = "count_portion")
     private int countPortion;
 
+    @Column(name = "national_kitchen")
+    private String nationalKitchen;
+
     @Column(name = "kkal")
     private int kkal;
 
