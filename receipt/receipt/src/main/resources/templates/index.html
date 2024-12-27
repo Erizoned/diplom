@@ -1,10 +1,107 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <title>Receipt Site</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Рецепты</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 36px;
+            color: #333;
+        }
+
+        .recipe-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            padding: 20px;
+        }
+
+        .recipe-card {
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            width: 300px;
+            text-align: left;
+        }
+
+        .recipe-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .recipe-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .recipe-details {
+            padding: 20px;
+        }
+
+        .recipe-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #222;
+            margin-bottom: 10px;
+        }
+
+        .recipe-description {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .recipe-time {
+            font-size: 14px;
+            font-weight: bold;
+            color: #888;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        @media screen and (max-width: 768px) {
+            .recipe-card {
+                width: 90%;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>ХЕХЕЕЕЕЕЕЙ БЛЯЯЯЯ</h1>
+<h1>Все рецепты</h1>
+<div class="recipe-container">
+    <div th:each="recipe : ${recipes}" class="recipe-card">
+        <a th:href="@{${recipe.id} + '/recipe'}">
+            <img th:if="${recipe.photos != null and recipe.photos.size() > 0}"
+                 th:src="@{'/files/file_system/' + ${recipe.photos[0].name}}"
+                 alt="Фото блюда" />
+            <img th:if="${recipe.photos == null or recipe.photos.size() == 0}"
+                 src="/static/images/default-recipe.png"
+                 alt="Нет фото" />
+            <div class="recipe-details">
+                <div class="recipe-title" th:text="${recipe.theme}">Название рецепта</div>
+                <div class="recipe-description" th:text="${recipe.description}">Описание рецепта</div>
+                <div class="recipe-time" th:text="'Время приготовления: ' + ${recipe.timeToCook} + ' минут'">Время приготовления</div>
+            </div>
+        </a>
+    </div>
+</div>
 </body>
 </html>

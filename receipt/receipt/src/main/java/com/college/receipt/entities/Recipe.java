@@ -49,4 +49,16 @@ public class Recipe {
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL)
     private List<UploadedFile> photos;
+
+    @Override
+    public String toString() {
+        return "Recipe{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", theme='" + theme + '\'' +
+                ", typeOfFood='" + typeOfFood + '\'' +
+                ", timeToCook=" + timeToCook +
+                '}';
+    }
 }

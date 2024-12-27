@@ -4,39 +4,117 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title th:text="${recipe.theme}">Рецепт</title>
+  <style>
+    body {
+        font-family: 'Arial', sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f9f9f9;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 20px;
+        background: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+    }
+
+    h1 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    h2 {
+        color: #555;
+        border-bottom: 2px solid #eaeaea;
+        padding-bottom: 5px;
+        margin-bottom: 15px;
+    }
+
+    p {
+        margin: 10px 0;
+        color: #666;
+    }
+
+    .photos {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .photos img {
+        max-width: 150px;
+        height: auto;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .details {
+        margin: 20px 0;
+        padding: 10px;
+        background: #f3f3f3;
+        border-radius: 8px;
+    }
+
+    .details strong {
+        color: #444;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        color: #fff;
+        background: #007BFF;
+        text-decoration: none;
+        border-radius: 5px;
+        text-align: center;
+    }
+
+    .back-link:hover {
+        background: #0056b3;
+    }
+  </style>
 </head>
 <body>
-<h1 th:text="${recipe.theme}">Тема блюда</h1>
+<div class="container">
+  <h1 th:text="${recipe.theme}">Тема блюда</h1>
 
-  <h2 for="photoFood">Фото блюда:</h2>
+  <h2>Фото блюда:</h2>
+  <div class="photos">
     <div th:if="${photoFoods != null and photoFoods.size() > 0}">
-      <ul>
-        <li th:each="photo : ${photoFoods}">
-          <img th:src="@{'/files/file_system/' + ${photo.name}}" alt="Фото блюда" />
-        </li>
-      </ul>
+      <img th:each="photo : ${photoFoods}" th:src="@{'/files/file_system/' + ${photo.name}}" alt="Фото блюда" />
     </div>
+    <div th:if="${photoFoods == null or photoFoods.size() == 0}">
+      <p>Фото блюда отсутствует.</p>
+    </div>
+  </div>
 
-
-
-<h2>Фото шагов приготовления</h2>
+  <h2>Фото шагов приготовления:</h2>
+  <div class="photos">
     <div th:if="${stepPhotos != null and stepPhotos.size() > 0}">
-      <ul>
-        <li th:each="step : ${stepPhotos}">
-          <img th:src="@{'/files/file_system/' + ${step.name}}" alt="Фото шага приготовления">
-        </li>
-      </ul>
+      <img th:each="step : ${stepPhotos}" th:src="@{'/files/file_system/' + ${step.name}}" alt="Фото шага приготовления">
     </div>
+    <div th:if="${stepPhotos == null or stepPhotos.size() == 0}">
+      <p>Фото шагов приготовления отсутствуют.</p>
+    </div>
+  </div>
 
+  <div class="details">
+    <p><strong>Тип блюда:</strong> <span th:text="${recipe.typeOfFood}">Тип блюда</span></p>
+    <p><strong>Национальная кухня:</strong> <span th:text="${recipe.nationalKitchen}">Национальная кухня</span></p>
+    <p><strong>Тип приготовления:</strong> <span th:text="${recipe.typeOfCook}">Тип приготовления</span></p>
+    <p><strong>Ограничения:</strong> <span th:text="${recipe.restrictions}">Ограничения</span></p>
+    <p><strong>Количество порций:</strong> <span th:text="${recipe.countPortion}">Количество порций</span></p>
+    <p><strong>Калорийность (ккал):</strong> <span th:text="${recipe.kkal}">Калорийность</span></p>
+    <p><strong>Время приготовления:</strong> <span th:text="${recipe.timeToCook}">Время приготовления</span> минут</p>
+  </div>
 
-<p><strong>Тип блюда:</strong> <span th:text="${recipe.typeOfFood}">Тип блюда</span></p>
-<p><strong>Национальная кухня:</strong> <span th:text="${recipe.nationalKitchen}">Национальная кухня</span></p>
-<p><strong>Тип приготовления:</strong> <span th:text="${recipe.typeOfCook}">Тип приготовления</span></p>
-<p><strong>Ограничения:</strong> <span th:text="${recipe.restrictions}">Ограничения</span></p>
-<p><strong>Количество порций:</strong> <span th:text="${recipe.countPortion}">Количество порций</span></p>
-<p><strong>Калорийность (ккал):</strong> <span th:text="${recipe.kkal}">Калорийность</span></p>
-<p><strong>Время приготовления:</strong> <span th:text="${recipe.timeToCook}">Время приготовления</span> минут</p>
-
-<a href="/recipes">Назад к списку рецептов</a>
+  <a href="/" class="back-link">Назад к списку рецептов</a>
+</div>
 </body>
 </html>

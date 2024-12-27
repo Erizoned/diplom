@@ -1,6 +1,7 @@
 package com.college.receipt.service;
 
 import com.college.receipt.entities.Recipe;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -13,6 +14,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Validated
+@Transactional
 public class RecipeServiceImpl implements RecipeService {
     private final RecipeRepository recipeRepository;
 
@@ -32,8 +34,11 @@ public class RecipeServiceImpl implements RecipeService {
         return recipe;
     }
 
-    public List<Recipe> findAllRecipes(){
-        return (List<Recipe>) recipeRepository.findAll();
+    @Override
+    public List<Recipe> findAllRecipes() {
+        List<Recipe> recipes = recipeRepository.findAll();
+        System.out.println("Найдено рецептов: " + recipes.size()); // Временный вывод
+        return recipes;
     }
 
     public Recipe updateRecipe(Recipe recipe){
