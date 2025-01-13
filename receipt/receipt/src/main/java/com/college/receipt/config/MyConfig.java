@@ -23,6 +23,7 @@ public class MyConfig implements WebMvcConfigurer {
     @Bean
     public LocaleResolver localeResolver() {
         SessionLocaleResolver sessionLocaleResolver = new SessionLocaleResolver();
+        sessionLocaleResolver.setDefaultLocale(new Locale("ru"));
         return sessionLocaleResolver;
     }
 }

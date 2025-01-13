@@ -42,12 +42,6 @@ public class RecipeController {
         return "index";
     }
 
-    @GetMapping("/login")
-    public String login(Model model){
-        logger.info("Открыта страница входа в аккаунт");
-        return "login";
-    }
-
     @GetMapping("/create_recipe")
     public String createForm(Model model) {
         logger.info("Открыта страница создания рецептов");

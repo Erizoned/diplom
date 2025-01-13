@@ -22,23 +22,35 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/logout", "/resources/**", "/user/registration").permitAll() // Добавьте здесь /user/registration
-                        .anyRequest().permitAll() // Все остальные требуют аутентификации
+                        .anyRequest().permitAll() // Разрешить все запросы
                 )
-                .formLogin(form -> form
-                        .loginPage("/login.html") // Страница входа
-                        .failureUrl("/login.html?error=true") // URL для ошибки входа
-                        .defaultSuccessUrl("/home", true) // URL после успешного входа
-                        .permitAll()
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/logout.html?logSucc=true")
-                        .deleteCookies("JSESSIONID")
-                        .permitAll()
-                );
+                .httpBasic(httpBasic -> httpBasic.disable()) // Отключить базовую аутентификацию
+                .formLogin(form -> form.disable()) // Отключить форму входа
+                .logout(logout -> logout.disable()); // Отключить логаут
         return http.build();
     }
+
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        http
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/login", "/logout", "/resources/**", "/user/registration").permitAll()
+//                        .anyRequest().permitAll() // Все остальные требуют аутентификации
+//                )
+//                .formLogin(form -> form
+//                        .loginPage("/login.html") // Страница входа
+//                        .failureUrl("/login.html?error=true") // URL для ошибки входа
+//                        .defaultSuccessUrl("/home", true) // URL после успешного входа
+//                        .permitAll()
+//                )
+//                .logout(logout -> logout
+//                        .logoutUrl("/logout")
+//                        .logoutSuccessUrl("/logout.html?logSucc=true")
+//                        .deleteCookies("JSESSIONID")
+//                        .permitAll()
+//                );
+//        return http.build();
+//    }
 
 
     @Bean

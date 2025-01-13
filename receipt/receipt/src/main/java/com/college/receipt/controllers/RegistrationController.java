@@ -21,11 +21,10 @@ public class RegistrationController {
     @Autowired
     private IUserService userService;
 
-    // Обработка GET-запроса на страницу регистрации
     @GetMapping("/user/registration")
     public String showRegistrationForm(Model model) {
-        model.addAttribute("user", new UserDto()); // Передаём пустой объект для формы
-        return "registration"; // Имя HTML-шаблона регистрации (например, registration.html)
+        model.addAttribute("user", new UserDto());
+        return "registration";
     }
 
     // Обработка POST-запроса на регистрацию
@@ -34,23 +33,24 @@ public class RegistrationController {
             @ModelAttribute("user") @Valid UserDto userDto,
             HttpServletRequest request,
             Errors errors) {
-
         ModelAndView mav = new ModelAndView("registration");
-
         if (errors.hasErrors()) {
+            System.out.println("Validation errors: " + errors.getAllErrors());
             mav.addObject("message", "Please correct the errors in the form.");
             return mav;
         }
 
         try {
             User registered = userService.registerNewUserAccount(userDto);
-            mav.setViewName("successRegister"); // Переход на страницу успешной регистрации
+            mav.setViewName("successRegister");
             mav.addObject("user", registered);
         } catch (UserAlreadyExistException uaeEx) {
+            System.out.println("User already exists: " + uaeEx.getMessage());
             mav.addObject("message", "An account for that username/email already exists.");
             return mav;
         }
 
         return mav;
     }
+
 }
