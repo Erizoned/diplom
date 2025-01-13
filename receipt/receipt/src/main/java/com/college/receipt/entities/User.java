@@ -1,9 +1,7 @@
 package com.college.receipt.entities;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,10 +22,13 @@ public class User {
     @NotBlank(message = "Имя не может быть пустым")
     @Size(min = 3, max = 20)
     private String username;
+    @Getter
     @NotBlank(message = "Почта не может быть пустой")
     @Email(message = "Неккоректный адресс почты")
     private String email;
-
+    @NotBlank
+    private String password;
+    @Getter
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "users_roles",
@@ -62,14 +63,15 @@ public class User {
         return username;
     }
 
-    public String getEmail() {
-        return email;
-    }
-    public Set<Role> getRoles() {
-        return roles;
-    }
-
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    public void setPassword(String password){
+        this.password = password;
+    }
+
+    public Set<Role> getRoles(){
+        return roles;
     }
 }
