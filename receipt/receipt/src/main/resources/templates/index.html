@@ -85,6 +85,12 @@
     </style>
 </head>
 <body>
+<div th:replace="header.html"></div>
+<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+<form th:action="@{/}" method="get">
+    <input id="search" type="text" name="keyword">
+    <button type="submit">Search</button>
+</form>
 <h1>Все рецепты</h1>
 <div class="recipe-container">
     <div th:each="recipe : ${recipes}" class="recipe-card">
@@ -103,5 +109,6 @@
         </a>
     </div>
 </div>
+<a href="/create_recipe" class="redirect-button"> Создать рецепт </a>
 </body>
 </html>

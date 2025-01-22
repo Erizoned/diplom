@@ -1,172 +1,24 @@
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title th:text="#{login.title}">Login</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f7f7f7;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-
-    .login-container {
-      background: #fff;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 400px;
-      text-align: center;
-    }
-
-    h1 {
-      margin-bottom: 20px;
-      color: #333;
-    }
-
-    form {
-      display: flex;
-      flex-direction: column;
-    }
-
-    label {
-      margin-bottom: 5px;
-      font-weight: bold;
-      color: #555;
-    }
-
-    input {
-      margin-bottom: 15px;
-      padding: 10px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      outline: none;
-    }
-
-    input:focus {
-      border-color: #007BFF;
-      box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-    }
-
-    button {
-      padding: 10px;
-      font-size: 16px;
-      font-weight: bold;
-      background-color: #007BFF;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    button:hover {
-      background-color: #0056b3;
-    }
-
-    #status, #error {
-      margin-bottom: 15px;
-      padding: 10px;
-      border-radius: 5px;
-    }
-
-    #status {
-      background-color: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
-    }
-
-    #error {
-      background-color: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-    }
-
-    .language-switch {
-      margin-top: 20px;
-    }
-
-    .language-switch a {
-      text-decoration: none;
-      color: #007BFF;
-      margin: 0 10px;
-      font-weight: bold;
-      transition: color 0.3s;
-    }
-
-    .language-switch a:hover {
-      color: #0056b3;
-    }
-  </style>
-  <script type="text/javascript">
-    function validate() {
-        let noUser = /*[[#{message.username}]]*/ 'Введите имя пользователя';
-        let noPass = /*[[#{message.password}]]*/ 'Введите пароль';
-
-        if (document.f.username.value === "" && document.f.password.value === "") {
-            alert(noUser + ' и ' + noPass);
-            document.f.username.focus();
-            return false;
-        }
-        if (document.f.username.value === "") {
-            alert(noUser);
-            document.f.username.focus();
-            return false;
-        }
-        if (document.f.password.value === "") {
-            alert(noPass);
-            document.f.password.focus();
-            return false;
-        }
-    }
-  </script>
+  <title>Вход</title>
 </head>
 <body>
-<div class="login-container">
-  <h1 th:text="#{login.heading}">Login</h1>
-
-  <form name="f" method="post" action="/login" onsubmit="return validate();">
-    <div>
-      <label for="username" th:text="#{message.username}">Username</label>
-      <input type="text" id="username" name="username"/>
-    </div>
-    <div>
-      <label for="password" th:text="#{message.password}">Password</label>
-      <input type="password" id="password" name="password"/>
-    </div>
-    <div>
-      <button type="submit" th:text="#{button.submit}">Submit</button>
-    </div>
-  </form>
-
-  <!-- Уведомления об успешной регистрации -->
-  <div th:if="${param.regSucc == true}" id="status">
-    <p th:text="#{message.regSucc}">Registration successful!</p>
+<h1>Вход в аккаунт</h1>
+<form th:action="@{/user/login/done}" method="POST">
+  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+  <div>
+    <label for="username">Имя пользователя:</label>
+    <input type="text" id="username" name="username" required />
   </div>
-
-  <!-- Ошибка регистрации -->
-  <div th:if="${param.regError == true}" id="error">
-    <p th:text="#{message.regError}">Registration error!</p>
+  <div>
+    <label for="password">Пароль:</label>
+    <input type="password" id="password" name="password" required />
   </div>
-
-  <!-- Ошибка авторизации -->
-  <div th:if="${param.error != null}" id="error">
-    <p th:text="#{message.badCredentials}">Invalid username or password</p>
+  <div>
+    <button type="submit">Войти</button>
   </div>
-
-  <!-- Ссылки для переключения языков -->
-  <div class="language-switch">
-    <a href="?lang=en">English</a> |
-    <a href="?lang=ru">Russian</a>
-  </div>
-</div>
+  <p th:if="${param.error}" style="color: red;">Неверное имя пользователя или пароль</p>
+  <p th:if="${param.logout}" style="color: green;">Вы успешно вышли из системы</p>
+</form>
 </body>
 </html>

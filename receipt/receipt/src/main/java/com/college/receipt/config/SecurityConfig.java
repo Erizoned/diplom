@@ -1,20 +1,27 @@
 package com.college.receipt.config;
 
+import com.college.receipt.controllers.RecipeController;
 import com.college.receipt.service.MyUserDetailsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
+@EnableWebSecurity
 @Configuration
 public class SecurityConfig {
-
+    public static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
     @Autowired
     private MyUserDetailsService userDetailsService;
 
@@ -22,40 +29,37 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll() // Разрешить все запросы
+                        .requestMatchers("/user/login", "/user/logout", "/resources/**", "/user/registration").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN") // Доступ только для роли ADMIN
+                        .requestMatchers(HttpMethod.GET, "/user/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/user/login/done").permitAll()
+                        .requestMatchers("/anonymous*").anonymous() // Доступ только анонимным пользователям
+                        .anyRequest().authenticated() // Все остальные запросы требуют аутентификации
                 )
-                .httpBasic(httpBasic -> httpBasic.disable()) // Отключить базовую аутентификацию
-                .formLogin(form -> form.disable()) // Отключить форму входа
-                .logout(logout -> logout.disable()); // Отключить логаут
+                .formLogin(form -> form
+                        .loginPage("/user/login")
+                        .loginProcessingUrl("/user/login/done")
+                        .failureHandler((request, response, exception) -> {
+                            logger.error("Authentication failed: {}", exception.getMessage());
+                            response.sendRedirect("/user/login?error=true");
+                        })
+                        .successHandler((request, response, authentication) -> {
+                            logger.info("Authentication successful for user: {}", authentication.getName());
+                            response.sendRedirect("/");
+                        })
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/logout.html?logSucc=true")
+                        .deleteCookies("JSESSIONID")
+                        .permitAll()
+                );
         return http.build();
     }
 
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/login", "/logout", "/resources/**", "/user/registration").permitAll()
-//                        .anyRequest().permitAll() // Все остальные требуют аутентификации
-//                )
-//                .formLogin(form -> form
-//                        .loginPage("/login.html") // Страница входа
-//                        .failureUrl("/login.html?error=true") // URL для ошибки входа
-//                        .defaultSuccessUrl("/home", true) // URL после успешного входа
-//                        .permitAll()
-//                )
-//                .logout(logout -> logout
-//                        .logoutUrl("/logout")
-//                        .logoutSuccessUrl("/logout.html?logSucc=true")
-//                        .deleteCookies("JSESSIONID")
-//                        .permitAll()
-//                );
-//        return http.build();
-//    }
-
-
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Использование BCrypt для шифрования паролей
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
@@ -72,4 +76,17 @@ public class SecurityConfig {
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
+
+    // На случай  если будут проблемы с регистрацией
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        http
+//                .authorizeHttpRequests(auth -> auth
+//                        .anyRequest().permitAll() // Разрешить все запросы
+//                )
+//                .httpBasic(httpBasic -> httpBasic.disable()) // Отключить базовую аутентификацию
+//                .formLogin(form -> form.disable()) // Отключить форму входа
+//                .logout(logout -> logout.disable()); // Отключить логаут
+//        return http.build();
+//    }
 }

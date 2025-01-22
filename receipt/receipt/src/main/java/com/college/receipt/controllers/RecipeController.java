@@ -104,10 +104,10 @@ public class RecipeController {
         }
 
         logger.info("Рецепт {} успешно сохранён", recipe);
-        return "redirect:/recipe";
+        return "redirect:/recipe/" + recipe.getId();
     }
 
-    @GetMapping("/{id}/recipe")
+    @GetMapping("/recipe/{id}")
     public String viewRecipe(@PathVariable("id") Long id, Model model) {
         logger.info("Открыта страница просмотра рецепта с id={}", id);
         Recipe recipe = recipeService.findRecipeById(id)

@@ -2,7 +2,7 @@ package com.college.receipt.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-import org.hibernate.validator.internal.constraintvalidators.bv.EmailValidator;
+import com.college.receipt.validation.EmailValidator;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

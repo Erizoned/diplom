@@ -9,6 +9,7 @@ import com.college.receipt.exceptions.UserAlreadyExistException;
 import com.college.receipt.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -20,6 +21,9 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class UserService implements IUserService {
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private UserRepository userRepository;
@@ -44,7 +48,7 @@ public class UserService implements IUserService {
 
         User user = new User();
         user.setUsername(userDto.getUsername());
-        user.setPassword(userDto.getPassword());
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         user.setEmail(userDto.getEmail());
         user.setRoles(getRolesFromNames(Arrays.asList("ROLE_USER")));
 

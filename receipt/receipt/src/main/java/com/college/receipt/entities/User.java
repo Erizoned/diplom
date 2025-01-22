@@ -17,7 +17,6 @@ import java.util.Set;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    // не стал добавлять NOTNULL, так как айди сам генерируется
     private Long id;
     @NotBlank(message = "Имя не может быть пустым")
     @Size(min = 3, max = 20)

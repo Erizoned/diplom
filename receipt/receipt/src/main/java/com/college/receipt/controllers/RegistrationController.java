@@ -27,7 +27,6 @@ public class RegistrationController {
         return "registration";
     }
 
-    // Обработка POST-запроса на регистрацию
     @PostMapping("/user/registration")
     public ModelAndView registerUserAccount(
             @ModelAttribute("user") @Valid UserDto userDto,
