@@ -170,13 +170,14 @@
                  src="/static/images/default-recipe.png"
                  alt="Нет фото" />
             <div class="recipe-details">
-                <div class="recipe-title" th:text="${recipe.theme}">Название рецепта</div>
+                <div class="recipe-title" th:text="${recipe.name}">Название рецепта</div>
                 <div class="recipe-description" th:text="${recipe.description}">Описание рецепта</div>
                 <div class="recipe-time" th:text="'Время приготовления: ' + ${recipe.timeToCook} + ' минут'">Время приготовления</div>
             </div>
         </a>
     </div>
 </div>
+<p th:if="@{errorMessage}" th:text="${errorMessage}" style="color: red;"></p>
 <a href="/create_recipe" class="redirect-button"> Создать рецепт </a>
 </body>
 <script>

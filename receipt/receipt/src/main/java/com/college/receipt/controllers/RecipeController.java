@@ -2,6 +2,7 @@ package com.college.receipt.controllers;
 
 import com.college.receipt.entities.Recipe;
 import com.college.receipt.entities.UploadedFile;
+import com.college.receipt.exceptions.recipesNotFoundException;
 import com.college.receipt.repositories.UploadedFileRepository;
 import com.college.receipt.service.Recipe.RecipeRepository;
 import com.college.receipt.service.UploadedFileService;
@@ -58,20 +59,28 @@ public class RecipeController {
                     typeOfFood
             );
             model.addAttribute("recipes", filteredRecipes);
-            logger.info("Применяем фильтры: countPortion={}, kkal={}, timeToCook={}, nationalKitchen={}, restrictions={}, theme={}, typeOfCook={}, typeOfFood={}",
-                    countPortion, kkal, timeToCook, nationalKitchen, restrictions, theme, typeOfCook, typeOfFood);
-
-        }
-        if(keyword != null){
-            model.addAttribute("recipes", recipeRepository.findByKeyword(keyword));
+            if (keyword != null){
+                model.addAttribute("recipes", recipeRepository.findByKeyword(keyword));
+                logger.info("поисковое слово:{}",keyword);
+            }
+            logger.info("Применяем фильтры: countPortion={}, kkal={}, timeToCook={}, nationalKitchen={}, restrictions={}, theme={}, typeOfCook={}, typeOfFood={}", countPortion, kkal, timeToCook, nationalKitchen, restrictions, theme, typeOfCook, typeOfFood);
+            List<Recipe> recipes = recipeRepository.findByFilter( countPortion, kkal, timeToCook, nationalKitchen, restrictions, theme, typeOfCook, typeOfFood);
+            logger.info("Найдено отфильтрованных рецептов: {}", recipes.size());
+            if (recipes.size() == 0) {
+                model.addAttribute("errorMessage", "Ошибка. Рецепты не были найдены");
+                model.addAttribute("recipes", List.of());
+                logger.warn("Ошибка, рецепты не найдены");
+                return "index";
+            }
+            else{
+                logger.info("Найдено рецептов: {}", recipes.size());
+                recipes.forEach(recipe -> logger.info("Рецепт: id={}, name={}", recipe.getId(), recipe.getName()));
+            }
         }
         else{
-            model.addAttribute("recipes", recipeRepository.findAll());
+            List<Recipe> recipes = recipeRepository.findAll();
+            model.addAttribute("recipes", recipes);
         }
-        List<Recipe> recipes = recipeRepository.findAll();
-        logger.info("Найдено рецептов: {}", recipes.size());
-
-        recipes.forEach(recipe -> logger.info("Рецепт: id={}, name={}", recipe.getId(), recipe.getName()));
         return "index";
     }
 
