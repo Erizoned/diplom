@@ -1,8 +1,7 @@
-package com.college.receipt.service;
+package com.college.receipt.service.User;
 
 import com.college.receipt.entities.Role;
 import com.college.receipt.repositories.RoleRepository;
-import com.college.receipt.service.IUserService;
 import com.college.receipt.entities.User;
 import com.college.receipt.entities.UserDto;
 import com.college.receipt.exceptions.UserAlreadyExistException;

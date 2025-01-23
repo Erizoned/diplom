@@ -3,7 +3,7 @@ package com.college.receipt.controllers;
 import com.college.receipt.entities.Recipe;
 import com.college.receipt.entities.UploadedFile;
 import com.college.receipt.repositories.UploadedFileRepository;
-import com.college.receipt.service.RecipeService;
+import com.college.receipt.service.Recipe.RecipeRepository;
 import com.college.receipt.service.UploadedFileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,24 +21,57 @@ import java.util.List;
 @RequestMapping("/")
 @Controller
 public class RecipeController {
-    private final RecipeService recipeService;
+    private final RecipeRepository recipeRepository;
     private final UploadedFileService uploadedFileService;
     private final UploadedFileRepository uploadedFileRepository;
     public static final Logger logger = LoggerFactory.getLogger(RecipeController.class);
 
-    public RecipeController(RecipeService recipeService, UploadedFileService uploadedFileService, UploadedFileRepository uploadedFileRepository) {
-        this.recipeService = recipeService;
+    public RecipeController(RecipeRepository recipeRepository, UploadedFileService uploadedFileService, UploadedFileRepository uploadedFileRepository) {
+        this.recipeRepository = recipeRepository;
         this.uploadedFileService = uploadedFileService;
         this.uploadedFileRepository = uploadedFileRepository;
     }
 
     @GetMapping("/")
-    public String home(Model model) {
+    public String home(Model model, String keyword,
+                       @RequestParam(value = "countPortion", required = false) Integer countPortion,
+                       @RequestParam(value = "kkal", required = false) Integer kkal,
+                       @RequestParam(value = "timeToCook", required = false) Integer timeToCook,
+                       @RequestParam(value = "nationalKitchen", required = false) String nationalKitchen,
+                       @RequestParam(value = "restrictions", required = false) String restrictions,
+                       @RequestParam(value = "theme", required = false) String theme,
+                       @RequestParam(value = "typeOfCook", required = false) String typeOfCook,
+                       @RequestParam(value = "typeOfFood", required = false) String typeOfFood) {
         logger.info("Открыта главная страница со списком рецептов");
-        List<Recipe> recipes = recipeService.findAllRecipes();
+        if (keyword != null || countPortion != null || kkal != null || timeToCook != null ||
+                nationalKitchen != null || restrictions != null || theme != null ||
+                typeOfCook != null || typeOfFood != null) {
+            logger.info("Фильтрация");
+            List<Recipe> filteredRecipes = recipeRepository.findByFilter(
+                    countPortion,
+                    kkal,
+                    timeToCook,
+                    nationalKitchen,
+                    restrictions,
+                    theme,
+                    typeOfCook,
+                    typeOfFood
+            );
+            model.addAttribute("recipes", filteredRecipes);
+            logger.info("Применяем фильтры: countPortion={}, kkal={}, timeToCook={}, nationalKitchen={}, restrictions={}, theme={}, typeOfCook={}, typeOfFood={}",
+                    countPortion, kkal, timeToCook, nationalKitchen, restrictions, theme, typeOfCook, typeOfFood);
+
+        }
+        if(keyword != null){
+            model.addAttribute("recipes", recipeRepository.findByKeyword(keyword));
+        }
+        else{
+            model.addAttribute("recipes", recipeRepository.findAll());
+        }
+        List<Recipe> recipes = recipeRepository.findAll();
         logger.info("Найдено рецептов: {}", recipes.size());
+
         recipes.forEach(recipe -> logger.info("Рецепт: id={}, name={}", recipe.getId(), recipe.getName()));
-        model.addAttribute("recipes", recipes);
         return "index";
     }
 
@@ -67,7 +100,7 @@ public class RecipeController {
 
         try {
             logger.info("Сохраняем рецепт: {}", recipe);
-            Recipe savedRecipe = recipeService.createRecipe(recipe);
+            Recipe savedRecipe = recipeRepository.save(recipe);
             logger.info("Рецепт успешно сохранён: {}", savedRecipe);
 
             if (!photoFood.isEmpty()) {
@@ -110,7 +143,7 @@ public class RecipeController {
     @GetMapping("/recipe/{id}")
     public String viewRecipe(@PathVariable("id") Long id, Model model) {
         logger.info("Открыта страница просмотра рецепта с id={}", id);
-        Recipe recipe = recipeService.findRecipeById(id)
+        Recipe recipe = recipeRepository.findRecipeById(id)
                 .orElseThrow(() -> {
                     logger.error("Рецепт с id={} не найден", id);
                     return new RuntimeException("Recipe not found");

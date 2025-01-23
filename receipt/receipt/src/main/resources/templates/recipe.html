@@ -82,7 +82,8 @@
 </head>
 <body>
 <div class="container">
-  <h1 th:text="${recipe.theme}">Тема блюда</h1>
+  <h1 th:text="${recipe.name}">Название</h1>
+
 
   <h2>Фото блюда:</h2>
   <div class="photos">
@@ -105,6 +106,7 @@
   </div>
 
   <div class="details">
+    <p><strong>Тема блюда </strong> <span th:text="${recipe.theme}"</span></p>
     <p><strong>Тип блюда:</strong> <span th:text="${recipe.typeOfFood}">Тип блюда</span></p>
     <p><strong>Национальная кухня:</strong> <span th:text="${recipe.nationalKitchen}">Национальная кухня</span></p>
     <p><strong>Тип приготовления:</strong> <span th:text="${recipe.typeOfCook}">Тип приготовления</span></p>

@@ -1,4 +1,4 @@
-package com.college.receipt.service;
+package com.college.receipt.service.Role;
 
 import com.college.receipt.entities.Role;
 import lombok.RequiredArgsConstructor;

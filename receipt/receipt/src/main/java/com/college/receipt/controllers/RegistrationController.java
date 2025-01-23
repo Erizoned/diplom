@@ -3,7 +3,7 @@ package com.college.receipt.controllers;
 import com.college.receipt.entities.User;
 import com.college.receipt.entities.UserDto;
 import com.college.receipt.exceptions.UserAlreadyExistException;
-import com.college.receipt.service.IUserService;
+import com.college.receipt.service.User.IUserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -91,10 +91,78 @@
     <input id="search" type="text" name="keyword">
     <button type="submit">Search</button>
 </form>
+<button onclick="toggleDiv()">Фильтр</button>
+<div id="filterDiv" style="display: none;">
+    <form th:action="@{/}" method="get">
+    <div>
+        <label for="theme">Тема блюда:</label>
+        <select id="theme" name="theme">
+            <option value="" selected>Все</option>
+            <option value="breakfast">Завтрак</option>
+            <option value="lunch">Обед</option>
+            <option value="dinner">Ужин</option>
+            <option value="snack">Перекус</option>
+            <option value="holiday">Праздничное блюдо</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="typeOfFood">Тип блюда:</label>
+        <select id="typeOfFood" name="typeOfFood">
+            <option value="" selected>Все</option>
+            <option value="soup">Суп</option>
+            <option value="meat">Мясо</option>
+            <option value="salad">Салат</option>
+            <option value="dessert">Десерт</option>
+            <option value="sideDish">Гарнир</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="typeOfCook">Тип приготовления:</label>
+        <select id="typeOfCook" name="typeOfCook">
+            <option value="" selected>Все</option>
+            <option value="pan">Сковорода</option>
+            <option value="pot">Кастрюля</option>
+            <option value="oven">Духовка</option>
+            <option value="grill">Гриль</option>
+            <option value="steamer">Пароварка</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="restrictions">Ограничения:</label>
+        <select id="restrictions" name="restrictions">
+            <option value="" selected>Все</option>
+            <option value="no_sugar">Без сахара</option>
+            <option value="no_gluten">Без глютена</option>
+            <option value="no_dairy">Без молочных продуктов</option>
+            <option value="vegan">Веган</option>
+            <option value="nut_allergy">Без орехов</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="countPortion">Количество порций:</label>
+        <input type="number" id="countPortion" name="countPortion">
+    </div>
+
+    <div>
+        <label for="kkal">Калорийность (ккал):</label>
+        <input type="number" id="kkal" name="kkal">
+    </div>
+
+    <div>
+        <label for="timeToCook">Время приготовления (мин):</label>
+        <input type="number" id="timeToCook" name="timeToCook">
+    </div>
+        <button type="submit">Отфильтровать</button>
+    </form>
+</div>
 <h1>Все рецепты</h1>
 <div class="recipe-container">
     <div th:each="recipe : ${recipes}" class="recipe-card">
-        <a th:href="@{${recipe.id} + '/recipe'}">
+        <a th:href="@{'/recipe/'} + ${recipe.id}">
             <img th:if="${recipe.photos != null and recipe.photos.size() > 0}"
                  th:src="@{'/files/file_system/' + ${recipe.photos[0].name}}"
                  alt="Фото блюда" />
@@ -111,4 +179,16 @@
 </div>
 <a href="/create_recipe" class="redirect-button"> Создать рецепт </a>
 </body>
+<script>
+    function toggleDiv() {
+        const filterDiv = document.getElementById("filterDiv");
+
+        if (filterDiv.style.display === "none") {
+            filterDiv.style.display = "block";
+        } else {
+            filterDiv.style.display = "none";
+        }
+    }
+
+</script>
 </html>

@@ -1,4 +1,4 @@
-package com.college.receipt.service;
+package com.college.receipt.service.User;
 
 import com.college.receipt.entities.UserDto;
 import com.college.receipt.exceptions.UserAlreadyExistException;
