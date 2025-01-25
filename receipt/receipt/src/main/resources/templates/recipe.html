@@ -9,74 +9,107 @@
         font-family: 'Arial', sans-serif;
         margin: 0;
         padding: 0;
-        background-color: #f9f9f9;
+        background-color: #f5f5f5;
+        color: #333;
     }
 
     .container {
-        max-width: 800px;
-        margin: 50px auto;
+        max-width: 900px;
+        margin: 40px auto;
         padding: 20px;
-        background: #fff;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
+        background: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1, h2, h3 {
+        color: #2c3e50;
+        margin-bottom: 20px;
     }
 
     h1 {
         text-align: center;
-        color: #333;
-        margin-bottom: 20px;
+        font-size: 2.5rem;
     }
 
     h2 {
-        color: #555;
-        border-bottom: 2px solid #eaeaea;
-        padding-bottom: 5px;
-        margin-bottom: 15px;
+        font-size: 1.8rem;
+        border-bottom: 2px solid #e1e1e1;
+        padding-bottom: 10px;
+    }
+
+    h3 {
+        font-size: 1.5rem;
+        margin-top: 15px;
     }
 
     p {
+        font-size: 1rem;
+        line-height: 1.6;
         margin: 10px 0;
-        color: #666;
     }
 
-    .photos {
+    .photos, .steps {
         display: flex;
         flex-wrap: wrap;
-        gap: 10px;
+        gap: 15px;
         justify-content: center;
+        margin-bottom: 20px;
     }
 
-    .photos img {
-        max-width: 150px;
-        height: auto;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    .photos img, .steps img {
+        max-width: 200px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .photos img:hover, .steps img:hover {
+        transform: scale(1.1);
+    }
+
+    .steps > div {
+        background: #f9f9f9;
+        border: 1px solid #e1e1e1;
+        border-radius: 10px;
+        padding: 15px;
+        width: 100%;
+        max-width: 400px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     }
 
     .details {
-        margin: 20px 0;
-        padding: 10px;
-        background: #f3f3f3;
-        border-radius: 8px;
+        margin-top: 30px;
+        padding: 20px;
+        background: #f7f7f7;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .details p {
+        margin: 10px 0;
     }
 
     .details strong {
-        color: #444;
+        color: #555;
     }
 
     .back-link {
-        display: inline-block;
-        margin-top: 20px;
+        display: block;
+        text-align: center;
+        margin-top: 30px;
         padding: 10px 20px;
+        background-color: #3498db;
         color: #fff;
-        background: #007BFF;
         text-decoration: none;
         border-radius: 5px;
-        text-align: center;
+        font-size: 1.2rem;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
     }
 
     .back-link:hover {
-        background: #0056b3;
+        background-color: #2980b9;
     }
   </style>
 </head>
@@ -84,29 +117,35 @@
 <div class="container">
   <h1 th:text="${recipe.name}">Название</h1>
 
-
+  <!-- Фото блюда -->
   <h2>Фото блюда:</h2>
   <div class="photos">
-    <div th:if="${photoFoods != null and photoFoods.size() > 0}">
-      <img th:each="photo : ${photoFoods}" th:src="@{'/files/file_system/' + ${photo.name}}" alt="Фото блюда" />
+    <div th:if="${photoFood != null and photoFood.size() > 0}">
+      <img th:each="photo : ${photoFood}" th:src="@{'/files/file_system/' + ${photo.name}}" alt="Фото блюда" />
     </div>
-    <div th:if="${photoFoods == null or photoFoods.size() == 0}">
+    <div th:if="${photoFood == null or photoFood.size() == 0}">
       <p>Фото блюда отсутствует.</p>
     </div>
   </div>
 
-  <h2>Фото шагов приготовления:</h2>
-  <div class="photos">
-    <div th:if="${stepPhotos != null and stepPhotos.size() > 0}">
-      <img th:each="step : ${stepPhotos}" th:src="@{'/files/file_system/' + ${step.name}}" alt="Фото шага приготовления">
+  <!-- Шаги приготовления -->
+  <h2>Шаги приготовления:</h2>
+  <div class="steps">
+    <div th:if="${steps != null and steps.size() > 0}">
+      <div th:each="step : ${steps}">
+        <h3 th:text="'Шаг ' + ${step.stepNumber}">Шаг</h3>
+        <p th:text="${step.description}">Описание шага</p>
+        <img th:if="${step.photo != null}" th:src="@{'/files/file_system/' + ${step.photo.name}}" alt="Фото шага приготовления" />
+      </div>
     </div>
-    <div th:if="${stepPhotos == null or stepPhotos.size() == 0}">
-      <p>Фото шагов приготовления отсутствуют.</p>
+    <div th:if="${steps == null or steps.size() == 0}">
+      <p>Шаги приготовления отсутствуют.</p>
     </div>
   </div>
 
+  <!-- Дополнительная информация о рецепте -->
   <div class="details">
-    <p><strong>Тема блюда </strong> <span th:text="${recipe.theme}"</span></p>
+    <p><strong>Тема блюда:</strong> <span th:text="${recipe.theme}">Тема блюда</span></p>
     <p><strong>Тип блюда:</strong> <span th:text="${recipe.typeOfFood}">Тип блюда</span></p>
     <p><strong>Национальная кухня:</strong> <span th:text="${recipe.nationalKitchen}">Национальная кухня</span></p>
     <p><strong>Тип приготовления:</strong> <span th:text="${recipe.typeOfCook}">Тип приготовления</span></p>

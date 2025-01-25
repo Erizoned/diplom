@@ -75,10 +75,40 @@
         <input type="file" id="photoFood" name="photoFood" accept="image/*" required>
     </div>
 
-    <div>
-        <label for="stepPhoto">Фото шагов приготовления:</label>
-        <input type="file" id="stepPhoto" name="stepPhoto" accept="image/*">
+
+    <div id="stepsContainer">
+        <div class="step">
+            <label for="stepDescription1">Описание шага 1:</label>
+            <textarea id="stepDescription1" name="stepDescriptions" required></textarea>
+
+            <label for="stepPhoto1">Фото шага 1:</label>
+            <input type="file" id="stepPhoto1" name="stepPhotos" accept="image/*" required>
+        </div>
     </div>
 
+    <button type="button" onclick="addStep()">Добавить шаг</button>
     <button type="submit">Создать рецепт</button>
 </form>
+
+<script>
+    let stepCounter = 1;
+
+    function addStep() {
+        stepCounter++;
+
+        const stepsContainer = document.getElementById("stepsContainer");
+
+        const stepDiv = document.createElement("div");
+        stepDiv.classList.add("step");
+
+        stepDiv.innerHTML = `
+            <label for="stepDescription${stepCounter}">Описание шага ${stepCounter}:</label>
+            <textarea id="stepDescription${stepCounter}" name="stepDescriptions" required></textarea>
+
+            <label for="stepPhoto${stepCounter}">Фото шага ${stepCounter}:</label>
+            <input type="file" id="stepPhoto${stepCounter}" name="stepPhotos" accept="image/*" required>
+        `;
+
+        stepsContainer.appendChild(stepDiv);
+    }
+</script>

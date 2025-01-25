@@ -26,13 +26,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/create_recipe") // Отключение CSRF для конкретного эндпоинта
+                )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/user/login", "/user/logout", "/resources/**", "/user/registration").permitAll()
+                        .requestMatchers("/user/login", "/user/logout", "/resources/**", "/user/registration", "/create_recipe").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN") // Доступ только для роли ADMIN
-                        .requestMatchers(HttpMethod.GET, "/user/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/user/login/done").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/user/login","create_recipe").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/user/login/done","/create_recipe").permitAll()
                         .requestMatchers("/anonymous*").anonymous() // Доступ только анонимным пользователям
-                        .anyRequest().authenticated() // Все остальные запросы требуют аутентификации
+                        .anyRequest().permitAll()
                 )
                 .formLogin(form -> form
                         .loginPage("/user/login")

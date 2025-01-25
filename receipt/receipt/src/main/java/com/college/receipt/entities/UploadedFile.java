@@ -1,9 +1,6 @@
 package com.college.receipt.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import jakarta.persistence.*;
 
@@ -13,6 +10,8 @@ import jakarta.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "uploaded_files")
+@Getter
+@Setter
 public class UploadedFile {
 
     @Id
@@ -27,7 +26,6 @@ public class UploadedFile {
 
     public boolean isPhotoFood;
 
-//    private int stepNumber;
 
     @ManyToOne
     @JoinColumn(name = "recipe_id")
