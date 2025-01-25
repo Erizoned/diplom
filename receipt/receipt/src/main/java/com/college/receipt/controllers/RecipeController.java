@@ -5,6 +5,7 @@ import com.college.receipt.entities.UploadedFile;
 import com.college.receipt.exceptions.recipesNotFoundException;
 import com.college.receipt.repositories.UploadedFileRepository;
 import com.college.receipt.service.Recipe.RecipeRepository;
+import com.college.receipt.service.Recipe.RecipeServiceImpl;
 import com.college.receipt.service.UploadedFileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,11 +27,13 @@ public class RecipeController {
     private final UploadedFileService uploadedFileService;
     private final UploadedFileRepository uploadedFileRepository;
     public static final Logger logger = LoggerFactory.getLogger(RecipeController.class);
+    private final RecipeServiceImpl recipeService;
 
-    public RecipeController(RecipeRepository recipeRepository, UploadedFileService uploadedFileService, UploadedFileRepository uploadedFileRepository) {
+    public RecipeController(RecipeRepository recipeRepository, UploadedFileService uploadedFileService, UploadedFileRepository uploadedFileRepository, RecipeServiceImpl recipeService) {
         this.recipeRepository = recipeRepository;
         this.uploadedFileService = uploadedFileService;
         this.uploadedFileRepository = uploadedFileRepository;
+        this.recipeService = recipeService;
     }
 
     @GetMapping("/")
@@ -96,49 +99,27 @@ public class RecipeController {
             @Valid @ModelAttribute Recipe recipe,
             BindingResult result,
             @RequestParam("photoFood") MultipartFile photoFood,
-            @RequestParam("stepPhoto") MultipartFile stepPhoto,
+            @RequestParam(value = "stepPhotos", required = false) List<MultipartFile> stepPhotos,
             Model model
     ) {
-        logger.info("Метод createRecipe вызван с recipe={}, photoFood={}, stepPhoto={}", recipe, photoFood.getOriginalFilename(), stepPhoto.getOriginalFilename());
-
+        logger.info("Получено photoFood: {}", photoFood.getOriginalFilename());
+        logger.info("Получено stepPhotos: {}", stepPhotos != null ? stepPhotos.size() : "null");
+        if (stepPhotos != null) {
+            for (MultipartFile stepPhoto : stepPhotos) {
+                logger.info("Файл: {}", stepPhoto.getOriginalFilename());
+            }
+        }
         if (result.hasErrors()) {
-            logger.warn("Ошибка валидации: {}", result.getAllErrors());
+            logger.error("Ошибка валидации: {}", result.getAllErrors());
             model.addAttribute("errorMessage", "Пожалуйста, заполните все обязательные поля.");
             return "create_recipe";
         }
 
         try {
             logger.info("Сохраняем рецепт: {}", recipe);
-            Recipe savedRecipe = recipeRepository.save(recipe);
+            Recipe savedRecipe = recipeService.createRecipe(recipe, photoFood, stepPhotos);
             logger.info("Рецепт успешно сохранён: {}", savedRecipe);
 
-            if (!photoFood.isEmpty()) {
-                logger.info("Обработка фото блюда: {}");
-                UploadedFile photoFoodFile = new UploadedFile();
-                photoFoodFile.setName(photoFood.getOriginalFilename());
-                photoFoodFile.setType(photoFood.getContentType());
-                photoFoodFile.setFilePath("C:/Users/Anton/Documents/photos/" + photoFood.getOriginalFilename());
-                photoFoodFile.setRecipe(savedRecipe);
-                photoFoodFile.setPhotoFood(true);
-
-                photoFood.transferTo(new File(photoFoodFile.getFilePath()));
-                uploadedFileService.save(photoFoodFile);
-                logger.info("Фото блюда {} успешно сохранено", photoFood.getOriginalFilename());
-            }
-
-            if (!stepPhoto.isEmpty()) {
-                logger.info("Обработка фото шага приготовления: {}");
-                UploadedFile stepPhotoFile = new UploadedFile();
-                stepPhotoFile.setName(stepPhoto.getOriginalFilename());
-                stepPhotoFile.setType(stepPhoto.getContentType());
-                stepPhotoFile.setFilePath("C:/Users/Anton/Documents/photos/" + stepPhoto.getOriginalFilename());
-                stepPhotoFile.setRecipe(savedRecipe);
-                stepPhotoFile.setPhotoFood(false);
-
-                stepPhoto.transferTo(new File(stepPhotoFile.getFilePath()));
-                uploadedFileService.save(stepPhotoFile);
-                logger.info("Фото шага приготовления {} успешно сохранено", stepPhoto.getOriginalFilename());
-            }
         } catch (IOException e) {
             logger.error("Ошибка при загрузке файлов: {}", e.getMessage(), e);
             model.addAttribute("errorMessage", "Ошибка при загрузке изображений: " + e.getMessage());
