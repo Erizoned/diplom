@@ -106,7 +106,7 @@ public class RecipeController {
             @RequestParam("stepPhotos") MultipartFile[] stepPhotos,
             @RequestParam("stepDescriptions") String[] stepDescriptions,
             Model model
-    ) {
+    ){
         logger.info("Получено фото блюда: {}", photoFood.getOriginalFilename());
 
         if (result.hasErrors()) {
@@ -114,75 +114,18 @@ public class RecipeController {
             model.addAttribute("errorMessage", "Пожалуйста, заполните все обязательные поля.");
             return "create_recipe";
         }
-
         try {
-            // Сохранение рецепта
-            Recipe savedRecipe = recipeRepository.save(recipe);
-
-            // Сохранение фото блюда
-            savePhoto(photoFood, savedRecipe, true);
-
-            // Сохранение шагов
-            for (int i = 0; i < stepPhotos.length; i++) {
-                saveStep(i + 1, stepDescriptions[i], stepPhotos[i], savedRecipe);
-            }
-
+            Recipe savedRecipe = recipeService.createRecipe(recipe, photoFood, stepPhotos, stepDescriptions);
             logger.info("Рецепт успешно сохранён: {}", savedRecipe);
-
-        } catch (IOException e) {
-            logger.error("Ошибка при загрузке файлов: {}", e.getMessage(), e);
-            model.addAttribute("errorMessage", "Ошибка при загрузке изображений: " + e.getMessage());
+        }
+        catch (IOException e){
+            logger.error("Ошибка при сохранении рецепта: {}", e.getMessage());
+            model.addAttribute("errorMessage", "Ошибка при сохранении рецепта: " + e.getMessage());
             return "create_recipe";
         }
-
         return "redirect:/recipe/" + recipe.getId();
     }
-
-    private void savePhoto(MultipartFile file, Recipe recipe, boolean isPhotoFood) throws IOException {
-        String filePath = "C:/Users/Anton/Documents/photos/" + file.getOriginalFilename();
-        file.transferTo(new File(filePath));
-
-        UploadedFile uploadedFile = UploadedFile.builder()
-                .name(file.getOriginalFilename())
-                .type(file.getContentType())
-                .filePath(filePath)
-                .recipe(recipe)
-                .isPhotoFood(true)
-                .build();
-
-        uploadedFileService.save(uploadedFile);
-    }
-
-    private void saveStep(int stepNumber, String stepDescription, MultipartFile stepPhoto, Recipe recipe) throws IOException {
-        if (!stepPhoto.isEmpty()) {
-            // Сохранение фото шага
-            UploadedFile stepPhotoFile = new UploadedFile();
-            stepPhotoFile.setName(stepPhoto.getOriginalFilename());
-            stepPhotoFile.setType(stepPhoto.getContentType());
-            stepPhotoFile.setFilePath("C:/Users/Anton/Documents/photos/" + stepPhoto.getOriginalFilename());
-            stepPhotoFile.setRecipe(recipe);
-            stepPhotoFile.setPhotoFood(false); // Это фото шага, не блюда
-            stepPhoto.transferTo(new File(stepPhotoFile.getFilePath()));
-            uploadedFileService.save(stepPhotoFile);
-
-            logger.info("Фото шага {} успешно сохранено: {}", stepNumber, stepPhoto.getOriginalFilename());
-
-            // Сохранение шага с описанием
-            Steps step = new Steps();
-            step.setStepNumber(stepNumber);
-            step.setDescription(stepDescription);
-            step.setPhoto(stepPhotoFile); // Привязываем фото к шагу
-            step.setRecipe(recipe); // Привязываем шаг к рецепту
-            stepRepository.save(step);
-
-            logger.info("Шаг {} успешно сохранён: {}", stepNumber, stepDescription);
-        } else {
-            logger.warn("Фото для шага {} не передано.", stepNumber);
-        }
-    }
-
-
-
+    
     @GetMapping("/recipe/{id}")
     public String viewRecipe(@PathVariable("id") Long id, Model model) {
         logger.info("Открыта страница просмотра рецепта с id={}", id);

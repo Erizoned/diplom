@@ -1,7 +1,9 @@
 package com.college.receipt.service.Recipe;
 
 import com.college.receipt.entities.Recipe;
+import com.college.receipt.entities.Steps;
 import com.college.receipt.entities.UploadedFile;
+import com.college.receipt.repositories.StepRepository;
 import com.college.receipt.service.UploadedFileService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,41 +27,57 @@ public class RecipeServiceImpl {
 
     private final RecipeRepository recipeRepository;
     private final UploadedFileService uploadedFileService;
+    private final StepRepository stepRepository;
 
-    public Recipe createRecipe(Recipe recipe, MultipartFile photoFood, MultipartFile stepPhoto) throws IOException {
+    public Recipe createRecipe(Recipe recipe, MultipartFile photoFood, MultipartFile[] stepPhotos, String[] stepDescriptions) throws IOException {
         Recipe savedRecipe = recipeRepository.save(recipe);
+        logger.info("Началась обработка рецепта:{}", recipe.getName());
         if (!photoFood.isEmpty()) {
-            UploadedFile photoFoodFile = new UploadedFile();
-            logger.info("Обработка фото блюда: {}");
-            photoFoodFile.setName(photoFood.getOriginalFilename());
-            photoFoodFile.setType(photoFood.getContentType());
-            photoFoodFile.setFilePath("C:/Users/Anton/Documents/photos/" + photoFood.getOriginalFilename());
-            photoFoodFile.setRecipe(savedRecipe);
-            photoFoodFile.setPhotoFood(true);
+            String filePath = "C:/Users/Anton/Documents/photos/" + photoFood.getOriginalFilename();
+            photoFood.transferTo(new File(filePath));
 
-            photoFood.transferTo(new File(photoFoodFile.getFilePath()));
-            uploadedFileService.save(photoFoodFile);
+            UploadedFile uploadedFile = UploadedFile.builder()
+                    .name(photoFood.getOriginalFilename())
+                    .type(photoFood.getContentType())
+                    .filePath(filePath)
+                    .recipe(recipe)
+                    .isPhotoFood(true)
+                    .build();
+
+            uploadedFileService.save(uploadedFile);
             logger.info("Фото блюда {} успешно сохранено", photoFood.getOriginalFilename());
         }
         logger.info("Получено photoFood: {}", photoFood != null ? photoFood.getOriginalFilename() : "null");
-        if (!stepPhoto.isEmpty()) {
-            logger.info("Обработка фото шага приготовления: {}");
-            UploadedFile stepPhotoFile = new UploadedFile();
-            stepPhotoFile.setName(stepPhoto.getOriginalFilename());
-            stepPhotoFile.setType(stepPhoto.getContentType());
-            stepPhotoFile.setFilePath("C:/Users/Anton/Documents/photos/" + stepPhoto.getOriginalFilename());
-            stepPhotoFile.setRecipe(savedRecipe);
-            stepPhotoFile.setPhotoFood(false);
+        for (int i = 0; i < stepPhotos.length; i++) {
+            MultipartFile stepPhoto = stepPhotos[i];
+            String stepDescription = stepDescriptions[i];
+            Integer stepNumber = i + 1;
 
-            stepPhoto.transferTo(new File(stepPhotoFile.getFilePath()));
-            uploadedFileService.save(stepPhotoFile);
-            logger.info("Фото шага приготовления {} успешно сохранено", stepPhoto.getOriginalFilename());
-        }
-        else {
-            logger.warn("Шаги приготовления не переданы.");
-            return savedRecipe;
-        }
+            if (!stepPhoto.isEmpty()) {
+                UploadedFile stepPhotoFile = new UploadedFile();
+                stepPhotoFile.setName(stepPhoto.getOriginalFilename());
+                stepPhotoFile.setType(stepPhoto.getContentType());
+                stepPhotoFile.setFilePath("C:/Users/Anton/Documents/photos/" + stepPhoto.getOriginalFilename());
+                stepPhotoFile.setRecipe(recipe);
+                stepPhotoFile.setPhotoFood(false);
+                stepPhoto.transferTo(new File(stepPhotoFile.getFilePath()));
+                uploadedFileService.save(stepPhotoFile);
 
+                logger.info("Фото шага {} успешно сохранено: {}", stepNumber, stepPhoto.getOriginalFilename());
+
+                Steps step = new Steps();
+                step.setStepNumber(stepNumber);
+                step.setDescription(stepDescription);
+                step.setPhoto(stepPhotoFile);
+                step.setRecipe(recipe);
+                stepRepository.save(step);
+
+                logger.info("Шаг {} успешно сохранён: {}", stepNumber, stepDescription);
+            } else {
+                logger.warn("Фото для шага {} не передано.", stepNumber);
+            }
+        }
+        logger.info("Рецепт {} успешно сохранён!", recipe.getName());
         return savedRecipe;
     }
 

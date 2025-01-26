@@ -88,6 +88,7 @@
 
     <button type="button" onclick="addStep()">Добавить шаг</button>
     <button type="submit">Создать рецепт</button>
+    <p th:if="@{errorMessage}" th:text="${errorMessage}" style="color: red;"></p>
 </form>
 
 <script>
