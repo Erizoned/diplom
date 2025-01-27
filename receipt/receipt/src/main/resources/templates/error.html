@@ -1,12 +1,89 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>Error</title>
+    <title>Error</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <style>
+        :root {
+            --olive-green: #667302;
+            --orange: #F25C05;
+            --beige: #F2D0C9;
+            --brown: #8C3503;
+            --black: #0D0D0D;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--beige);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .error-container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        h1 {
+            color: var(--brown);
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: var(--black);
+            font-size: 1.1em;
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+
+        .home-button {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 24px;
+            background-color: var(--orange);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        .home-button:hover {
+            background-color: var(--brown);
+            transform: translateY(-2px);
+        }
+    </style>
 </head>
 <body>
-<h1>Произошла ошибка</h1>
-<p th:text="${message}">Описание ошибки</p>
-<p th:text="${statusCode}">Внутренняя ошибка сервера</p>
-<a th:href="@{/}" style="text-decoration: none; color: blue;">Вернуться на главную</a>
+    <div class="error-container">
+        <h1>Произошла ошибка</h1>
+        <p th:text="${message}">Описание ошибки</p>
+        <p th:text="${statusCode}">Внутренняя ошибка сервера</p>
+        <a href="/" class="home-button">Вернуться на главную</a>
+    </div>
+
+    <script>
+        window.addEventListener('load', () => {
+            gsap.to(".error-container", {
+                duration: 1,
+                opacity: 1,
+                y: 0,
+                ease: "power3.out"
+            });
+        });
+    </script>
 </body>
 </html>

@@ -2,40 +2,75 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Header</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <style>
+        :root {
+            --olive-green: #667302;
+            --orange: #F25C05;
+            --beige: #F2D0C9;
+            --brown: #8C3503;
+            --black: #0D0D0D;
+        }
+
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: #f8f9fa;
-            padding: 10px 20px;
-            border-bottom: 1px solid #eaeaea;
+            background-color: var(--brown);
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            opacity: 0;
         }
+
         .header-title {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
+            color: var(--beige);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
+
         .logout-button {
-            background-color: #dc3545;
+            background-color: var(--orange);
             color: white;
             border: none;
-            padding: 10px 15px;
+            padding: 12px 24px;
             cursor: pointer;
-            border-radius: 4px;
+            border-radius: 6px;
             text-decoration: none;
+            font-weight: bold;
+            transition: transform 0.3s ease;
         }
+
         .logout-button:hover {
-            background-color: #c82333;
+            background-color: var(--brown);
+            transform: translateY(-2px);
         }
     </style>
 </head>
 <body>
 <header>
-    <div class="header-title">Моё Приложениe</div>
+    <div class="header-title">Кулинарная Книга</div>
     <form th:action="@{/logout}" method="POST">
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
         <button type="submit" class="logout-button">Выйти</button>
     </form>
 </header>
+
+<script>
+    window.addEventListener('load', () => {
+        gsap.to("header", {
+            duration: 1,
+            opacity: 1,
+            y: 0,
+            ease: "power3.out"
+        });
+    });
+</script>
 </body>
 </html>
