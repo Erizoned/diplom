@@ -68,7 +68,7 @@
         transform: scale(1.1);
     }
 
-    .steps > div {
+    .steps > div, .ingredients > div {
         background: #f9f9f9;
         border: 1px solid #e1e1e1;
         border-radius: 10px;
@@ -76,6 +76,7 @@
         width: 100%;
         max-width: 400px;
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 10px;
     }
 
     .details {
@@ -128,6 +129,18 @@
     </div>
   </div>
 
+  <h2>Ингредиенты:</h2>
+  <div class="ingredients">
+    <div th:if="${ingredients != null and ingredients.size() > 0}">
+      <div th:each="ingredient : ${ingredients}">
+        <p><strong th:text="${ingredient.name}">Название ингредиента</strong>: <span th:text="${ingredient.count}">Количество</span></p>
+      </div>
+    </div>
+    <div th:if="${ingredients == null or ingredients.size() == 0}">
+      <p>Ингредиенты отсутствуют.</p>
+    </div>
+  </div>
+
   <h2>Шаги приготовления:</h2>
   <div class="steps">
     <div th:if="${steps != null and steps.size() > 0}">
@@ -152,11 +165,11 @@
     <p><strong>Калорийность (ккал):</strong> <span th:text="${recipe.kkal}">Калорийность</span></p>
     <p><strong>Время приготовления:</strong> <span th:text="${recipe.timeToCook}">Время приготовления</span> минут</p>
   </div>
-<form th:action="@{'/recipe/' + ${id} + '/delete'}" method="POST">
-  <input type="hidden" name="_method" value="DELETE">
-  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-  <button type="submit" class="back-link">Удалить рецепт</button>
-</form>
+  <form th:action="@{'/recipe/' + ${id} + '/delete'}" method="POST">
+    <input type="hidden" name="_method" value="DELETE">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+    <button type="submit" class="back-link">Удалить рецепт</button>
+  </form>
   <a href="/" class="back-link">Назад к списку рецептов</a>
 </div>
 </body>

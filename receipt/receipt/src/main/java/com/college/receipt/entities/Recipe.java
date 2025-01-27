@@ -22,6 +22,7 @@ public class Recipe {
     @NotBlank(message = "Название не может быть пустым")
     private String name;
 
+    @Column(length = 500)
     @NotBlank(message = "Описание рецепта не может быть пустым")
     private String description;
 

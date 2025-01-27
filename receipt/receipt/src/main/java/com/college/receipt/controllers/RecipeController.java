@@ -1,9 +1,11 @@
 package com.college.receipt.controllers;
 
+import com.college.receipt.entities.Ingredients;
 import com.college.receipt.entities.Recipe;
 import com.college.receipt.entities.Steps;
 import com.college.receipt.entities.UploadedFile;
 import com.college.receipt.exceptions.recipesNotFoundException;
+import com.college.receipt.repositories.IngredientRepository;
 import com.college.receipt.repositories.StepRepository;
 import com.college.receipt.repositories.UploadedFileRepository;
 import com.college.receipt.service.Recipe.RecipeRepository;
@@ -12,6 +14,7 @@ import com.college.receipt.service.UploadedFileService;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -35,13 +38,15 @@ public class RecipeController {
     public static final Logger logger = LoggerFactory.getLogger(RecipeController.class);
     private final RecipeServiceImpl recipeService;
     private final StepRepository stepRepository;
+    private final IngredientRepository ingredientRepository;
 
-    public RecipeController(RecipeRepository recipeRepository, UploadedFileService uploadedFileService, UploadedFileRepository uploadedFileRepository, RecipeServiceImpl recipeService, StepRepository stepRepository) {
+    public RecipeController(RecipeRepository recipeRepository, UploadedFileService uploadedFileService, UploadedFileRepository uploadedFileRepository, RecipeServiceImpl recipeService, StepRepository stepRepository, IngredientRepository ingredientRepository) {
         this.recipeRepository = recipeRepository;
         this.uploadedFileService = uploadedFileService;
         this.uploadedFileRepository = uploadedFileRepository;
         this.recipeService = recipeService;
         this.stepRepository = stepRepository;
+        this.ingredientRepository = ingredientRepository;
     }
 
     @GetMapping("/")
@@ -124,6 +129,10 @@ public class RecipeController {
             Recipe savedRecipe = recipeService.createRecipe(recipe, photoFood, stepPhotos, stepDescriptions, userName, ingredientNames, ingredientsCounts);
             logger.info("Рецепт успешно сохранён: {}", savedRecipe);
         }
+        catch (DataIntegrityViolationException e){
+            model.addAttribute("errorMessage","Ошибка, количество слов превышает допустимый лимит" + e.getMessage());
+            return "create_recipe";
+        }
         catch (IOException e){
             logger.error("Ошибка при сохранении рецепта: {}", e.getMessage());
             model.addAttribute("errorMessage", "Ошибка при сохранении рецепта: " + e.getMessage());
@@ -144,12 +153,14 @@ public class RecipeController {
 
         List<UploadedFile> photoFood = uploadedFileRepository.findByRecipeAndIsPhotoFoodTrue(recipe);
         List<Steps> steps = stepRepository.findByRecipe(recipe);
+        List<Ingredients> ingredients = ingredientRepository.findByRecipe(recipe);
 
         logger.info("Найдено шагов: {}", steps.size());
 
         model.addAttribute("recipe", recipe);
         model.addAttribute("photoFood", photoFood);
         model.addAttribute("steps", steps);
+        model.addAttribute("ingredients", ingredients);
 
         return "recipe";
     }
