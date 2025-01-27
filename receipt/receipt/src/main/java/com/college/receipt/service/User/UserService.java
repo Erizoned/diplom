@@ -1,5 +1,6 @@
 package com.college.receipt.service.User;
 
+import com.college.receipt.controllers.RecipeController;
 import com.college.receipt.entities.Role;
 import com.college.receipt.repositories.RoleRepository;
 import com.college.receipt.entities.User;
@@ -7,6 +8,8 @@ import com.college.receipt.entities.UserDto;
 import com.college.receipt.exceptions.UserAlreadyExistException;
 import com.college.receipt.repositories.UserRepository;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,6 +23,8 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class UserService implements IUserService {
+
+    public static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -49,8 +54,8 @@ public class UserService implements IUserService {
         user.setUsername(userDto.getUsername());
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         user.setEmail(userDto.getEmail());
-        user.setRoles(getRolesFromNames(Arrays.asList("ROLE_USER")));
-
+        user.setRoles(getRolesFromNames(Arrays.asList("USER")));
+        logger.info("Пользователь {} успешно зарегистрировался c ролью {}", user.getUsername(), user.getRoles());
         return userRepository.save(user);
     }
 

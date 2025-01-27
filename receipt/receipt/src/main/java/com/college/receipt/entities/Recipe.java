@@ -49,12 +49,18 @@ public class Recipe {
     @Column(name = "time_to_cook")
     private int timeToCook;
 
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Ingredients> ingredients = new ArrayList<>();
+
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL)
     private List<UploadedFile> photos;
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Steps> steps = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name= "user_id", nullable = false)
+    private User createdBy;
 
     @Override
     public String toString() {

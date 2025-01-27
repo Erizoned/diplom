@@ -1,9 +1,9 @@
 package com.college.receipt.service.Recipe;
 
-import com.college.receipt.entities.Recipe;
-import com.college.receipt.entities.Steps;
-import com.college.receipt.entities.UploadedFile;
+import com.college.receipt.entities.*;
+import com.college.receipt.repositories.IngredientRepository;
 import com.college.receipt.repositories.StepRepository;
+import com.college.receipt.repositories.UserRepository;
 import com.college.receipt.service.UploadedFileService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -28,10 +28,24 @@ public class RecipeServiceImpl {
     private final RecipeRepository recipeRepository;
     private final UploadedFileService uploadedFileService;
     private final StepRepository stepRepository;
+    private final UserRepository userRepository;
+    private final IngredientRepository ingredientRepository;
 
-    public Recipe createRecipe(Recipe recipe, MultipartFile photoFood, MultipartFile[] stepPhotos, String[] stepDescriptions) throws IOException {
+    public Recipe createRecipe(Recipe recipe, MultipartFile photoFood, MultipartFile[] stepPhotos, String[] stepDescriptions, String userName, String[] ingredientNames , Integer[] ingredientsCounts) throws IOException {
+        User user = userRepository.findByEmail(userName);
+        recipe.setCreatedBy(user);
         Recipe savedRecipe = recipeRepository.save(recipe);
         logger.info("Началась обработка рецепта:{}", recipe.getName());
+        for (int i = 0; i < ingredientNames.length; i++){
+            Ingredients ingredient = Ingredients.builder()
+                    .name(ingredientNames[i])
+                    .count(ingredientsCounts[i])
+                    .recipe(savedRecipe)
+                    .build();
+            savedRecipe.getIngredients().add(ingredient);
+            logger.info("Сохранён ингредиент {} количеством {}", ingredientNames[i], ingredientsCounts[i]);
+        }
+
         if (!photoFood.isEmpty()) {
             String filePath = "C:/Users/Anton/Documents/photos/" + photoFood.getOriginalFilename();
             photoFood.transferTo(new File(filePath));
@@ -77,7 +91,7 @@ public class RecipeServiceImpl {
                 logger.warn("Фото для шага {} не передано.", stepNumber);
             }
         }
-        logger.info("Рецепт {} успешно сохранён!", recipe.getName());
+        logger.info("Рецепт {} пользователя {} успешно сохранён!", recipe.getName(), userName);
         return savedRecipe;
     }
 

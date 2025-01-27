@@ -2,6 +2,7 @@ package com.college.receipt.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -26,4 +27,10 @@ public class MyConfig implements WebMvcConfigurer {
         sessionLocaleResolver.setDefaultLocale(new Locale("ru"));
         return sessionLocaleResolver;
     }
+
+    @Bean
+    public HiddenHttpMethodFilter hiddenHttpMethodFilter() {
+        return new HiddenHttpMethodFilter();
+    }
+
 }

@@ -9,8 +9,11 @@ import com.college.receipt.repositories.UploadedFileRepository;
 import com.college.receipt.service.Recipe.RecipeRepository;
 import com.college.receipt.service.Recipe.RecipeServiceImpl;
 import com.college.receipt.service.UploadedFileService;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -20,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import jakarta.validation.Valid;
 import java.io.File;
 import java.io.IOException;
+import java.net.Authenticator;
 import java.util.List;
 
 @RequestMapping("/")
@@ -105,17 +109,19 @@ public class RecipeController {
             @RequestParam("photoFood") MultipartFile photoFood,
             @RequestParam("stepPhotos") MultipartFile[] stepPhotos,
             @RequestParam("stepDescriptions") String[] stepDescriptions,
+            @RequestParam("ingredientNames") String[] ingredientNames,
+            @RequestParam("ingredientsCounts") Integer[] ingredientsCounts,
             Model model
     ){
-        logger.info("Получено фото блюда: {}", photoFood.getOriginalFilename());
-
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userName = authentication.getName();
         if (result.hasErrors()) {
             logger.error("Ошибка валидации: {}", result.getAllErrors());
             model.addAttribute("errorMessage", "Пожалуйста, заполните все обязательные поля.");
             return "create_recipe";
         }
         try {
-            Recipe savedRecipe = recipeService.createRecipe(recipe, photoFood, stepPhotos, stepDescriptions);
+            Recipe savedRecipe = recipeService.createRecipe(recipe, photoFood, stepPhotos, stepDescriptions, userName, ingredientNames, ingredientsCounts);
             logger.info("Рецепт успешно сохранён: {}", savedRecipe);
         }
         catch (IOException e){
@@ -125,7 +131,7 @@ public class RecipeController {
         }
         return "redirect:/recipe/" + recipe.getId();
     }
-    
+
     @GetMapping("/recipe/{id}")
     public String viewRecipe(@PathVariable("id") Long id, Model model) {
         logger.info("Открыта страница просмотра рецепта с id={}", id);
@@ -147,4 +153,14 @@ public class RecipeController {
 
         return "recipe";
     }
+
+    @DeleteMapping("/recipe/{id}/delete")
+    public String deleteRecipe(@PathVariable("id") Long id) {
+        Recipe recipe = recipeRepository.findById(id).orElseThrow(() -> new RuntimeException("Рецепт с id: " + id + " не найден"));
+        recipeRepository.deleteById(id);
+        logger.info("Рецепт {} удалён", recipe.getName());
+        return "redirect:/";
+    }
+
+
 }

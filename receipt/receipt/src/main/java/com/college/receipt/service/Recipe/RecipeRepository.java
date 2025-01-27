@@ -11,7 +11,6 @@ import java.util.Optional;
 public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
     Optional<Recipe> findRecipeById(Long id);
-    Recipe deleteRecipeById(Long id);
     @Query(value="SELECT * FROM recipes r WHERE r.name LIKE %:keyword%", nativeQuery = true)
     List<Recipe> findByKeyword(@Param("keyword") String keyword);
     @Query(value = "SELECT * FROM recipes r " +

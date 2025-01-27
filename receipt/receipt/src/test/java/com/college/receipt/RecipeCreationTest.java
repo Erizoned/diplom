@@ -1,5 +1,6 @@
 package com.college.receipt;
 
+import com.college.receipt.config.SecurityConfig;
 import com.college.receipt.entities.Recipe;
 import com.college.receipt.entities.Steps;
 import com.college.receipt.entities.UploadedFile;
@@ -17,11 +18,16 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,11 +52,15 @@ public class RecipeCreationTest {
     @Test
     public void RecipeRepository_SaveRecipe_ReturnSavedRecipe() throws IOException {
         //Arrange
+        String userName = "Anton@gmail.com";
+
         MultipartFile photoFood = Mockito.mock(MultipartFile.class);
         MultipartFile stepPhoto1 = Mockito.mock(MultipartFile.class);
         MultipartFile stepPhoto2 = Mockito.mock(MultipartFile.class);
 
         String[] stepDescription = {"Нагреть сковороду","Добавить масло"};
+        String[] ingredientNames = {"Яйца","Масло"};
+        Integer[] ingredientCounts = {3, 400};
 
         Mockito.when(photoFood.getOriginalFilename()).thenReturn("photoFood.jpg");
         Mockito.when(stepPhoto1.getOriginalFilename()).thenReturn("stepPhoto1.jpg");
@@ -66,6 +76,7 @@ public class RecipeCreationTest {
                 .id(1L)
                 .name("Тестовый рецепт")
                 .description("Тестовое описание")
+                .ingredients(new ArrayList<>())
                 .build();
 
 
@@ -76,7 +87,7 @@ public class RecipeCreationTest {
         Mockito.when(stepRepository.save(any(Steps.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
 
-        Recipe savedRecipe = recipeService.createRecipe(recipe, photoFood,new MultipartFile[]{stepPhoto1, stepPhoto2}, stepDescription);
+        Recipe savedRecipe = recipeService.createRecipe(recipe, photoFood,new MultipartFile[]{stepPhoto1, stepPhoto2}, stepDescription, userName, ingredientNames, ingredientCounts);
 
         //Assert
 

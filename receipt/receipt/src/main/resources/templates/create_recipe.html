@@ -75,8 +75,20 @@
         <input type="file" id="photoFood" name="photoFood" accept="image/*" required>
     </div>
 
+    <div id="ingredientsContainer">
+        <h3>Ингредиенты</h3>
+        <div class="ingredient">
+            <label for="ingredientName1">Название ингредиента:</label>
+            <input type="text" id="ingredientName1" name="ingredientNames" required>
+
+            <label for="ingredientCount1">Количество:</label>
+            <input type="number" id="ingredientCount1" name="ingredientsCounts" required>
+        </div>
+    </div>
+    <button type="button" onclick="addIngredient()">Добавить ингредиент</button>
 
     <div id="stepsContainer">
+        <h3>Шаги</h3>
         <div class="step">
             <label for="stepDescription1">Описание шага 1:</label>
             <textarea id="stepDescription1" name="stepDescriptions" required></textarea>
@@ -85,14 +97,15 @@
             <input type="file" id="stepPhoto1" name="stepPhotos" accept="image/*" required>
         </div>
     </div>
-
     <button type="button" onclick="addStep()">Добавить шаг</button>
+
     <button type="submit">Создать рецепт</button>
     <p th:if="@{errorMessage}" th:text="${errorMessage}" style="color: red;"></p>
 </form>
 
 <script>
     let stepCounter = 1;
+    let ingredientCounter = 1;
 
     function addStep() {
         stepCounter++;
@@ -111,5 +124,24 @@
         `;
 
         stepsContainer.appendChild(stepDiv);
+    }
+
+    function addIngredient() {
+        ingredientCounter++;
+
+        const ingredientsContainer = document.getElementById("ingredientsContainer");
+
+        const ingredientDiv = document.createElement("div");
+        ingredientDiv.classList.add("ingredient");
+
+        ingredientDiv.innerHTML = `
+            <label for="ingredientName${ingredientCounter}">Название ингредиента:</label>
+            <input type="text" id="ingredientName${ingredientCounter}" name="ingredientNames" required>
+
+            <label for="ingredientCount${ingredientCounter}">Количество:</label>
+            <input type="number" id="ingredientCount${ingredientCounter}" name="ingredientsCounts" required>
+        `;
+
+        ingredientsContainer.appendChild(ingredientDiv);
     }
 </script>

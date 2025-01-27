@@ -26,16 +26,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/create_recipe") // Отключение CSRF для конкретного эндпоинта
-                )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/user/login", "/user/logout", "/resources/**", "/user/registration", "/create_recipe").permitAll()
+                        .requestMatchers("/user/login", "/user/logout", "/resources/**", "/user/registration").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN") // Доступ только для роли ADMIN
-                        .requestMatchers(HttpMethod.GET, "/user/login","create_recipe").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/user/login/done","/create_recipe").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/user/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/user/login/done").permitAll()
                         .requestMatchers("/anonymous*").anonymous() // Доступ только анонимным пользователям
-                        .anyRequest().permitAll()
+                        .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/user/login")
@@ -77,17 +74,4 @@ public class SecurityConfig {
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
-
-    // На случай  если будут проблемы с регистрацией
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http
-//                .authorizeHttpRequests(auth -> auth
-//                        .anyRequest().permitAll() // Разрешить все запросы
-//                )
-//                .httpBasic(httpBasic -> httpBasic.disable()) // Отключить базовую аутентификацию
-//                .formLogin(form -> form.disable()) // Отключить форму входа
-//                .logout(logout -> logout.disable()); // Отключить логаут
-//        return http.build();
-//    }
 }

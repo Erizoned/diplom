@@ -23,11 +23,8 @@ public class Role {
         this.name = name;
     }
 
-    public Object getName() {
+    @Override
+    public String toString(){
         return name;
-    }
-
-    public void setName(Object name) {
-        this.name = (String) name;
     }
 }
