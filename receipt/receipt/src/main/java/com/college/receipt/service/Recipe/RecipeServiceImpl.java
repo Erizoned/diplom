@@ -33,7 +33,7 @@ public class RecipeServiceImpl {
         Recipe savedRecipe = recipeRepository.save(recipe);
         logger.info("Началась обработка рецепта:{}", recipe.getName());
         if (!photoFood.isEmpty()) {
-            String filePath = "C:/Users/Anton/Documents/photos/" + photoFood.getOriginalFilename();
+            String filePath = "C:/Users/lolgr/OneDrive/Документы/Новая папка" + photoFood.getOriginalFilename();
             photoFood.transferTo(new File(filePath));
 
             UploadedFile uploadedFile = UploadedFile.builder()
@@ -57,7 +57,7 @@ public class RecipeServiceImpl {
                 UploadedFile stepPhotoFile = new UploadedFile();
                 stepPhotoFile.setName(stepPhoto.getOriginalFilename());
                 stepPhotoFile.setType(stepPhoto.getContentType());
-                stepPhotoFile.setFilePath("C:/Users/Anton/Documents/photos/" + stepPhoto.getOriginalFilename());
+                stepPhotoFile.setFilePath("C:/Users/lolgr/OneDrive/Документы/Новая папка" + stepPhoto.getOriginalFilename());
                 stepPhotoFile.setRecipe(recipe);
                 stepPhotoFile.setPhotoFood(false);
                 stepPhoto.transferTo(new File(stepPhotoFile.getFilePath()));
