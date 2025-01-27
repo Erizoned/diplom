@@ -1,80 +1,228 @@
-<form action="/create_recipe" method="POST" enctype="multipart/form-data" xmlns:th="http://www.w3.org/1999/xhtml">
-    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-    <div>
-        <label for="name">Название рецепта:</label>
-        <input type="text" id="name" name="name" value="Омлет с овощами" required>
-    </div>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Создание рецепта</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <style>
+        :root {
+            --olive-green: #667302;
+            --orange: #F25C05;
+            --beige: #F2D0C9;
+            --brown: #8C3503;
+            --black: #0D0D0D;
+        }
 
-    <div>
-        <label for="description">Описание:</label>
-        <textarea id="description" name="description" required>Вкусный и питательный омлет с овощами.</textarea>
-    </div>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--beige);
+            margin: 0;
+            padding: 80px 20px 20px;
+            min-height: 100vh;
+        }
 
-    <div>
-        <label for="theme">Тема блюда:</label>
-        <select id="theme" name="theme" required>
-            <option value="breakfast" selected>Завтрак</option>
-            <option value="lunch">Обед</option>
-            <option value="dinner">Ужин</option>
-            <option value="snack">Перекус</option>
-            <option value="holiday">Праздничное блюдо</option>
-        </select>
-    </div>
+        .create-recipe-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            opacity: 0;
+        }
 
-    <div>
-        <label for="typeOfFood">Тип блюда:</label>
-        <select id="typeOfFood" name="typeOfFood">
-            <option value="soup">Суп</option>
-            <option value="meat">Мясо</option>
-            <option value="salad">Салат</option>
-            <option value="dessert">Десерт</option>
-            <option value="sideDish" selected>Гарнир</option>
-        </select>
-    </div>
+        h1 {
+            color: var(--brown);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
 
-    <div>
-        <label for="typeOfCook">Тип приготовления:</label>
-        <select id="typeOfCook" name="typeOfCook">
-            <option value="pan" selected>Сковорода</option>
-            <option value="pot">Кастрюля</option>
-            <option value="oven">Духовка</option>
-            <option value="grill">Гриль</option>
-            <option value="steamer">Пароварка</option>
-        </select>
-    </div>
+        .form-group {
+            margin-bottom: 25px;
+        }
 
-    <div>
-        <label for="restrictions">Ограничения:</label>
-        <select id="restrictions" name="restrictions">
-            <option value="">Выберите ограничение</option>
-            <option value="no_sugar">Без сахара</option>
-            <option value="no_gluten">Без глютена</option>
-            <option value="no_dairy" selected>Без молочных продуктов</option>
-            <option value="vegan">Веган</option>
-            <option value="nut_allergy">Без орехов</option>
-        </select>
-    </div>
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--black);
+            font-weight: bold;
+        }
 
-    <div>
-        <label for="countPortion">Количество порций:</label>
-        <input type="number" id="countPortion" name="countPortion" value="2" required>
-    </div>
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--olive-green);
+            border-radius: 6px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
 
-    <div>
-        <label for="kkal">Калорийность (ккал):</label>
-        <input type="number" id="kkal" name="kkal" value="300" required>
-    </div>
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--orange);
+            box-shadow: 0 0 0 3px rgba(242, 92, 5, 0.1);
+        }
 
-    <div>
-        <label for="timeToCook">Время приготовления (мин):</label>
-        <input type="number" id="timeToCook" name="timeToCook" value="20" required>
-    </div>
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
 
-    <div>
-        <label for="photoFood">Фото блюда:</label>
-        <input type="file" id="photoFood" name="photoFood" accept="image/*" required>
-    </div>
+        .step {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #e1e1e1;
+            opacity: 0;
+            transform: translateY(20px);
+        }
 
+        button {
+            background-color: var(--orange);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 10px 0;
+        }
+
+        button[type="submit"] {
+            background-color: var(--olive-green);
+            width: 100%;
+            margin-top: 30px;
+        }
+
+        button:hover {
+            background-color: var(--brown);
+            transform: translateY(-2px);
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        input[type="file"] {
+            padding: 10px;
+            background: #f5f5f5;
+        }
+
+        input[type="file"]::-webkit-file-upload-button {
+            background: var(--olive-green);
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="create-recipe-container">
+        <h1>Создание нового рецепта</h1>
+        <form action="/create_recipe" method="POST" enctype="multipart/form-data">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+            <div>
+                <label for="name">Название рецепта:</label>
+                <input type="text" id="name" name="name" value="Омлет с овощами" required>
+            </div>
+
+            <div>
+                <label for="description">Описание:</label>
+                <textarea id="description" name="description" required>Вкусный и питательный омлет с овощами.</textarea>
+            </div>
+
+            <div>
+                <label for="theme">Тема блюда:</label>
+                <select id="theme" name="theme" required>
+                    <option value="breakfast" selected>Завтрак</option>
+                    <option value="lunch">Обед</option>
+                    <option value="dinner">Ужин</option>
+                    <option value="snack">Перекус</option>
+                    <option value="holiday">Праздничное блюдо</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="typeOfFood">Тип блюда:</label>
+                <select id="typeOfFood" name="typeOfFood">
+                    <option value="soup">Суп</option>
+                    <option value="meat">Мясо</option>
+                    <option value="salad">Салат</option>
+                    <option value="dessert">Десерт</option>
+                    <option value="sideDish" selected>Гарнир</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="typeOfCook">Тип приготовления:</label>
+                <select id="typeOfCook" name="typeOfCook">
+                    <option value="pan" selected>Сковорода</option>
+                    <option value="pot">Кастрюля</option>
+                    <option value="oven">Духовка</option>
+                    <option value="grill">Гриль</option>
+                    <option value="steamer">Пароварка</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="restrictions">Ограничения:</label>
+                <select id="restrictions" name="restrictions">
+                    <option value="">Выберите ограничение</option>
+                    <option value="no_sugar">Без сахара</option>
+                    <option value="no_gluten">Без глютена</option>
+                    <option value="no_dairy" selected>Без молочных продуктов</option>
+                    <option value="vegan">Веган</option>
+                    <option value="nut_allergy">Без орехов</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="countPortion">Количество порций:</label>
+                <input type="number" id="countPortion" name="countPortion" value="2" required>
+            </div>
+
+            <div>
+                <label for="kkal">Калорийность (ккал):</label>
+                <input type="number" id="kkal" name="kkal" value="300" required>
+            </div>
+
+            <div>
+                <label for="timeToCook">Время приготовления (мин):</label>
+                <input type="number" id="timeToCook" name="timeToCook" value="20" required>
+            </div>
+
+            <div>
+                <label for="photoFood">Фото блюда:</label>
+                <input type="file" id="photoFood" name="photoFood" accept="image/*" required>
+            </div>
+
+            <div id="stepsContainer">
+                <div class="step">
+                    <h3>Шаг 1</h3>
+                    <div class="form-group">
+                        <label for="stepDescription1">Описание шага:</label>
+                        <textarea id="stepDescription1" name="stepDescriptions" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="stepPhoto1">Фото шага:</label>
+                        <input type="file" id="stepPhoto1" name="stepPhotos" accept="image/*" required>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" onclick="addStep()">+ Добавить шаг</button>
+            <button type="submit">Создать рецепт</button>
+            <p th:if="${errorMessage}" th:text="${errorMessage}" style="color: red;"></p>
+        </form>
+    </div>
     <div id="ingredientsContainer">
         <h3>Ингредиенты</h3>
         <div class="ingredient">
@@ -103,26 +251,61 @@
     <p th:if="@{errorMessage}" th:text="${errorMessage}" style="color: red;"></p>
 </form>
 
+    <script>
+        let stepCounter = 1;
 <script>
     let stepCounter = 1;
     let ingredientCounter = 1;
 
-    function addStep() {
-        stepCounter++;
+        window.addEventListener('load', () => {
+            gsap.to(".create-recipe-container", {
+                duration: 1,
+                opacity: 1,
+                y: 0,
+                ease: "power3.out"
+            });
 
-        const stepsContainer = document.getElementById("stepsContainer");
+            gsap.to(".step", {
+                duration: 0.8,
+                opacity: 1,
+                y: 0,
+                stagger: 0.2,
+                ease: "power3.out"
+            });
+        });
 
-        const stepDiv = document.createElement("div");
-        stepDiv.classList.add("step");
+        function addStep() {
+            stepCounter++;
+            const stepsContainer = document.getElementById("stepsContainer");
+            const stepDiv = document.createElement("div");
+            stepDiv.classList.add("step");
+            stepDiv.style.opacity = "0";
+            stepDiv.style.transform = "translateY(20px)";
 
-        stepDiv.innerHTML = `
-            <label for="stepDescription${stepCounter}">Описание шага ${stepCounter}:</label>
-            <textarea id="stepDescription${stepCounter}" name="stepDescriptions" required></textarea>
+            stepDiv.innerHTML = `
+                <h3>Шаг ${stepCounter}</h3>
+                <div class="form-group">
+                    <label for="stepDescription${stepCounter}">Описание шага:</label>
+                    <textarea id="stepDescription${stepCounter}" name="stepDescriptions" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="stepPhoto${stepCounter}">Фото шага:</label>
+                    <input type="file" id="stepPhoto${stepCounter}" name="stepPhotos" accept="image/*" required>
+                </div>
+            `;
 
-            <label for="stepPhoto${stepCounter}">Фото шага ${stepCounter}:</label>
-            <input type="file" id="stepPhoto${stepCounter}" name="stepPhotos" accept="image/*" required>
-        `;
+            stepsContainer.appendChild(stepDiv);
 
+            gsap.to(stepDiv, {
+                duration: 0.8,
+                opacity: 1,
+                y: 0,
+                ease: "power3.out"
+            });
+        }
+    </script>
+</body>
+</html>
         stepsContainer.appendChild(stepDiv);
     }
 

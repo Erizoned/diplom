@@ -17,7 +17,7 @@ public class UploadedFileService {
     @Autowired
     private UploadedFileRepository uploadedFileRepository;
 
-    private final String FOLDER_PATH = "C:/Users/Anton/Documents/photos/";
+    private final String FOLDER_PATH = "C:/Users/lolgr/OneDrive/Документы/Новая папка";
 
     public String uploadImageToDataSystem(MultipartFile file) throws IOException {
         String filePath = FOLDER_PATH + file.getOriginalFilename();

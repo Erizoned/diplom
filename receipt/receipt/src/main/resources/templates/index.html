@@ -5,46 +5,108 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Рецепты</title>
     <style>
+            --beige: #F2D0C9;
+            --brown: #8C3503;
+            --black: #0D0D0D;
+        }
+
         body {
             font-family: Arial, sans-serif;
-            background-color: #f7f7f7;
+            background-color: var(--beige);
             margin: 0;
             padding: 0;
+            color: var(--black);
         }
 
         h1 {
             text-align: center;
+            margin: 40px 0;
+            font-size: 42px;
+            color: var(--brown);
+            opacity: 0;
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
             margin: 20px 0;
-            font-size: 36px;
-            color: #333;
+            opacity: 0;
+        }
+
+        .search-container input {
+            padding: 10px;
+            border: 2px solid var(--olive-green);
+            border-radius: 5px;
+            width: 300px;
+        }
+
+        .search-container button,
+        .filter-button,
+        .redirect-button {
+            background-color: var(--orange);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .search-container button:hover,
+        .filter-button:hover,
+        .redirect-button:hover {
+            background-color: var(--brown);
+        }
+
+        #filterDiv {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px auto;
+            max-width: 800px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        #filterDiv select,
+        #filterDiv input {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0 15px;
+            border: 1px solid var(--olive-green);
+            border-radius: 4px;
         }
 
         .recipe-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 30px;
             padding: 20px;
+            margin-top: 20px;
         }
 
         .recipe-card {
-            background-color: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background: white;
+            border-radius: 15px;
             overflow: hidden;
-            transition: transform 0.3s, box-shadow 0.3s;
-            width: 300px;
-            text-align: left;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .recipe-card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+            transform: translateY(-10px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
         }
 
-        .recipe-card img {
+        .recipe-card a {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .recipe-image {
             width: 100%;
-            height: 180px;
+            height: 200px;
             object-fit: cover;
         }
 
@@ -53,28 +115,26 @@
         }
 
         .recipe-title {
-            font-size: 22px;
+            font-size: 1.5rem;
             font-weight: bold;
-            color: #222;
+            color: var(--brown);
             margin-bottom: 10px;
         }
 
         .recipe-description {
-            font-size: 16px;
-            color: #666;
-            margin-bottom: 10px;
+            color: var(--black);
+            margin-bottom: 15px;
             line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .recipe-time {
-            font-size: 14px;
+            color: var(--olive-green);
             font-weight: bold;
-            color: #888;
-        }
-
-        a {
-            text-decoration: none;
-            color: inherit;
+            font-size: 0.9rem;
         }
 
         @media screen and (max-width: 768px) {
@@ -82,114 +142,273 @@
                 width: 90%;
             }
         }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 80px auto 0;
+            padding: 20px;
+        }
+
+        .search-section {
+            margin-bottom: 30px;
+        }
+
+        .search-form {
+            width: 100%;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            opacity: 1;
+        }
+
+        .search-container input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid var(--olive-green);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .search-container input:focus {
+            border-color: var(--orange);
+            box-shadow: 0 0 0 3px rgba(242, 92, 5, 0.1);
+        }
+
+        .search-button, 
+        .filter-button {
+            padding: 15px 25px;
+            font-weight: bold;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .create-recipe-button {
+            display: inline-block;
+            background-color: var(--olive-green);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+        }
+
+        .create-recipe-button:hover {
+            background-color: var(--brown);
+            transform: translateY(-2px);
+        }
+
+        .actions-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .filter-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Добавим анимацию для плавного появления карточек */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .recipe-card {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
     </style>
 </head>
 <body>
-<div th:replace="header.html"></div>
-<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-<form th:action="@{/}" method="get">
-    <input id="search" type="text" name="keyword">
-    <button type="submit">Search</button>
-</form>
-<button onclick="toggleDiv()">Фильтр</button>
-<div id="filterDiv" style="display: none;">
-    <form th:action="@{/}" method="get">
-    <div>
-        <label for="theme">Тема блюда:</label>
-        <select id="theme" name="theme">
-            <option value="" selected>Все</option>
-            <option value="breakfast">Завтрак</option>
-            <option value="lunch">Обед</option>
-            <option value="dinner">Ужин</option>
-            <option value="snack">Перекус</option>
-            <option value="holiday">Праздничное блюдо</option>
-        </select>
-    </div>
+    <div th:replace="header.html"></div>
+    
+    <div class="main-container" style="margin-top: 80px; padding: 20px;">
+        <div class="search-section">
+            <form th:action="@{/}" method="get" class="search-form">
+                <div class="search-container">
+                    <input id="search" type="text" name="keyword" placeholder="Поиск рецептов...">
+                    <button type="submit" class="search-button">
+                        Найти
+                    </button>
+                    <button type="button" class="filter-button" onclick="toggleDiv()">
+                        Фильтры
+                    </button>
+                </div>
+            </form>
 
-    <div>
-        <label for="typeOfFood">Тип блюда:</label>
-        <select id="typeOfFood" name="typeOfFood">
-            <option value="" selected>Все</option>
-            <option value="soup">Суп</option>
-            <option value="meat">Мясо</option>
-            <option value="salad">Салат</option>
-            <option value="dessert">Десерт</option>
-            <option value="sideDish">Гарнир</option>
-        </select>
-    </div>
+            <div id="filterDiv" style="display: none;" class="filter-container">
+                <form th:action="@{/}" method="get">
+                    <div>
+                        <label for="theme">Тема блюда:</label>
+                        <select id="theme" name="theme">
+                            <option value="" selected>Все</option>
+                            <option value="breakfast">Завтрак</option>
+                            <option value="lunch">Обед</option>
+                            <option value="dinner">Ужин</option>
+                            <option value="snack">Перекус</option>
+                            <option value="holiday">Праздничное блюдо</option>
+                        </select>
+                    </div>
 
-    <div>
-        <label for="typeOfCook">Тип приготовления:</label>
-        <select id="typeOfCook" name="typeOfCook">
-            <option value="" selected>Все</option>
-            <option value="pan">Сковорода</option>
-            <option value="pot">Кастрюля</option>
-            <option value="oven">Духовка</option>
-            <option value="grill">Гриль</option>
-            <option value="steamer">Пароварка</option>
-        </select>
-    </div>
+                    <div>
+                        <label for="typeOfFood">Тип блюда:</label>
+                        <select id="typeOfFood" name="typeOfFood">
+                            <option value="" selected>Все</option>
+                            <option value="soup">Суп</option>
+                            <option value="meat">Мясо</option>
+                            <option value="salad">Салат</option>
+                            <option value="dessert">Десерт</option>
+                            <option value="sideDish">Гарнир</option>
+                        </select>
+                    </div>
 
-    <div>
-        <label for="restrictions">Ограничения:</label>
-        <select id="restrictions" name="restrictions">
-            <option value="" selected>Все</option>
-            <option value="no_sugar">Без сахара</option>
-            <option value="no_gluten">Без глютена</option>
-            <option value="no_dairy">Без молочных продуктов</option>
-            <option value="vegan">Веган</option>
-            <option value="nut_allergy">Без орехов</option>
-        </select>
-    </div>
+                    <div>
+                        <label for="typeOfCook">Тип приготовления:</label>
+                        <select id="typeOfCook" name="typeOfCook">
+                            <option value="" selected>Все</option>
+                            <option value="pan">Сковорода</option>
+                            <option value="pot">Кастрюля</option>
+                            <option value="oven">Духовка</option>
+                            <option value="grill">Гриль</option>
+                            <option value="steamer">Пароварка</option>
+                        </select>
+                    </div>
 
-    <div>
-        <label for="countPortion">Количество порций:</label>
-        <input type="number" id="countPortion" name="countPortion">
-    </div>
+                    <div>
+                        <label for="restrictions">Ограничения:</label>
+                        <select id="restrictions" name="restrictions">
+                            <option value="" selected>Все</option>
+                            <option value="no_sugar">Без сахара</option>
+                            <option value="no_gluten">Без глютена</option>
+                            <option value="no_dairy">Без молочных продуктов</option>
+                            <option value="vegan">Веган</option>
+                            <option value="nut_allergy">Без орехов</option>
+                        </select>
+                    </div>
 
-    <div>
-        <label for="kkal">Калорийность (ккал):</label>
-        <input type="number" id="kkal" name="kkal">
-    </div>
+                    <div>
+                        <label for="countPortion">Количество порций:</label>
+                        <input type="number" id="countPortion" name="countPortion">
+                    </div>
 
-    <div>
-        <label for="timeToCook">Время приготовления (мин):</label>
-        <input type="number" id="timeToCook" name="timeToCook">
-    </div>
-        <button type="submit">Отфильтровать</button>
-    </form>
-</div>
-<h1>Все рецепты</h1>
-<div class="recipe-container">
-    <div th:each="recipe : ${recipes}" class="recipe-card">
-        <a th:href="@{'/recipe/'} + ${recipe.id}">
-            <img th:if="${recipe.photos != null and recipe.photos.size() > 0}"
-                 th:src="@{'/files/file_system/' + ${recipe.photos[0].name}}"
-                 alt="Фото блюда" />
-            <img th:if="${recipe.photos == null or recipe.photos.size() == 0}"
-                 src="/static/images/default-recipe.png"
-                 alt="Нет фото" />
-            <div class="recipe-details">
-                <div class="recipe-title" th:text="${recipe.name}">Название рецепта</div>
-                <div class="recipe-description" th:text="${recipe.description}">Описание рецепта</div>
-                <div class="recipe-time" th:text="'Время приготовления: ' + ${recipe.timeToCook} + ' минут'">Время приготовления</div>
+                    <div>
+                        <label for="kkal">Калорийность (ккал):</label>
+                        <input type="number" id="kkal" name="kkal">
+                    </div>
+
+                    <div>
+                        <label for="timeToCook">Время приготовления (мин):</label>
+                        <input type="number" id="timeToCook" name="timeToCook">
+                    </div>
+                    <button type="submit">Отфильтровать</button>
+                </form>
             </div>
-        </a>
+        </div>
+
+        <div class="actions-container">
+            <a href="/create_recipe" class="create-recipe-button">
+                + Создать новый рецепт
+            </a>
+        </div>
+
+        <h1>Все рецепты</h1>
+        
+        <div class="recipe-container">
+            <div th:each="recipe : ${recipes}" class="recipe-card">
+                <a th:href="@{'/recipe/'} + ${recipe.id}">
+                    <img th:if="${recipe.photos != null and recipe.photos.size() > 0}"
+                         th:src="@{'/files/file_system/' + ${recipe.photos[0].name}}"
+                         alt="Фото блюда"
+                         class="recipe-image" />
+                    <img th:if="${recipe.photos == null or recipe.photos.size() == 0}"
+                         src="/static/images/default-recipe.png"
+                         alt="Нет фото"
+                         class="recipe-image" />
+                    <div class="recipe-details">
+                        <div class="recipe-title" th:text="${recipe.name}">Название рецепта</div>
+                        <div class="recipe-description" th:text="${recipe.description}">Описание рецепта</div>
+                        <div class="recipe-time" th:text="'Время приготовления: ' + ${recipe.timeToCook} + ' минут'">
+                            Время приготовления
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
     </div>
-</div>
-<p th:if="@{errorMessage}" th:text="${errorMessage}" style="color: red;"></p>
-<a href="/create_recipe" class="redirect-button"> Создать рецепт </a>
-</body>
-<script>
-    function toggleDiv() {
-        const filterDiv = document.getElementById("filterDiv");
 
-        if (filterDiv.style.display === "none") {
-            filterDiv.style.display = "block";
-        } else {
-            filterDiv.style.display = "none";
+    <script>
+        function toggleDiv() {
+            const filterDiv = document.getElementById("filterDiv");
+            const isHidden = filterDiv.style.display === "none";
+            
+            if (isHidden) {
+                filterDiv.style.display = "block";
+                gsap.from(filterDiv, {
+                    duration: 0.5,
+                    height: 0,
+                    opacity: 0,
+                    ease: "power3.out"
+                });
+            } else {
+                gsap.to(filterDiv, {
+                    duration: 0.5,
+                    height: 0,
+                    opacity: 0,
+                    ease: "power3.out",
+                    onComplete: () => {
+                        filterDiv.style.display = "none";
+                    }
+                });
+            }
         }
-    }
 
-</script>
+        window.addEventListener('load', () => {
+            gsap.from(".search-section", {
+                duration: 1,
+                y: -30,
+                opacity: 0,
+                ease: "power3.out"
+            });
+
+            gsap.from(".actions-container", {
+                duration: 1,
+                y: -20,
+                opacity: 0,
+                delay: 0.2,
+                ease: "power3.out"
+            });
+
+            gsap.from("h1", {
+                duration: 1,
+                y: -20,
+                opacity: 0,
+                delay: 0.4,
+                ease: "power3.out"
+            });
+
+            gsap.from(".recipe-card", {
+                duration: 0.8,
+                y: 50,
+                opacity: 0,
+                stagger: 0.1,
+                ease: "power3.out"
+            });
+        });
+    </script>
+</body>
 </html>
