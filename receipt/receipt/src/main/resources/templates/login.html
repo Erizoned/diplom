@@ -1,24 +1,118 @@
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <title>Вход</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <style>
+    :root {
+        --gradient-start: #FF6B6B;
+        --gradient-middle: #FF758C;
+        --gradient-end: #FF8FAB;
+        --white: #FFFFFF;
+        --gray-light: #F5F5F5;
+        --text-color: #333333;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Arial', sans-serif;
+        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-middle), var(--gradient-end));
+    }
+
+    .login-card {
+        background: var(--white);
+        width: 400px;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    h1 {
+        color: var(--text-color);
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 24px;
+        font-weight: 600;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 15px;
+        border: none;
+        background: var(--gray-light);
+        border-radius: 10px;
+        font-size: 16px;
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+    }
+
+    .form-group input:focus {
+        box-shadow: 0 0 0 2px var(--gradient-middle);
+        outline: none;
+    }
+
+    .button {
+        width: 90%; /* Фиксированная ширина для всех кнопок */
+        padding: 15px;
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        text-decoration: none; /* Для ссылок */
+        display: block; /* Уравнивание всех элементов */
+        margin: 10px auto; /* Центрирование кнопок */
+    }
+
+    .button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+    }
+  </style>
 </head>
 <body>
-<h1>Вход в аккаунт</h1>
-<form th:action="@{/user/login/done}" method="POST">
-  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-  <div>
-    <label for="username">Имя пользователя:</label>
-    <input type="text" id="username" name="username" required />
-  </div>
-  <div>
-    <label for="password">Пароль:</label>
-    <input type="password" id="password" name="password" required />
-  </div>
-  <div>
-    <button type="submit">Войти</button>
-  </div>
-  <p th:if="${param.error}" style="color: red;">Неверное имя пользователя или пароль</p>
-  <p th:if="${param.logout}" style="color: green;">Вы успешно вышли из системы</p>
-</form>
+<div class="login-card">
+  <h1>Вход в аккаунт</h1>
+  <form th:action="@{/user/login/done}" method="POST">
+    <div class="form-group">
+      <input type="text" id="username" name="username" placeholder="Имя пользователя" required />
+    </div>
+    <div class="form-group">
+      <input type="password" id="password" name="password" placeholder="Пароль" required />
+    </div>
+    <button type="submit" class="button">Войти</button>
+  </form>
+
+  <!-- Ссылки, стилизованные как кнопки -->
+  <a href="/registration" class="button">Создать аккаунт</a>
+  <a href="/forgot-password" class="button">Забыли пароль?</a>
+</div>
+
+<script>
+  gsap.from(".login-card", {
+      duration: 1,
+      y: 50,
+      opacity: 0,
+      ease: "power3.out"
+  });
+</script>
 </body>
 </html>
