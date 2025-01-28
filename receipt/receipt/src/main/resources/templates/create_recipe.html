@@ -71,8 +71,6 @@
             border-radius: 10px;
             margin-bottom: 20px;
             border: 1px solid #e1e1e1;
-            transform: translateY(20px);
-            opacity: 0;
         }
 
         button {
@@ -237,13 +235,14 @@
 
     window.addEventListener('load', () => {
         gsap.to(".create-recipe-container", { duration: 1, opacity: 1, y: 0, ease: "power3.out" });
-        gsap.to(".step, .ingredient", { duration: 0.8, opacity: 1, y: 0, stagger: 0.2, ease: "power3.out" });
     });
 
     function addStep() {
         stepCounter++;
         const stepDiv = document.createElement("div");
         stepDiv.classList.add("step");
+        stepDiv.style.opacity = "1";
+        stepDiv.style.transform = "translateY(0px)";
         stepDiv.innerHTML = `
             <h3>Шаг ${stepCounter}</h3>
             <label for="stepDescription${stepCounter}">Описание шага:</label>
@@ -259,6 +258,8 @@
         ingredientCounter++;
         const ingredientDiv = document.createElement("div");
         ingredientDiv.classList.add("ingredient");
+        ingredientDiv.style.opacity = "1";
+        ingredientDiv.style.transform = "translateY(0px)";
         ingredientDiv.innerHTML = `
             <label for="ingredientName${ingredientCounter}">Название ингредиента:</label>
             <input type="text" id="ingredientName${ingredientCounter}" name="ingredientNames" required>

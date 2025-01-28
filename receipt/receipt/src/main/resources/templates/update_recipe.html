@@ -5,25 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Обновление рецепта</title>
     <style>
+        :root {
+            --background: #f5f5f5;
+            --card-bg: #ffffff;
+            --primary-color: #007bff;
+            --primary-hover: #0056b3;
+            --text-color: #333;
+            --border-color: #ddd;
+            --shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            --radius: 10px;
+        }
+
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #f5f5f5;
+            background-color: var(--background);
             margin: 0;
             padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
 
         .container {
+            width: 100%;
             max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
         }
 
         h1 {
             text-align: center;
-            color: #333;
+            color: var(--text-color);
+            margin-bottom: 20px;
         }
 
         .form-group {
@@ -34,43 +50,66 @@
             font-weight: bold;
             display: block;
             margin-bottom: 8px;
+            color: var(--text-color);
         }
 
         input, select, textarea {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
             font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
         }
 
         button {
-            background-color: #007bff;
-            color: white;
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: var(--primary-color);
+            color: #fff;
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
+            border-radius: var(--radius);
             font-size: 16px;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        .steps, .ingredients {
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
             margin-top: 20px;
         }
 
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .steps, .ingredients {
+            margin-top: 30px;
+        }
+
         .step, .ingredient {
-            border: 1px solid #ddd;
-            padding: 10px;
-            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: var(--radius);
             margin-bottom: 10px;
         }
 
         .add-btn {
+            background-color: var(--primary-color);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            font-size: 14px;
+            cursor: pointer;
+            display: inline-block;
             margin-top: 10px;
+        }
+
+        .add-btn:hover {
+            background-color: var(--primary-hover);
         }
     </style>
 </head>
@@ -155,7 +194,6 @@
             <input type="file" id="photoFood" name="photoFood" accept="image/*">
         </div>
 
-        <!-- Шаги -->
         <div class="steps">
             <h3>Шаги приготовления</h3>
             <div class="step" th:each="step, iter : ${steps}">
@@ -167,7 +205,6 @@
         </div>
         <button type="button" class="add-btn" onclick="addStep()">+ Добавить шаг</button>
 
-        <!-- Ингредиенты -->
         <div class="ingredients">
             <h3>Ингредиенты</h3>
             <div class="ingredient" th:each="ingredient, iter : ${ingredients}">

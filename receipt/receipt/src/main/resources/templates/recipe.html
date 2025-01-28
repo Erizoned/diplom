@@ -36,7 +36,21 @@
         font-size: 2.5rem;
         color: var(--brown);
         margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 3px solid var(--orange);
+        position: relative;
         opacity: 0;
+      }
+
+      h1::after {
+        content: '';
+        position: absolute;
+        bottom: -3px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 3px;
+        background: var(--brown);
       }
 
       h2 {
@@ -122,12 +136,55 @@
       .delete-button:hover {
         background-color: var(--orange);
       }
+
+      .recipe-description {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        margin: 20px 0 30px 0;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        position: relative;
+        border-left: 4px solid var(--orange);
+      }
+
+      .recipe-description p {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        color: var(--black);
+        margin: 0;
+        text-align: justify;
+      }
+
+      /* Анимация для заголовка и описания */
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      h1 {
+        animation: slideIn 0.8s ease forwards;
+      }
+
+      .recipe-description {
+        opacity: 0;
+        animation: slideIn 0.8s ease 0.3s forwards;
+      }
     </style>
   </head>
   <body>
   <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
   <div class="container">
     <h1 th:text="${recipe.name}">Название</h1>
+
+    <div class="recipe-description">
+      <p th:text="${recipe.description}">Описание рецепта</p>
+    </div>
 
     <h2>Фото блюда:</h2>
     <div class="photos">
@@ -195,8 +252,22 @@
   </div>
 
   <script>
-    window.addEventListener('load', () => {
-      gsap.from("h1", { opacity: 0, y: -30, duration: 0.8, ease: "power3.out" });
+    addEventListener('load', () => {
+      gsap.from("h1", { 
+        opacity: 0, 
+        y: -30, 
+        duration: 0.8, 
+        ease: "power3.out" 
+      });
+
+      gsap.from(".recipe-description", { 
+        opacity: 0, 
+        y: 20, 
+        duration: 0.8, 
+        delay: 0.3,
+        ease: "power3.out" 
+      });
+
       gsap.from(".photos img", { opacity: 0, y: 20, duration: 0.6, stagger: 0.2, ease: "power3.out" });
       gsap.from(".details", { opacity: 0, y: 20, duration: 0.8, ease: "power3.out" });
       gsap.from(".ingredients p", { opacity: 0, x: -20, duration: 0.5, stagger: 0.1, ease: "power3.out" });
