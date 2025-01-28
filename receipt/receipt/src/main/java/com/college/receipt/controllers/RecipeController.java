@@ -107,46 +107,48 @@ public class RecipeController {
         return "create_recipe";
     }
 
+    @GetMapping("/update_recipe/{id}")
+    public String updateRecipe(@PathVariable("id") Long id,Model model) {
+        Recipe savedRecipe = recipeRepository.findRecipeById(id).orElseThrow(() -> {
+            logger.error("Рецепт с id={} не найден", id);
+            return new RuntimeException("Recipe not found");
+        });
+        List<Steps> steps = stepRepository.findByRecipe(savedRecipe);
+        List<Ingredients> ingredients = ingredientRepository.findByRecipe(savedRecipe);
+        model.addAttribute("recipe", savedRecipe);
+        model.addAttribute("steps", steps);
+        model.addAttribute("ingredients", ingredients);
+
+    return "update_recipe";
+    }
+
     @PutMapping("/update_recipe/{id}")
-    public String updateRecipe(            @Valid @ModelAttribute Recipe recipe,
-                                           BindingResult result,
-                                           @PathVariable("id") Long id,
-                                           @RequestParam("photoFood") MultipartFile photoFood,
-                                           @RequestParam("stepPhotos") MultipartFile[] stepPhotos,
-                                           @RequestParam("stepDescriptions") String[] stepDescriptions,
-                                           @RequestParam("ingredientNames") String[] ingredientNames,
-                                           @RequestParam("ingredientsCounts") Integer[] ingredientsCounts,
-                                           Model model){
-
-        if(result.hasErrors()){
-            logger.error("Ошибка");
+    public String updateRecipe(
+            @Valid @ModelAttribute Recipe recipe,
+            BindingResult result,
+            @PathVariable("id") Long id,
+            @RequestParam("photoFood") MultipartFile photoFood,
+            @RequestParam("stepPhotos") MultipartFile[] stepPhotos,
+            @RequestParam("stepDescriptions") String[] stepDescriptions,
+            @RequestParam("ingredientNames") String[] ingredientNames,
+            @RequestParam("ingredientsCounts") Integer[] ingredientsCounts,
+            Model model
+    ) {
+        if (result.hasErrors()) {
+            logger.error("Ошибка валидации: {}", result.getAllErrors());
             model.addAttribute("errorMessage", "Пожалуйста, заполните все обязательные поля.");
-            return "create_recipe";
+            return "update_recipe";
         }
-        try{
-            Recipe savedRecipe = recipeRepository.findRecipeById(id).orElseThrow(() -> {
-                logger.error("Рецепт с id={} не найден", id);
-                return new RuntimeException("Recipe not found");
-            });
-            savedRecipe.setDescription(recipe.getDescription());
-            savedRecipe.setName(recipe.getName());
-            savedRecipe.setKkal(recipe.getKkal());
-            savedRecipe.setTypeOfCook(recipe.getTypeOfCook());
-            savedRecipe.setTypeOfFood(recipe.getTypeOfFood());
-            savedRecipe.setRestrictions(recipe.getRestrictions());
-            savedRecipe.setTimeToCook(recipe.getTimeToCook());
-            savedRecipe.setCountPortion(recipe.getCountPortion());
-            savedRecipe.setTheme(recipe.getTheme());
 
-            Recipe updatedRecipe = recipeService.createRecipe(savedRecipe,  photoFood, stepPhotos, stepDescriptions, savedRecipe.getCreatedBy().getUsername(),
-                    ingredientNames, ingredientsCounts);
-
-        }
-        catch (Exception e){
+        try {
+            recipeService.updateRecipe(id, recipe, photoFood, stepPhotos, stepDescriptions, ingredientNames, ingredientsCounts);
+            logger.info("Рецепт успешно обновлён: {}", recipe.getName());
+        } catch (Exception e) {
             logger.error("Ошибка при обновлении рецепта: {}", e.getMessage());
             model.addAttribute("errorMessage", "Ошибка при сохранении рецепта: " + e.getMessage());
             return "update_recipe";
         }
+
         return "redirect:/recipe/" + id;
     }
 
