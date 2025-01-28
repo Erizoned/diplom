@@ -47,7 +47,7 @@ public class RecipeServiceImpl {
         }
 
         if (!photoFood.isEmpty()) {
-            String filePath = "C:/Users/lolgr/OneDrive/Документы/Новая папка" + photoFood.getOriginalFilename();
+            String filePath = "C:/Users/Anton/Documents/photos" + photoFood.getOriginalFilename();
             photoFood.transferTo(new File(filePath));
 
             UploadedFile uploadedFile = UploadedFile.builder()
@@ -71,7 +71,7 @@ public class RecipeServiceImpl {
                 UploadedFile stepPhotoFile = new UploadedFile();
                 stepPhotoFile.setName(stepPhoto.getOriginalFilename());
                 stepPhotoFile.setType(stepPhoto.getContentType());
-                stepPhotoFile.setFilePath("C:/Users/lolgr/OneDrive/Документы/Новая папка" + stepPhoto.getOriginalFilename());
+                stepPhotoFile.setFilePath("C:/Users/Anton/Documents/photos" + stepPhoto.getOriginalFilename());
                 stepPhotoFile.setRecipe(recipe);
                 stepPhotoFile.setPhotoFood(false);
                 stepPhoto.transferTo(new File(stepPhotoFile.getFilePath()));
@@ -95,69 +95,94 @@ public class RecipeServiceImpl {
         return savedRecipe;
     }
 
-    public Recipe updateRecipe(Recipe recipe, MultipartFile photoFood, MultipartFile[] stepPhotos, String[] stepDescriptions, String userName, String[] ingredientNames , Integer[] ingredientsCounts) throws IOException{
-        User user = userRepository.findByEmail(userName);
-        Recipe savedRecipe = recipeRepository.save(recipe);
-        logger.info("Началась обработка рецепта:{}", recipe.getName());
-        for (int i = 0; i < ingredientNames.length; i++){
-            Ingredients ingredient = Ingredients.builder()
-                    .name(ingredientNames[i])
-                    .count(ingredientsCounts[i])
-                    .recipe(savedRecipe)
-                    .build();
-            savedRecipe.getIngredients().add(ingredient);
-            logger.info("Сохранён ингредиент {} количеством {}", ingredientNames[i], ingredientsCounts[i]);
+    public void updateRecipe(
+            Long id,
+            Recipe recipe,
+            MultipartFile photoFood,
+            MultipartFile[] stepPhotos,
+            String[] stepDescriptions,
+            String[] ingredientNames,
+            Integer[] ingredientsCounts
+    ) throws IOException {
+        Recipe savedRecipe = recipeRepository.findRecipeById(id).orElseThrow(() -> {
+            throw new RuntimeException("Recipe not found");
+        });
 
-            if (!photoFood.isEmpty()) {
-                String filePath = "C:/Users/lolgr/OneDrive/Документы/Новая папка" + photoFood.getOriginalFilename();
-                photoFood.transferTo(new File(filePath));
+        savedRecipe.setName(recipe.getName());
+        savedRecipe.setDescription(recipe.getDescription());
+        savedRecipe.setKkal(recipe.getKkal());
+        savedRecipe.setTypeOfCook(recipe.getTypeOfCook());
+        savedRecipe.setTypeOfFood(recipe.getTypeOfFood());
+        savedRecipe.setRestrictions(recipe.getRestrictions());
+        savedRecipe.setTimeToCook(recipe.getTimeToCook());
+        savedRecipe.setCountPortion(recipe.getCountPortion());
+        savedRecipe.setTheme(recipe.getTheme());
 
-                UploadedFile uploadedFile = UploadedFile.builder()
-                        .name(photoFood.getOriginalFilename())
-                        .type(photoFood.getContentType())
-                        .filePath(filePath)
-                        .recipe(recipe)
-                        .isPhotoFood(true)
+        // Удаляем старые ингредиенты и шаги
+        ingredientRepository.deleteByRecipeId(id);
+        stepRepository.deleteByRecipeId(id);
+
+        // Добавляем ингредиенты
+        if (ingredientNames != null && ingredientsCounts != null && ingredientNames.length == ingredientsCounts.length) {
+            for (int i = 0; i < ingredientNames.length; i++) {
+                Ingredients ingredient = Ingredients.builder()
+                        .name(ingredientNames[i])
+                        .count(ingredientsCounts[i])
+                        .recipe(savedRecipe)
                         .build();
-
-                uploadedFileService.save(uploadedFile);
-                logger.info("Фото блюда {} успешно сохранено", photoFood.getOriginalFilename());
+                savedRecipe.getIngredients().add(ingredient);
             }
-            logger.info("Получено photoFood: {}", photoFood != null ? photoFood.getOriginalFilename() : "null");
+        }
+
+        // Обновляем фото блюда
+        if (photoFood != null && !photoFood.isEmpty()) {
+            String filePath = "C:/Users/Anton/Documents/photos/" + photoFood.getOriginalFilename();
+            photoFood.transferTo(new File(filePath));
+
+            UploadedFile uploadedFile = UploadedFile.builder()
+                    .name(photoFood.getOriginalFilename())
+                    .type(photoFood.getContentType())
+                    .filePath(filePath)
+                    .recipe(savedRecipe)
+                    .isPhotoFood(true)
+                    .build();
+
+            uploadedFileService.save(uploadedFile);
+        }
+
+        // Добавляем шаги
+        if (stepDescriptions != null && stepPhotos != null && stepDescriptions.length == stepPhotos.length) {
             for (int j = 0; j < stepPhotos.length; j++) {
                 MultipartFile stepPhoto = stepPhotos[j];
                 String stepDescription = stepDescriptions[j];
                 Integer stepNumber = j + 1;
 
                 if (!stepPhoto.isEmpty()) {
-                    UploadedFile stepPhotoFile = new UploadedFile();
-                    stepPhotoFile.setName(stepPhoto.getOriginalFilename());
-                    stepPhotoFile.setType(stepPhoto.getContentType());
-                    stepPhotoFile.setFilePath("C:/Users/lolgr/OneDrive/Документы/Новая папка" + stepPhoto.getOriginalFilename());
-                    stepPhotoFile.setRecipe(recipe);
-                    stepPhotoFile.setPhotoFood(false);
-                    stepPhoto.transferTo(new File(stepPhotoFile.getFilePath()));
+                    String stepFilePath = "C:/Users/Anton/Documents/photos/" + stepPhoto.getOriginalFilename();
+                    stepPhoto.transferTo(new File(stepFilePath));
+
+                    UploadedFile stepPhotoFile = UploadedFile.builder()
+                            .name(stepPhoto.getOriginalFilename())
+                            .type(stepPhoto.getContentType())
+                            .filePath(stepFilePath)
+                            .recipe(savedRecipe)
+                            .isPhotoFood(false)
+                            .build();
+
                     uploadedFileService.save(stepPhotoFile);
 
-                    logger.info("Фото шага {} успешно сохранено: {}", stepNumber, stepPhoto.getOriginalFilename());
+                    Steps step = Steps.builder()
+                            .stepNumber(stepNumber)
+                            .description(stepDescription)
+                            .photo(stepPhotoFile)
+                            .recipe(savedRecipe)
+                            .build();
 
-                    Steps step = new Steps();
-                    step.setStepNumber(stepNumber);
-                    step.setDescription(stepDescription);
-                    step.setPhoto(stepPhotoFile);
-                    step.setRecipe(recipe);
                     stepRepository.save(step);
-
-                    logger.info("Шаг {} успешно сохранён: {}", stepNumber, stepDescription);
-                } else {
-                    logger.warn("Фото для шага {} не передано.", stepNumber);
                 }
             }
-            logger.info("Рецепт {} пользователя {} успешно сохранён!", recipe.getName(), userName);
         }
 
-
-        return savedRecipe;
     }
 
     public Optional<Recipe> findRecipeById(Long id){
