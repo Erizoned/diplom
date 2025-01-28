@@ -65,6 +65,13 @@
       outline: none;
     }
 
+    .error-message {
+      color: #dc3545;
+      font-size: 14px;
+      margin: -10px 0 20px 0;
+      text-align: center;
+    }
+
     .button {
       width: 90%; /* Фиксированная ширина для всех кнопок */
       padding: 15px;
@@ -91,7 +98,8 @@
 <body>
 <div class="login-card">
   <h1>Вход в аккаунт</h1>
-  <form id="loginForm">
+  <form th:action="@{/user/login/done}" method="POST">
+    <div th:if="${error}" class="error-message" th:text="${error}">Неверный логин или пароль</div>
     <div class="form-group">
       <input type="text" id="username" name="username" placeholder="Почта" required />
     </div>
@@ -106,41 +114,6 @@
 </div>
 
 <script>
-  // Обработка отправки формы
-  document.getElementById('loginForm').addEventListener('submit', async (e) => {
-    e.preventDefault(); // Останавливаем отправку формы
-
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-
-    try {
-      const response = await fetch('http://localhost:8081/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const token = data.token;
-
-        // Сохраняем токен в localStorage
-        localStorage.setItem('token', token);
-
-        // Перенаправляем на защищённую страницу
-        window.location.href = '/dashboard.html';
-      } else {
-        alert('Неправильный логин или пароль');
-      }
-    } catch (error) {
-      console.error('Ошибка при попытке войти:', error);
-      alert('Произошла ошибка. Попробуйте ещё раз.');
-    }
-  });
-
-  // Анимация карточки
   gsap.from(".login-card", {
     duration: 1,
     y: 50,
