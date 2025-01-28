@@ -28,10 +28,10 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/user/login", "/user/logout", "/resources/**", "/user/registration").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN") // Доступ только для роли ADMIN
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/user/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/user/login/done").permitAll()
-                        .requestMatchers("/anonymous*").anonymous() // Доступ только анонимным пользователям
+                        .requestMatchers("/anonymous*").anonymous()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
