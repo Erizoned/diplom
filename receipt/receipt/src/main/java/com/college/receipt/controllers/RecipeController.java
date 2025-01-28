@@ -4,14 +4,12 @@ import com.college.receipt.entities.Ingredients;
 import com.college.receipt.entities.Recipe;
 import com.college.receipt.entities.Steps;
 import com.college.receipt.entities.UploadedFile;
-import com.college.receipt.exceptions.recipesNotFoundException;
 import com.college.receipt.repositories.IngredientRepository;
 import com.college.receipt.repositories.StepRepository;
 import com.college.receipt.repositories.UploadedFileRepository;
 import com.college.receipt.service.Recipe.RecipeRepository;
 import com.college.receipt.service.Recipe.RecipeServiceImpl;
 import com.college.receipt.service.UploadedFileService;
-import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -24,9 +22,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.Valid;
-import java.io.File;
+
 import java.io.IOException;
-import java.net.Authenticator;
 import java.util.List;
 
 @RequestMapping("/")

@@ -1,7 +1,6 @@
 package com.college.receipt.controllers;
 
 import com.college.receipt.service.UploadedFileService;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

@@ -5,25 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Обновление рецепта</title>
     <style>
+        :root {
+            --background: #f5f5f5;
+            --card-bg: #ffffff;
+            --primary-color: #007bff;
+            --primary-hover: #0056b3;
+            --text-color: #333;
+            --border-color: #ddd;
+            --shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            --radius: 10px;
+        }
+
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #f5f5f5;
+            background-color: var(--background);
             margin: 0;
             padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
 
         .container {
+            width: 100%;
             max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
         }
 
         h1 {
             text-align: center;
-            color: #333;
+            color: var(--text-color);
+            margin-bottom: 20px;
         }
 
         .form-group {
@@ -34,43 +50,66 @@
             font-weight: bold;
             display: block;
             margin-bottom: 8px;
+            color: var(--text-color);
         }
 
         input, select, textarea {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
             font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
         }
 
         button {
-            background-color: #007bff;
-            color: white;
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: var(--primary-color);
+            color: #fff;
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
+            border-radius: var(--radius);
             font-size: 16px;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        .steps, .ingredients {
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
             margin-top: 20px;
         }
 
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .steps, .ingredients {
+            margin-top: 30px;
+        }
+
         .step, .ingredient {
-            border: 1px solid #ddd;
-            padding: 10px;
-            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: var(--radius);
             margin-bottom: 10px;
         }
 
         .add-btn {
+            background-color: var(--primary-color);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            font-size: 14px;
+            cursor: pointer;
+            display: inline-block;
             margin-top: 10px;
+        }
+
+        .add-btn:hover {
+            background-color: var(--primary-hover);
         }
     </style>
 </head>
@@ -94,44 +133,44 @@
         <div class="form-group">
             <label for="theme">Тема блюда:</label>
             <select id="theme" name="theme" th:value="${recipe.theme}">
-                <option value="breakfast" th:selected="${recipe.theme == 'breakfast'}">Завтрак</option>
-                <option value="lunch" th:selected="${recipe.theme == 'lunch'}">Обед</option>
-                <option value="dinner" th:selected="${recipe.theme == 'dinner'}">Ужин</option>
-                <option value="snack" th:selected="${recipe.theme == 'snack'}">Перекус</option>
-                <option value="holiday" th:selected="${recipe.theme == 'holiday'}">Праздничное блюдо</option>
+                <option value="breakfast" th:selected="${recipe.theme == 'Завтрак'}">Завтрак</option>
+                <option value="lunch" th:selected="${recipe.theme == 'Обед'}">Обед</option>
+                <option value="dinner" th:selected="${recipe.theme == 'Ужин'}">Ужин</option>
+                <option value="snack" th:selected="${recipe.theme == 'Перекус'}">Перекус</option>
+                <option value="holiday" th:selected="${recipe.theme == 'Праздничное'}">Праздничное блюдо</option>
             </select>
         </div>
 
         <div class="form-group">
             <label for="typeOfFood">Тип блюда:</label>
             <select id="typeOfFood" name="typeOfFood" th:value="${recipe.typeOfFood}">
-                <option value="soup" th:selected="${recipe.typeOfFood == 'soup'}">Суп</option>
-                <option value="meat" th:selected="${recipe.typeOfFood == 'meat'}">Мясо</option>
-                <option value="salad" th:selected="${recipe.typeOfFood == 'salad'}">Салат</option>
-                <option value="dessert" th:selected="${recipe.typeOfFood == 'dessert'}">Десерт</option>
-                <option value="sideDish" th:selected="${recipe.typeOfFood == 'sideDish'}">Гарнир</option>
+                <option value="soup" th:selected="${recipe.typeOfFood == 'Суп'}">Суп</option>
+                <option value="meat" th:selected="${recipe.typeOfFood == 'Мясо'}">Мясо</option>
+                <option value="salad" th:selected="${recipe.typeOfFood == 'Салат'}">Салат</option>
+                <option value="dessert" th:selected="${recipe.typeOfFood == 'Десерт'}">Десерт</option>
+                <option value="sideDish" th:selected="${recipe.typeOfFood == 'Гарнир'}">Гарнир</option>
             </select>
         </div>
 
         <div class="form-group">
             <label for="typeOfCook">Тип приготовления:</label>
             <select id="typeOfCook" name="typeOfCook" th:value="${recipe.typeOfCook}">
-                <option value="pan" th:selected="${recipe.typeOfCook == 'pan'}">Сковорода</option>
-                <option value="pot" th:selected="${recipe.typeOfCook == 'pot'}">Кастрюля</option>
-                <option value="oven" th:selected="${recipe.typeOfCook == 'oven'}">Духовка</option>
-                <option value="grill" th:selected="${recipe.typeOfCook == 'grill'}">Гриль</option>
-                <option value="steamer" th:selected="${recipe.typeOfCook == 'steamer'}">Пароварка</option>
+                <option value="pan" th:selected="${recipe.typeOfCook == 'Сковорода'}">Сковорода</option>
+                <option value="pot" th:selected="${recipe.typeOfCook == 'Кастрюля'}">Кастрюля</option>
+                <option value="oven" th:selected="${recipe.typeOfCook == 'Духовка'}">Духовка</option>
+                <option value="grill" th:selected="${recipe.typeOfCook == 'Гриль'}">Гриль</option>
+                <option value="steamer" th:selected="${recipe.typeOfCook == 'Пароварка'}">Пароварка</option>
             </select>
         </div>
 
         <div class="form-group">
             <label for="restrictions">Ограничения:</label>
             <select id="restrictions" name="restrictions" th:value="${recipe.restrictions}">
-                <option value="no_sugar" th:selected="${recipe.restrictions == 'no_sugar'}">Без сахара</option>
-                <option value="no_gluten" th:selected="${recipe.restrictions == 'no_gluten'}">Без глютена</option>
-                <option value="no_dairy" th:selected="${recipe.restrictions == 'no_dairy'}">Без молочных продуктов</option>
-                <option value="vegan" th:selected="${recipe.restrictions == 'vegan'}">Веган</option>
-                <option value="nut_allergy" th:selected="${recipe.restrictions == 'nut_allergy'}">Без орехов</option>
+                <option value="no_sugar" th:selected="${recipe.restrictions == 'Без сахара'}">Без сахара</option>
+                <option value="no_gluten" th:selected="${recipe.restrictions == 'Без глютена'}">Без глютена</option>
+                <option value="no_dairy" th:selected="${recipe.restrictions == 'Без молочных продуктов'}">Без молочных продуктов</option>
+                <option value="vegan" th:selected="${recipe.restrictions == 'Веган'}">Веган</option>
+                <option value="nut_allergy" th:selected="${recipe.restrictions == 'Без орехов'}">Без орехов</option>
             </select>
         </div>
 
@@ -155,7 +194,6 @@
             <input type="file" id="photoFood" name="photoFood" accept="image/*">
         </div>
 
-        <!-- Шаги -->
         <div class="steps">
             <h3>Шаги приготовления</h3>
             <div class="step" th:each="step, iter : ${steps}">
@@ -167,7 +205,6 @@
         </div>
         <button type="button" class="add-btn" onclick="addStep()">+ Добавить шаг</button>
 
-        <!-- Ингредиенты -->
         <div class="ingredients">
             <h3>Ингредиенты</h3>
             <div class="ingredient" th:each="ingredient, iter : ${ingredients}">
