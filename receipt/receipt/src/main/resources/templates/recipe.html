@@ -4,113 +4,123 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title th:text="${recipe.theme}">Рецепт</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <style>
+    :root {
+      --olive-green: #667302;
+      --orange: #F25C05;
+      --beige: #F2D0C9;
+      --brown: #8C3503;
+      --black: #0D0D0D;
+    }
+
     body {
-        font-family: 'Arial', sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: #f5f5f5;
-        color: #333;
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--beige);
+      color: var(--black);
     }
 
     .container {
-        max-width: 900px;
-        margin: 40px auto;
-        padding: 20px;
-        background: #ffffff;
-        border-radius: 10px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    h1, h2, h3 {
-        color: #2c3e50;
-        margin-bottom: 20px;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
     }
 
     h1 {
-        text-align: center;
-        font-size: 2.5rem;
+      text-align: center;
+      font-size: 2.5rem;
+      color: var(--brown);
+      margin-bottom: 20px;
+      opacity: 0;
     }
 
     h2 {
-        font-size: 1.8rem;
-        border-bottom: 2px solid #e1e1e1;
-        padding-bottom: 10px;
+      font-size: 1.8rem;
+      border-bottom: 2px solid var(--orange);
+      padding-bottom: 10px;
+      color: var(--brown);
+      margin-bottom: 20px;
     }
 
     h3 {
-        font-size: 1.5rem;
-        margin-top: 15px;
+      font-size: 1.5rem;
+      margin-top: 15px;
+      color: var(--olive-green);
     }
 
     p {
-        font-size: 1rem;
-        line-height: 1.6;
-        margin: 10px 0;
+      font-size: 1rem;
+      line-height: 1.6;
+      margin: 10px 0;
     }
 
     .photos, .steps {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 15px;
-        justify-content: center;
-        margin-bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+      margin-bottom: 20px;
     }
 
     .photos img, .steps img {
-        max-width: 200px;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease;
+      max-width: 200px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
     .photos img:hover, .steps img:hover {
-        transform: scale(1.1);
-    }
-
-    .steps > div, .ingredients > div {
-        background: #f9f9f9;
-        border: 1px solid #e1e1e1;
-        border-radius: 10px;
-        padding: 15px;
-        width: 100%;
-        max-width: 400px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        margin-bottom: 10px;
+      transform: scale(1.1);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
     }
 
     .details {
-        margin-top: 30px;
-        padding: 20px;
-        background: #f7f7f7;
-        border-radius: 10px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      background: var(--beige);
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
     }
 
     .details p {
-        margin: 10px 0;
+      margin: 10px 0;
     }
 
     .details strong {
-        color: #555;
+      color: var(--black);
     }
 
-    .back-link {
-        display: block;
-        text-align: center;
-        margin-top: 30px;
-        padding: 10px 20px;
-        background-color: #3498db;
-        color: #fff;
-        text-decoration: none;
-        border-radius: 5px;
-        font-size: 1.2rem;
-        font-weight: bold;
-        transition: background-color 0.3s ease;
+    .back-link, .delete-button {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      padding: 12px 24px;
+      background-color: var(--orange);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      transition: background-color 0.3s ease, transform 0.3s ease;
     }
 
-    .back-link:hover {
-        background-color: #2980b9;
+    .back-link:hover, .delete-button:hover {
+      background-color: var(--brown);
+      transform: translateY(-3px);
+    }
+
+    .delete-button {
+      margin-top: 30px;
+      background-color: var(--olive-green);
+    }
+
+    .delete-button:hover {
+      background-color: var(--orange);
     }
   </style>
 </head>
@@ -165,12 +175,22 @@
     <p><strong>Калорийность (ккал):</strong> <span th:text="${recipe.kkal}">Калорийность</span></p>
     <p><strong>Время приготовления:</strong> <span th:text="${recipe.timeToCook}">Время приготовления</span> минут</p>
   </div>
+
   <form th:action="@{'/recipe/' + ${id} + '/delete'}" method="POST">
     <input type="hidden" name="_method" value="DELETE">
     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-    <button type="submit" class="back-link">Удалить рецепт</button>
+    <button type="submit" class="delete-button">Удалить рецепт</button>
   </form>
   <a href="/" class="back-link">Назад к списку рецептов</a>
 </div>
+
+<script>
+  window.addEventListener('load', () => {
+    gsap.from("h1", { opacity: 0, y: -30, duration: 0.8, ease: "power3.out" });
+    gsap.from(".photos img", { opacity: 0, y: 20, duration: 0.6, stagger: 0.2, ease: "power3.out" });
+    gsap.from(".details", { opacity: 0, y: 20, duration: 0.8, ease: "power3.out" });
+    gsap.from(".ingredients p", { opacity: 0, x: -20, duration: 0.5, stagger: 0.1, ease: "power3.out" });
+  });
+</script>
 </body>
 </html>

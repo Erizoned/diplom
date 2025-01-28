@@ -26,19 +26,16 @@
             background: white;
             padding: 40px;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             opacity: 0;
+            transform: translateY(20px);
         }
 
         h1 {
             color: var(--brown);
             text-align: center;
             margin-bottom: 30px;
-            font-size: 2.5em;
-        }
-
-        .form-group {
-            margin-bottom: 25px;
+            font-size: 2.5rem;
         }
 
         label {
@@ -58,14 +55,14 @@
         }
 
         input:focus, select:focus, textarea:focus {
-            outline: none;
             border-color: var(--orange);
-            box-shadow: 0 0 0 3px rgba(242, 92, 5, 0.1);
+            box-shadow: 0 0 5px var(--orange);
+            outline: none;
         }
 
         textarea {
-            min-height: 100px;
             resize: vertical;
+            min-height: 100px;
         }
 
         .step, .ingredient {
@@ -74,8 +71,8 @@
             border-radius: 10px;
             margin-bottom: 20px;
             border: 1px solid #e1e1e1;
-            opacity: 0;
             transform: translateY(20px);
+            opacity: 0;
         }
 
         button {
@@ -102,12 +99,6 @@
             transform: translateY(-2px);
         }
 
-        .error-message {
-            color: #dc3545;
-            font-size: 14px;
-            margin-top: 5px;
-        }
-
         input[type="file"] {
             padding: 10px;
             background: #f5f5f5;
@@ -120,6 +111,12 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
         }
     </style>
 </head>
@@ -148,55 +145,6 @@
                 <option value="snack">Перекус</option>
                 <option value="holiday">Праздничное блюдо</option>
             </select>
-        </div>
-
-        <div>
-            <label for="typeOfFood">Тип блюда:</label>
-            <select id="typeOfFood" name="typeOfFood">
-                <option value="soup">Суп</option>
-                <option value="meat">Мясо</option>
-                <option value="salad">Салат</option>
-                <option value="dessert">Десерт</option>
-                <option value="sideDish">Гарнир</option>
-            </select>
-        </div>
-
-        <div>
-            <label for="typeOfCook">Тип приготовления:</label>
-            <select id="typeOfCook" name="typeOfCook">
-                <option value="pan">Сковорода</option>
-                <option value="pot">Кастрюля</option>
-                <option value="oven">Духовка</option>
-                <option value="grill">Гриль</option>
-                <option value="steamer">Пароварка</option>
-            </select>
-        </div>
-
-        <div>
-            <label for="restrictions">Ограничения:</label>
-            <select id="restrictions" name="restrictions">
-                <option value="">Выберите ограничение</option>
-                <option value="no_sugar">Без сахара</option>
-                <option value="no_gluten">Без глютена</option>
-                <option value="no_dairy">Без молочных продуктов</option>
-                <option value="vegan">Веган</option>
-                <option value="nut_allergy">Без орехов</option>
-            </select>
-        </div>
-
-        <div>
-            <label for="countPortion">Количество порций:</label>
-            <input type="number" id="countPortion" name="countPortion" required>
-        </div>
-
-        <div>
-            <label for="kkal">Калорийность (ккал):</label>
-            <input type="number" id="kkal" name="kkal" required>
-        </div>
-
-        <div>
-            <label for="timeToCook">Время приготовления (мин):</label>
-            <input type="number" id="timeToCook" name="timeToCook" required>
         </div>
 
         <div>
@@ -239,75 +187,37 @@
     let ingredientCounter = 1;
 
     window.addEventListener('load', () => {
-        gsap.to(".create-recipe-container", {
-            duration: 1,
-            opacity: 1,
-            y: 0,
-            ease: "power3.out"
-        });
-
-        gsap.to(".step, .ingredient", {
-            duration: 0.8,
-            opacity: 1,
-            y: 0,
-            stagger: 0.2,
-            ease: "power3.out"
-        });
+        gsap.to(".create-recipe-container", { duration: 1, opacity: 1, y: 0, ease: "power3.out" });
+        gsap.to(".step, .ingredient", { duration: 0.8, opacity: 1, y: 0, stagger: 0.2, ease: "power3.out" });
     });
 
     function addStep() {
         stepCounter++;
-        const stepsContainer = document.getElementById("stepsContainer");
         const stepDiv = document.createElement("div");
         stepDiv.classList.add("step");
-        stepDiv.style.opacity = "0";
-        stepDiv.style.transform = "translateY(20px)";
-
         stepDiv.innerHTML = `
             <h3>Шаг ${stepCounter}</h3>
             <label for="stepDescription${stepCounter}">Описание шага:</label>
             <textarea id="stepDescription${stepCounter}" name="stepDescriptions" required></textarea>
-
             <label for="stepPhoto${stepCounter}">Фото шага:</label>
             <input type="file" id="stepPhoto${stepCounter}" name="stepPhotos" accept="image/*" required>
         `;
-
-        stepsContainer.appendChild(stepDiv);
-
-        gsap.to(stepDiv, {
-            duration: 0.8,
-            opacity: 1,
-            y: 0,
-            ease: "power3.out"
-        });
+        document.getElementById("stepsContainer").appendChild(stepDiv);
+        gsap.from(stepDiv, { duration: 0.8, opacity: 0, y: 20, ease: "power3.out" });
     }
 
     function addIngredient() {
         ingredientCounter++;
-
-        const ingredientsContainer = document.getElementById("ingredientsContainer");
-
         const ingredientDiv = document.createElement("div");
         ingredientDiv.classList.add("ingredient");
-        ingredientDiv.style.opacity = "0";
-        ingredientDiv.style.transform = "translateY(20px)";
-
         ingredientDiv.innerHTML = `
             <label for="ingredientName${ingredientCounter}">Название ингредиента:</label>
             <input type="text" id="ingredientName${ingredientCounter}" name="ingredientNames" required>
-
             <label for="ingredientCount${ingredientCounter}">Количество:</label>
             <input type="number" id="ingredientCount${ingredientCounter}" name="ingredientsCounts" required>
         `;
-
-        ingredientsContainer.appendChild(ingredientDiv);
-
-        gsap.to(ingredientDiv, {
-            duration: 0.8,
-            opacity: 1,
-            y: 0,
-            ease: "power3.out"
-        });
+        document.getElementById("ingredientsContainer").appendChild(ingredientDiv);
+        gsap.from(ingredientDiv, { duration: 0.8, opacity: 0, y: 20, ease: "power3.out" });
     }
 </script>
 </body>

@@ -7,12 +7,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <style>
         :root {
-            --gradient-start: #FF6B6B;
-            --gradient-middle: #FF758C;
-            --gradient-end: #FF8FAB;
+            --gradient-start: #667302;
+            --gradient-middle: #F25C05;
+            --gradient-end: #8C3503;
             --white: #FFFFFF;
-            --gray-light: #F5F5F5;
-            --text-color: #333333;
+            --gray-light: #F2D0C9;
+            --text-color: #0D0D0D;
         }
 
         body {
@@ -76,7 +76,7 @@
             border: none;
             border-radius: 10px;
             background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-            color: white;
+            color: var(--white);
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
@@ -89,7 +89,7 @@
 
         .button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+            box-shadow: 0 5px 15px rgba(102, 115, 2, 0.4);
         }
 
         .error-message {
@@ -102,7 +102,8 @@
             text-align: center;
             margin-top: 20px;
         }
-.login-link a {
+
+        .login-link a {
             color: var(--gradient-middle);
             text-decoration: none;
             font-weight: bold;

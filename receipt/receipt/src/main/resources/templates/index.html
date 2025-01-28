@@ -178,7 +178,7 @@
             box-shadow: 0 0 0 3px rgba(242, 92, 5, 0.1);
         }
 
-        .search-button, 
+        .search-button,
         .filter-button {
             padding: 15px 25px;
             font-weight: bold;
@@ -236,7 +236,7 @@
 </head>
 <body>
     <div th:replace="header.html"></div>
-    
+
     <div class="main-container" style="margin-top: 80px; padding: 20px;">
         <div class="search-section">
             <form th:action="@{/}" method="get" class="search-form">
@@ -327,7 +327,7 @@
         </div>
 
         <h1>Все рецепты</h1>
-        
+
         <div class="recipe-container">
             <div th:each="recipe : ${recipes}" class="recipe-card">
                 <a th:href="@{'/recipe/'} + ${recipe.id}">
@@ -355,7 +355,7 @@
         function toggleDiv() {
             const filterDiv = document.getElementById("filterDiv");
             const isHidden = filterDiv.style.display === "none";
-            
+
             if (isHidden) {
                 filterDiv.style.display = "block";
                 gsap.from(filterDiv, {

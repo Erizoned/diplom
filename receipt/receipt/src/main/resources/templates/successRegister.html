@@ -1,10 +1,80 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registration Successful</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        :root {
+            --olive-green: #667302;
+            --orange: #F25C05;
+            --beige: #F2D0C9;
+            --brown: #8C3503;
+            --black: #0D0D0D;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: var(--beige);
+            color: var(--black);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--olive-green);
+            margin: 0;
+            opacity: 0;
+        }
+
+        p {
+            font-size: 1.25rem;
+            margin: 20px 0 0;
+            color: var(--brown);
+            opacity: 0;
+        }
+
+        span {
+            color: var(--orange);
+            font-weight: bold;
+        }
+
+        .highlight {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: var(--brown);
+            color: var(--beige);
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            opacity: 0;
+        }
+
+        .highlight:hover {
+            background-color: var(--olive-green);
+            color: var(--beige);
+        }
+    </style>
 </head>
 <body>
-<h1>Registration Successful!</h1>
-<p>Welcome, <span th:text="${user.username}">user</span>!</p>
+<h1 id="header">Registration Successful!</h1>
+<p id="welcome-text">Welcome, <span th:text="${user.username}">user</span>!</p>
+<a href="/" class="highlight" id="button">Go to Homepage</a>
+
+<script>
+    // GSAP animations
+    gsap.timeline()
+        .to("#header", { opacity: 1, y: -20, duration: 1, ease: "power2.out" })
+        .to("#welcome-text", { opacity: 1, y: -20, duration: 1, ease: "power2.out" }, "-=0.5")
+        .to("#button", { opacity: 1, scale: 1.1, duration: 1, ease: "elastic.out(1, 0.5)" }, "-=0.5");
+</script>
 </body>
 </html>
