@@ -148,6 +148,55 @@
         </div>
 
         <div>
+            <label for="typeOfFood">Тип блюда:</label>
+            <select id="typeOfFood" name="typeOfFood">
+                <option value="soup">Суп</option>
+                <option value="meat">Мясо</option>
+                <option value="salad">Салат</option>
+                <option value="dessert">Десерт</option>
+                <option value="sideDish">Гарнир</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="typeOfCook">Тип приготовления:</label>
+            <select id="typeOfCook" name="typeOfCook">
+                <option value="pan">Сковорода</option>
+                <option value="pot">Кастрюля</option>
+                <option value="oven">Духовка</option>
+                <option value="grill">Гриль</option>
+                <option value="steamer">Пароварка</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="restrictions">Ограничения:</label>
+            <select id="restrictions" name="restrictions">
+                <option value="">Выберите ограничение</option>
+                <option value="no_sugar">Без сахара</option>
+                <option value="no_gluten">Без глютена</option>
+                <option value="no_dairy">Без молочных продуктов</option>
+                <option value="vegan">Веган</option>
+                <option value="nut_allergy">Без орехов</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="countPortion">Количество порций:</label>
+            <input type="number" id="countPortion" name="countPortion" required>
+        </div>
+
+        <div>
+            <label for="kkal">Калорийность (ккал):</label>
+            <input type="number" id="kkal" name="kkal" required>
+        </div>
+
+        <div>
+            <label for="timeToCook">Время приготовления (мин):</label>
+            <input type="number" id="timeToCook" name="timeToCook" required>
+        </div>
+
+        <div>
             <label for="photoFood">Фото блюда:</label>
             <input type="file" id="photoFood" name="photoFood" accept="image/*" required>
         </div>

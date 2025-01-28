@@ -5,9 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Рецепты</title>
     <style>
+        :root {
             --beige: #F2D0C9;
             --brown: #8C3503;
             --black: #0D0D0D;
+            --olive-green: #4A4A1A;
+            --orange: #F25C05;
+            --gradient-start: #FF6B6B;
+            --gradient-middle: #FF758C;
+            --gradient-end: #FF8FAB;
         }
 
         body {
@@ -20,69 +26,62 @@
 
         h1 {
             text-align: center;
-            margin: 40px 0;
-            font-size: 42px;
+            margin: 20px 0;
+            font-size: 36px;
             color: var(--brown);
-            opacity: 0;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .search-section {
+            margin-bottom: 20px;
         }
 
         .search-container {
             display: flex;
-            justify-content: center;
             gap: 10px;
-            margin: 20px 0;
-            opacity: 0;
+            margin-bottom: 10px;
         }
 
         .search-container input {
-            padding: 10px;
+            flex: 1;
+            padding: 12px;
             border: 2px solid var(--olive-green);
-            border-radius: 5px;
-            width: 300px;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
         }
 
-        .search-container button,
-        .filter-button,
-        .redirect-button {
+        .search-container input:focus {
+            border-color: var(--orange);
+            box-shadow: 0 0 0 3px rgba(242, 92, 5, 0.2);
+        }
+
+        .search-button, .filter-button {
+            padding: 10px 20px;
             background-color: var(--orange);
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+            border-radius: 8px;
+            font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
-        .search-container button:hover,
-        .filter-button:hover,
-        .redirect-button:hover {
+        .search-button:hover, .filter-button:hover {
             background-color: var(--brown);
-        }
-
-        #filterDiv {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px auto;
-            max-width: 800px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        #filterDiv select,
-        #filterDiv input {
-            width: 100%;
-            padding: 8px;
-            margin: 5px 0 15px;
-            border: 1px solid var(--olive-green);
-            border-radius: 4px;
+            transform: translateY(-2px);
         }
 
         .recipe-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 30px;
-            padding: 20px;
-            margin-top: 20px;
+            gap: 15px;
+            padding: 10px;
         }
 
         .recipe-card {
@@ -90,35 +89,67 @@
             border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            cursor: pointer;
+        }
+
+        .recipe-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--orange), var(--brown));
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 1;
+            border-radius: 15px;
         }
 
         .recipe-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 30px rgba(0,0,0,0.15);
         }
 
-        .recipe-card a {
-            text-decoration: none;
-            color: inherit;
-            display: block;
+        .recipe-card:hover::before {
+            opacity: 0.1;
         }
 
-        .recipe-image {
+        .recipe-card img {
             width: 100%;
             height: 200px;
             object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .recipe-card:hover img {
+            transform: scale(1.1);
         }
 
         .recipe-details {
             padding: 20px;
+            position: relative;
+            z-index: 2;
+            background: white;
+            transition: transform 0.3s ease;
+        }
+
+        .recipe-card:hover .recipe-details {
+            transform: translateY(-5px);
         }
 
         .recipe-title {
-            font-size: 1.5rem;
-            font-weight: bold;
             color: var(--brown);
+            font-size: 1.2rem;
+            font-weight: bold;
             margin-bottom: 10px;
+            transition: color 0.3s ease;
+        }
+
+        .recipe-card:hover .recipe-title {
+            color: var(--orange);
         }
 
         .recipe-description {
@@ -129,99 +160,28 @@
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            transition: color 0.3s ease;
         }
 
         .recipe-time {
             color: var(--olive-green);
             font-weight: bold;
             font-size: 0.9rem;
-        }
-
-        @media screen and (max-width: 768px) {
-            .recipe-card {
-                width: 90%;
-            }
-        }
-
-        .main-container {
-            max-width: 1200px;
-            margin: 80px auto 0;
-            padding: 20px;
-        }
-
-        .search-section {
-            margin-bottom: 30px;
-        }
-
-        .search-form {
-            width: 100%;
-        }
-
-        .search-container {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            opacity: 1;
+            align-items: center;
+            gap: 5px;
+            transition: transform 0.3s ease;
         }
 
-        .search-container input {
-            flex: 1;
-            padding: 15px;
-            border: 2px solid var(--olive-green);
-            border-radius: 8px;
-            font-size: 16px;
-            transition: all 0.3s ease;
+        .recipe-card:hover .recipe-time {
+            transform: scale(1.05);
         }
 
-        .search-container input:focus {
-            border-color: var(--orange);
-            box-shadow: 0 0 0 3px rgba(242, 92, 5, 0.1);
-        }
-
-        .search-button,
-        .filter-button {
-            padding: 15px 25px;
-            font-weight: bold;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .create-recipe-button {
-            display: inline-block;
-            background-color: var(--olive-green);
-            color: white;
-            padding: 15px 30px;
-            border-radius: 8px;
-            font-weight: bold;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            margin-bottom: 30px;
-        }
-
-        .create-recipe-button:hover {
-            background-color: var(--brown);
-            transform: translateY(-2px);
-        }
-
-        .actions-container {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 20px;
-        }
-
-        .filter-container {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            margin-top: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Добавим анимацию для плавного появления карточек */
-        @keyframes fadeInUp {
+        /* Добавляем анимацию появления */
+        @keyframes recipeCardAppear {
             from {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateY(30px);
             }
             to {
                 opacity: 1;
@@ -229,10 +189,105 @@
             }
         }
 
-        .recipe-card {
-            animation: fadeInUp 0.6s ease-out forwards;
+        /* Добавляем пульсацию для новых рецептов */
+        @keyframes newRecipePulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .recipe-card.new-recipe {
+            animation: newRecipePulse 2s infinite;
+        }
+
+        .filter-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .filter-container form div {
+            margin-bottom: 15px;
+        }
+
+        .filter-container label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: var(--brown);
+        }
+
+        .filter-container select,
+        .filter-container input {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 2px solid var(--olive-green);
+            border-radius: 8px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .filter-container select:focus,
+        .filter-container input:focus {
+            border-color: var(--orange);
+            box-shadow: 0 0 0 3px rgba(242, 92, 5, 0.2);
+        }
+
+        .filter-container button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: var(--orange);
+            color: white;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .filter-container button:hover {
+            background-color: var(--brown);
+            transform: translateY(-2px);
+        }
+
+        .create-recipe-button {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .create-recipe-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            background: linear-gradient(135deg, var(--gradient-end), var(--gradient-start));
+        }
+
+        .recipe-card a {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .actions-container {
+            margin: 20px 0;
+            text-align: left;
         }
     </style>
+
 </head>
 <body>
     <div th:replace="header.html"></div>
@@ -326,7 +381,7 @@
             </a>
         </div>
 
-        <h1>Все рецепты</h1>
+
 
         <div class="recipe-container">
             <div th:each="recipe : ${recipes}" class="recipe-card">
@@ -352,18 +407,20 @@
     </div>
 
     <script>
+        /**
+         * Функция для включения/выключения фильтров с анимацией
+         */
         function toggleDiv() {
             const filterDiv = document.getElementById("filterDiv");
-            const isHidden = filterDiv.style.display === "none";
+            const isHidden = filterDiv.style.display === "none" || filterDiv.style.display === "";
 
             if (isHidden) {
-                filterDiv.style.display = "block";
-                gsap.from(filterDiv, {
-                    duration: 0.5,
-                    height: 0,
-                    opacity: 0,
-                    ease: "power3.out"
-                });
+                filterDiv.style.display = "block"; // Показать фильтр
+                gsap.fromTo(
+                    filterDiv,
+                    { height: 0, opacity: 0 },
+                    { duration: 0.5, height: "auto", opacity: 1, ease: "power3.out" }
+                );
             } else {
                 gsap.to(filterDiv, {
                     duration: 0.5,
@@ -371,28 +428,34 @@
                     opacity: 0,
                     ease: "power3.out",
                     onComplete: () => {
-                        filterDiv.style.display = "none";
+                        filterDiv.style.display = "none"; // Скрыть фильтр
                     }
                 });
             }
         }
 
+        /**
+         * Анимация появления элементов при загрузке страницы
+         */
         window.addEventListener('load', () => {
+            // Анимация поиска
             gsap.from(".search-section", {
-                duration: 1,
-                y: -30,
+                duration: 0.8,
+                y: -20,
                 opacity: 0,
                 ease: "power3.out"
             });
 
+            // Анимация кнопок
             gsap.from(".actions-container", {
-                duration: 1,
-                y: -20,
+                duration: 0.8,
+                y: -15,
                 opacity: 0,
                 delay: 0.2,
                 ease: "power3.out"
             });
 
+            // Анимация заголовка
             gsap.from("h1", {
                 duration: 1,
                 y: -20,
@@ -401,14 +464,65 @@
                 ease: "power3.out"
             });
 
-            gsap.from(".recipe-card", {
-                duration: 0.8,
-                y: 50,
-                opacity: 0,
-                stagger: 0.1,
-                ease: "power3.out"
+            // Регистрируем плагины GSAP
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Анимация для карточек при скролле
+            gsap.utils.toArray('.recipe-card').forEach((card, i) => {
+                gsap.from(card, {
+                    scrollTrigger: {
+                        trigger: card,
+                        start: "top bottom-=100",
+                        toggleActions: "play none none reverse"
+                    },
+                    y: 100,
+                    opacity: 0,
+                    duration: 0.8,
+                    delay: i * 0.1,
+                    ease: "power3.out",
+                    onComplete: () => {
+                        // Добавляем hover эффект после появления
+                        card.style.opacity = 1;
+                        card.style.transform = "translateY(0)";
+                    }
+                });
+            });
+
+            // Анимация для изображений при наведении
+            document.querySelectorAll('.recipe-card').forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    gsap.to(card.querySelector('img'), {
+                        scale: 1.1,
+                        duration: 0.4,
+                        ease: "power2.out"
+                    });
+                    gsap.to(card.querySelector('.recipe-details'), {
+                        y: -5,
+                        duration: 0.3,
+                        ease: "power2.out"
+                    });
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    gsap.to(card.querySelector('img'), {
+                        scale: 1,
+                        duration: 0.4,
+                        ease: "power2.out"
+                    });
+                    gsap.to(card.querySelector('.recipe-details'), {
+                        y: 0,
+                        duration: 0.3,
+                        ease: "power2.out"
+                    });
+                });
+            });
+
+            // Добавляем случайную задержку для создания эффекта каскада
+            document.querySelectorAll('.recipe-card').forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
             });
         });
     </script>
+
 </body>
 </html>
