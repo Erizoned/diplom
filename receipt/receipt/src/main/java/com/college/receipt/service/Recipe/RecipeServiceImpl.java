@@ -7,6 +7,9 @@ import com.college.receipt.repositories.UserRepository;
 import com.college.receipt.service.UploadedFileService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
@@ -95,7 +98,7 @@ public class RecipeServiceImpl {
         return savedRecipe;
     }
 
-    public void updateRecipe(
+    public String updateRecipe(
             Long id,
             Recipe recipe,
             MultipartFile photoFood,
@@ -118,11 +121,18 @@ public class RecipeServiceImpl {
         savedRecipe.setCountPortion(recipe.getCountPortion());
         savedRecipe.setTheme(recipe.getTheme());
 
-        // Удаляем старые ингредиенты и шаги
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserEmail = authentication.getName();
+        boolean isOwner = savedRecipe.getCreatedBy().getEmail().equals(currentUserEmail);
+        boolean isAdmin = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"));
+
+        if(!isAdmin && !isOwner){
+            return "У вас недостаточно прав для редактирования";
+        }
+
         ingredientRepository.deleteByRecipeId(id);
         stepRepository.deleteByRecipeId(id);
 
-        // Добавляем ингредиенты
         if (ingredientNames != null && ingredientsCounts != null && ingredientNames.length == ingredientsCounts.length) {
             for (int i = 0; i < ingredientNames.length; i++) {
                 Ingredients ingredient = Ingredients.builder()
@@ -134,7 +144,6 @@ public class RecipeServiceImpl {
             }
         }
 
-        // Обновляем фото блюда
         if (photoFood != null && !photoFood.isEmpty()) {
             String filePath = "C:/Users/Anton/Documents/photos/" + photoFood.getOriginalFilename();
             photoFood.transferTo(new File(filePath));
@@ -150,7 +159,6 @@ public class RecipeServiceImpl {
             uploadedFileService.save(uploadedFile);
         }
 
-        // Добавляем шаги
         if (stepDescriptions != null && stepPhotos != null && stepDescriptions.length == stepPhotos.length) {
             for (int j = 0; j < stepPhotos.length; j++) {
                 MultipartFile stepPhoto = stepPhotos[j];
@@ -182,7 +190,22 @@ public class RecipeServiceImpl {
                 }
             }
         }
+        return null;
+    }
 
+    public String deleteRecipe(Long id){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserEmail = authentication.getName();
+        Recipe recipe = recipeRepository.findById(id).orElseThrow(() -> new RuntimeException("Рецепт с id: " + id + " не найден"));
+        boolean isOwner = recipe.getCreatedBy().getEmail().equals(currentUserEmail);
+        boolean isAdmin = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        if (!isAdmin && !isOwner){
+            return "У вас недостаточно прав для удаления рецепта";
+        }
+        recipeRepository.deleteById(id);
+        logger.info("Рецепт {} удалён", recipe.getName());
+
+        return null;
     }
 
     public Optional<Recipe> findRecipeById(Long id){

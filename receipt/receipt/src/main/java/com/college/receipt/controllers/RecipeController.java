@@ -141,6 +141,12 @@ public class RecipeController {
         }
 
         try {
+            String errorMessage = recipeService.updateRecipe(id, recipe, photoFood, stepPhotos, stepDescriptions, ingredientNames, ingredientsCounts);
+            if (errorMessage != null){
+                logger.warn("Ошибка при обновлении рецепта: {}", errorMessage);
+                model.addAttribute("errorMessage", errorMessage);
+                return "update_recipe";
+            }
             recipeService.updateRecipe(id, recipe, photoFood, stepPhotos, stepDescriptions, ingredientNames, ingredientsCounts);
             logger.info("Рецепт успешно обновлён: {}", recipe.getName());
         } catch (Exception e) {
@@ -206,17 +212,19 @@ public class RecipeController {
         model.addAttribute("photoFood", photoFood);
         model.addAttribute("steps", steps);
         model.addAttribute("ingredients", ingredients);
+        model.addAttribute("author", recipe.getCreatedBy());
 
         return "recipe";
     }
 
-
-
     @DeleteMapping("/recipe/{id}/delete")
     public String deleteRecipe(@PathVariable("id") Long id) {
-        Recipe recipe = recipeRepository.findById(id).orElseThrow(() -> new RuntimeException("Рецепт с id: " + id + " не найден"));
-        recipeRepository.deleteById(id);
-        logger.info("Рецепт {} удалён", recipe.getName());
+            String errorMessage = recipeService.deleteRecipe(id);
+            if(errorMessage != null){
+                logger.warn("Ошибка при создании рецепта:{}", errorMessage);
+                return "recipe";
+            }
+        recipeService.deleteRecipe(id);
         return "redirect:/";
     }
 

@@ -1,196 +1,206 @@
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title th:text="${recipe.theme}">Рецепт</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <style>
-    :root {
-      --olive-green: #667302;
-      --orange: #F25C05;
-      --beige: #F2D0C9;
-      --brown: #8C3503;
-      --black: #0D0D0D;
-    }
+  <!DOCTYPE html>
+  <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${recipe.theme}">Рецепт</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <style>
+      :root {
+        --olive-green: #667302;
+        --orange: #F25C05;
+        --beige: #F2D0C9;
+        --brown: #8C3503;
+        --black: #0D0D0D;
+      }
 
-    body {
-      font-family: 'Arial', sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: var(--beige);
-      color: var(--black);
-    }
+      body {
+        font-family: 'Arial', sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: var(--beige);
+        color: var(--black);
+      }
 
-    .container {
-      max-width: 900px;
-      margin: 40px auto;
-      padding: 20px;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-    }
+      .container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 20px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      }
 
-    h1 {
-      text-align: center;
-      font-size: 2.5rem;
-      color: var(--brown);
-      margin-bottom: 20px;
-      opacity: 0;
-    }
+      h1 {
+        text-align: center;
+        font-size: 2.5rem;
+        color: var(--brown);
+        margin-bottom: 20px;
+        opacity: 0;
+      }
 
-    h2 {
-      font-size: 1.8rem;
-      border-bottom: 2px solid var(--orange);
-      padding-bottom: 10px;
-      color: var(--brown);
-      margin-bottom: 20px;
-    }
+      h2 {
+        font-size: 1.8rem;
+        border-bottom: 2px solid var(--orange);
+        padding-bottom: 10px;
+        color: var(--brown);
+        margin-bottom: 20px;
+      }
 
-    h3 {
-      font-size: 1.5rem;
-      margin-top: 15px;
-      color: var(--olive-green);
-    }
+      h3 {
+        font-size: 1.5rem;
+        margin-top: 15px;
+        color: var(--olive-green);
+      }
 
-    p {
-      font-size: 1rem;
-      line-height: 1.6;
-      margin: 10px 0;
-    }
+      p {
+        font-size: 1rem;
+        line-height: 1.6;
+        margin: 10px 0;
+      }
 
-    .photos, .steps {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
+      .photos, .steps {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
 
-    .photos img, .steps img {
-      max-width: 200px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
+      .photos img, .steps img {
+        max-width: 200px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
 
-    .photos img:hover, .steps img:hover {
-      transform: scale(1.1);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-    }
+      .photos img:hover, .steps img:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+      }
 
-    .details {
-      padding: 20px;
-      background: var(--beige);
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      margin-bottom: 30px;
-    }
+      .details {
+        padding: 20px;
+        background: var(--beige);
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+      }
 
-    .details p {
-      margin: 10px 0;
-    }
+      .details p {
+        margin: 10px 0;
+      }
 
-    .details strong {
-      color: var(--black);
-    }
+      .details strong {
+        color: var(--black);
+      }
 
-    .back-link, .delete-button {
-      display: block;
-      text-align: center;
-      margin-top: 20px;
-      padding: 12px 24px;
-      background-color: var(--orange);
-      color: white;
-      text-decoration: none;
-      border-radius: 8px;
-      font-size: 1.2rem;
-      font-weight: bold;
-      transition: background-color 0.3s ease, transform 0.3s ease;
-    }
+      .back-link, .delete-button {
+        display: block;
+        text-align: center;
+        margin-top: 20px;
+        padding: 12px 24px;
+        background-color: var(--orange);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+      }
 
-    .back-link:hover, .delete-button:hover {
-      background-color: var(--brown);
-      transform: translateY(-3px);
-    }
+      .back-link:hover, .delete-button:hover {
+        background-color: var(--brown);
+        transform: translateY(-3px);
+      }
 
-    .delete-button {
-      margin-top: 30px;
-      background-color: var(--olive-green);
-    }
+      .delete-button {
+        margin-top: 30px;
+        background-color: var(--olive-green);
+      }
 
-    .delete-button:hover {
-      background-color: var(--orange);
-    }
-  </style>
-</head>
-<body>
-<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-<div class="container">
-  <h1 th:text="${recipe.name}">Название</h1>
+      .delete-button:hover {
+        background-color: var(--orange);
+      }
+    </style>
+  </head>
+  <body>
+  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+  <div class="container">
+    <h1 th:text="${recipe.name}">Название</h1>
 
-  <h2>Фото блюда:</h2>
-  <div class="photos">
-    <div th:if="${photoFood != null and photoFood.size() > 0}">
-      <img th:each="photo : ${photoFood}" th:src="@{'/files/file_system/' + ${photo.name}}" alt="Фото блюда" />
-    </div>
-    <div th:if="${photoFood == null or photoFood.size() == 0}">
-      <p>Фото блюда отсутствует.</p>
-    </div>
-  </div>
-
-  <h2>Ингредиенты:</h2>
-  <div class="ingredients">
-    <div th:if="${ingredients != null and ingredients.size() > 0}">
-      <div th:each="ingredient : ${ingredients}">
-        <p><strong th:text="${ingredient.name}">Название ингредиента</strong>: <span th:text="${ingredient.count}">Количество</span></p>
+    <h2>Фото блюда:</h2>
+    <div class="photos">
+      <div th:if="${photoFood != null and photoFood.size() > 0}">
+        <img th:each="photo : ${photoFood}" th:src="@{'/files/file_system/' + ${photo.name}}" alt="Фото блюда" />
+      </div>
+      <div th:if="${photoFood == null or photoFood.size() == 0}">
+        <p>Фото блюда отсутствует.</p>
       </div>
     </div>
-    <div th:if="${ingredients == null or ingredients.size() == 0}">
-      <p>Ингредиенты отсутствуют.</p>
-    </div>
-  </div>
 
-  <h2>Шаги приготовления:</h2>
-  <div class="steps">
-    <div th:if="${steps != null and steps.size() > 0}">
-      <div th:each="step : ${steps}">
-        <h3 th:text="'Шаг ' + ${step.stepNumber}">Шаг</h3>
-        <p th:text="${step.description}">Описание шага</p>
-        <img th:if="${step.photo != null}" th:src="@{'/files/file_system/' + ${step.photo.name}}" alt="Фото шага приготовления" />
+    <h2>Ингредиенты:</h2>
+    <div class="ingredients">
+      <div th:if="${ingredients != null and ingredients.size() > 0}">
+        <div th:each="ingredient : ${ingredients}">
+          <p><strong th:text="${ingredient.name}">Название ингредиента</strong>: <span th:text="${ingredient.count}">Количество</span></p>
+        </div>
+      </div>
+      <div th:if="${ingredients == null or ingredients.size() == 0}">
+        <p>Ингредиенты отсутствуют.</p>
       </div>
     </div>
-    <div th:if="${steps == null or steps.size() == 0}">
-      <p>Шаги приготовления отсутствуют.</p>
+
+    <h2>Шаги приготовления:</h2>
+    <div class="steps">
+      <div th:if="${steps != null and steps.size() > 0}">
+        <div th:each="step : ${steps}">
+          <h3 th:text="'Шаг ' + ${step.stepNumber}">Шаг</h3>
+          <p th:text="${step.description}">Описание шага</p>
+          <img th:if="${step.photo != null}" th:src="@{'/files/file_system/' + ${step.photo.name}}" alt="Фото шага приготовления" />
+        </div>
+      </div>
+      <div th:if="${steps == null or steps.size() == 0}">
+        <p>Шаги приготовления отсутствуют.</p>
+      </div>
     </div>
+
+    <div class="details">
+      <p><strong>Тема блюда:</strong> <span th:text="${recipe.theme}">Тема блюда</span></p>
+      <p><strong>Тип блюда:</strong> <span th:text="${recipe.typeOfFood}">Тип блюда</span></p>
+      <p><strong>Национальная кухня:</strong> <span th:text="${recipe.nationalKitchen}">Национальная кухня</span></p>
+      <p><strong>Тип приготовления:</strong> <span th:text="${recipe.typeOfCook}">Тип приготовления</span></p>
+      <p><strong>Ограничения:</strong> <span th:text="${recipe.restrictions}">Ограничения</span></p>
+      <p><strong>Количество порций:</strong> <span th:text="${recipe.countPortion}">Количество порций</span></p>
+      <p><strong>Калорийность (ккал):</strong> <span th:text="${recipe.kkal}">Калорийность</span></p>
+      <p><strong>Время приготовления:</strong> <span th:text="${recipe.timeToCook}">Время приготовления</span> минут</p>
+    </div>
+
+    <p><strong>Автор рецепта:</strong> <span th:text="${author.username}">Имя автора</span></p>
+
+    <form th:action="@{'/recipe/' + ${id} + '/delete'}" method="POST">
+      <input type="hidden" name="_method" value="DELETE">
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+      <button type="submit" class="delete-button">Удалить рецепт</button>
+
+    </form>
+    <a th:if="${currentUser != null and (currentUser.username == author.username or currentUser.roles.contains('ADMIN'))}"
+       th:href="@{'/update_recipe/' + ${id}}" class="button">Обновить рецепт</a>
+
+    <div th:if="${errorMessage}" style="color: red; font-weight: bold; margin-bottom: 20px;">
+      <p th:text="${errorMessage}"></p>
+    </div>
+
+    <a href="/" class="back-link">Назад к списку рецептов</a>
   </div>
 
-  <div class="details">
-    <p><strong>Тема блюда:</strong> <span th:text="${recipe.theme}">Тема блюда</span></p>
-    <p><strong>Тип блюда:</strong> <span th:text="${recipe.typeOfFood}">Тип блюда</span></p>
-    <p><strong>Национальная кухня:</strong> <span th:text="${recipe.nationalKitchen}">Национальная кухня</span></p>
-    <p><strong>Тип приготовления:</strong> <span th:text="${recipe.typeOfCook}">Тип приготовления</span></p>
-    <p><strong>Ограничения:</strong> <span th:text="${recipe.restrictions}">Ограничения</span></p>
-    <p><strong>Количество порций:</strong> <span th:text="${recipe.countPortion}">Количество порций</span></p>
-    <p><strong>Калорийность (ккал):</strong> <span th:text="${recipe.kkal}">Калорийность</span></p>
-    <p><strong>Время приготовления:</strong> <span th:text="${recipe.timeToCook}">Время приготовления</span> минут</p>
-  </div>
-
-  <form th:action="@{'/recipe/' + ${id} + '/delete'}" method="POST">
-    <input type="hidden" name="_method" value="DELETE">
-    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-    <button type="submit" class="delete-button">Удалить рецепт</button>
-  </form>
-  <a href="/" class="back-link">Назад к списку рецептов</a>
-</div>
-
-<script>
-  window.addEventListener('load', () => {
-    gsap.from("h1", { opacity: 0, y: -30, duration: 0.8, ease: "power3.out" });
-    gsap.from(".photos img", { opacity: 0, y: 20, duration: 0.6, stagger: 0.2, ease: "power3.out" });
-    gsap.from(".details", { opacity: 0, y: 20, duration: 0.8, ease: "power3.out" });
-    gsap.from(".ingredients p", { opacity: 0, x: -20, duration: 0.5, stagger: 0.1, ease: "power3.out" });
-  });
-</script>
-</body>
-</html>
+  <script>
+    window.addEventListener('load', () => {
+      gsap.from("h1", { opacity: 0, y: -30, duration: 0.8, ease: "power3.out" });
+      gsap.from(".photos img", { opacity: 0, y: 20, duration: 0.6, stagger: 0.2, ease: "power3.out" });
+      gsap.from(".details", { opacity: 0, y: 20, duration: 0.8, ease: "power3.out" });
+      gsap.from(".ingredients p", { opacity: 0, x: -20, duration: 0.5, stagger: 0.1, ease: "power3.out" });
+    });
+  </script>
+  </body>
+  </html>
