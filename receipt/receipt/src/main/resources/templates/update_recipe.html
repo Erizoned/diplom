@@ -133,44 +133,44 @@
         <div class="form-group">
             <label for="theme">Тема блюда:</label>
             <select id="theme" name="theme" th:value="${recipe.theme}">
-                <option value="breakfast" th:selected="${recipe.theme == 'breakfast'}">Завтрак</option>
-                <option value="lunch" th:selected="${recipe.theme == 'lunch'}">Обед</option>
-                <option value="dinner" th:selected="${recipe.theme == 'dinner'}">Ужин</option>
-                <option value="snack" th:selected="${recipe.theme == 'snack'}">Перекус</option>
-                <option value="holiday" th:selected="${recipe.theme == 'holiday'}">Праздничное блюдо</option>
+                <option value="breakfast" th:selected="${recipe.theme == 'Завтрак'}">Завтрак</option>
+                <option value="lunch" th:selected="${recipe.theme == 'Обед'}">Обед</option>
+                <option value="dinner" th:selected="${recipe.theme == 'Ужин'}">Ужин</option>
+                <option value="snack" th:selected="${recipe.theme == 'Перекус'}">Перекус</option>
+                <option value="holiday" th:selected="${recipe.theme == 'Праздничное'}">Праздничное блюдо</option>
             </select>
         </div>
 
         <div class="form-group">
             <label for="typeOfFood">Тип блюда:</label>
             <select id="typeOfFood" name="typeOfFood" th:value="${recipe.typeOfFood}">
-                <option value="soup" th:selected="${recipe.typeOfFood == 'soup'}">Суп</option>
-                <option value="meat" th:selected="${recipe.typeOfFood == 'meat'}">Мясо</option>
-                <option value="salad" th:selected="${recipe.typeOfFood == 'salad'}">Салат</option>
-                <option value="dessert" th:selected="${recipe.typeOfFood == 'dessert'}">Десерт</option>
-                <option value="sideDish" th:selected="${recipe.typeOfFood == 'sideDish'}">Гарнир</option>
+                <option value="soup" th:selected="${recipe.typeOfFood == 'Суп'}">Суп</option>
+                <option value="meat" th:selected="${recipe.typeOfFood == 'Мясо'}">Мясо</option>
+                <option value="salad" th:selected="${recipe.typeOfFood == 'Салат'}">Салат</option>
+                <option value="dessert" th:selected="${recipe.typeOfFood == 'Десерт'}">Десерт</option>
+                <option value="sideDish" th:selected="${recipe.typeOfFood == 'Гарнир'}">Гарнир</option>
             </select>
         </div>
 
         <div class="form-group">
             <label for="typeOfCook">Тип приготовления:</label>
             <select id="typeOfCook" name="typeOfCook" th:value="${recipe.typeOfCook}">
-                <option value="pan" th:selected="${recipe.typeOfCook == 'pan'}">Сковорода</option>
-                <option value="pot" th:selected="${recipe.typeOfCook == 'pot'}">Кастрюля</option>
-                <option value="oven" th:selected="${recipe.typeOfCook == 'oven'}">Духовка</option>
-                <option value="grill" th:selected="${recipe.typeOfCook == 'grill'}">Гриль</option>
-                <option value="steamer" th:selected="${recipe.typeOfCook == 'steamer'}">Пароварка</option>
+                <option value="pan" th:selected="${recipe.typeOfCook == 'Сковорода'}">Сковорода</option>
+                <option value="pot" th:selected="${recipe.typeOfCook == 'Кастрюля'}">Кастрюля</option>
+                <option value="oven" th:selected="${recipe.typeOfCook == 'Духовка'}">Духовка</option>
+                <option value="grill" th:selected="${recipe.typeOfCook == 'Гриль'}">Гриль</option>
+                <option value="steamer" th:selected="${recipe.typeOfCook == 'Пароварка'}">Пароварка</option>
             </select>
         </div>
 
         <div class="form-group">
             <label for="restrictions">Ограничения:</label>
             <select id="restrictions" name="restrictions" th:value="${recipe.restrictions}">
-                <option value="no_sugar" th:selected="${recipe.restrictions == 'no_sugar'}">Без сахара</option>
-                <option value="no_gluten" th:selected="${recipe.restrictions == 'no_gluten'}">Без глютена</option>
-                <option value="no_dairy" th:selected="${recipe.restrictions == 'no_dairy'}">Без молочных продуктов</option>
-                <option value="vegan" th:selected="${recipe.restrictions == 'vegan'}">Веган</option>
-                <option value="nut_allergy" th:selected="${recipe.restrictions == 'nut_allergy'}">Без орехов</option>
+                <option value="no_sugar" th:selected="${recipe.restrictions == 'Без сахара'}">Без сахара</option>
+                <option value="no_gluten" th:selected="${recipe.restrictions == 'Без глютена'}">Без глютена</option>
+                <option value="no_dairy" th:selected="${recipe.restrictions == 'Без молочных продуктов'}">Без молочных продуктов</option>
+                <option value="vegan" th:selected="${recipe.restrictions == 'Веган'}">Веган</option>
+                <option value="nut_allergy" th:selected="${recipe.restrictions == 'Без орехов'}">Без орехов</option>
             </select>
         </div>
 
