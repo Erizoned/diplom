@@ -13,8 +13,8 @@
 //    public String currentUser() {
 //        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 //        if (authentication != null && authentication.isAuthenticated() && !authentication.getName().equals("anonymousUser")) {
-//            return authentication.getName(); // Возвращаем имя текущего пользователя
+//            return authentication.getName();
 //        }
-//        return null; // Если пользователь не авторизован
+//        return null;
 //    }
 //}

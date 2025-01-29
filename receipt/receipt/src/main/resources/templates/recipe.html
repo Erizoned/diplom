@@ -241,8 +241,7 @@
       <button type="submit" class="delete-button">Удалить рецепт</button>
 
     </form>
-    <a th:if="${currentUser != null and (currentUser.username == author.username or currentUser.roles.contains('ADMIN'))}"
-       th:href="@{'/update_recipe/' + ${id}}" class="button">Обновить рецепт</a>
+    <a th:href="@{'/update_recipe/' + ${id}}" class="button">Обновить рецепт</a>
 
     <div th:if="${errorMessage}" style="color: red; font-weight: bold; margin-bottom: 20px;">
       <p th:text="${errorMessage}"></p>

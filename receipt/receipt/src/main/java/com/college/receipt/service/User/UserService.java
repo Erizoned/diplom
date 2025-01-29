@@ -56,6 +56,7 @@ public class UserService implements IUserService {
         user.setEmail(userDto.getEmail());
         user.setRoles(getRolesFromNames(Arrays.asList("USER")));
         logger.info("Пользователь {} успешно зарегистрировался c ролью {}", user.getUsername(), user.getRoles());
+
         return userRepository.save(user);
     }
 
