@@ -1,0 +1,56 @@
+<div class="main-container" style="margin-top: 80px; padding: 20px;">
+    <div class="search-section">
+        <form (submit)="onSearch()" class="search-form">
+            <div class="search-container">
+                <!-- <input id="search" type="text" [(ngModel)]="searchKeyword" name="keyword" placeholder="Поиск рецептов..."> -->
+                <button type="submit" class="search-button">Найти</button>
+                <button type="button" class="filter-button" (click)="toggleFilters()">Фильтры</button>
+            </div>
+        </form>
+
+        <div *ngIf="showFilters" class="filter-container">
+            <form (submit)="onFilter()">
+                <div>
+                    <label for="theme">Тема блюда:</label>
+                    <!-- <select id="theme" [(ngModel)]="filters.theme" name="theme">
+                        <option value="">Все</option>
+                        <option *ngFor="let theme of themes" [value]="theme">{{ theme }}</option>
+                    </select> -->
+                </div>
+                <div>
+                    <label for="typeOfFood">Тип блюда:</label>
+                    <!-- <select id="typeOfFood" [(ngModel)]="filters.typeOfFood" name="typeOfFood">
+                        <option value="">Все</option>
+                        <option *ngFor="let type of typesOfFood" [value]="type">{{ type }}</option>
+                    </select> -->
+                </div>
+                <div>
+                    <label for="typeOfCook">Тип приготовления:</label>
+                    <!-- <select id="typeOfCook" [(ngModel)]="filters.typeOfCook" name="typeOfCook">
+                        <option value="">Все</option>
+                        <option *ngFor="let cookType of cookingTypes" [value]="cookType">{{ cookType }}</option>
+                    </select> -->
+                </div>
+                <button type="submit">Отфильтровать</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="actions-container">
+        <a routerLink="/create-recipe" class="create-recipe-button">+ Создать новый рецепт</a>
+    </div>
+
+    <div class="recipe-container">
+        <div *ngFor="let recipe of recipes" class="recipe-card">
+            <!-- <a [routerLink]="['/recipe', recipe.id]">
+                <img *ngIf="recipe.photos?.length" [src]="'/files/file_system/' + recipe.photos[0].name" alt="Фото блюда" class="recipe-image" />
+                <img *ngIf="!recipe.photos?.length" src="/assets/images/default-recipe.png" alt="Нет фото" class="recipe-image" />
+                <div class="recipe-details">
+                    <div class="recipe-title">{{ recipe.name }}</div>
+                    <div class="recipe-description">{{ recipe.description }}</div>
+                    <div class="recipe-time">Время приготовления: {{ recipe.timeToCook }} минут</div>
+                </div>
+            </a> -->
+        </div>
+    </div>
+</div>

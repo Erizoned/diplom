@@ -110,49 +110,16 @@ public class RecipeController {
             logger.error("Рецепт с id={} не найден", id);
             return new RuntimeException("Recipe not found");
         });
+
+        List<UploadedFile> photoFood = uploadedFileRepository.findByRecipeAndIsPhotoFoodTrue(savedRecipe);
         List<Steps> steps = stepRepository.findByRecipe(savedRecipe);
         List<Ingredients> ingredients = ingredientRepository.findByRecipe(savedRecipe);
         model.addAttribute("recipe", savedRecipe);
         model.addAttribute("steps", steps);
         model.addAttribute("ingredients", ingredients);
+        model.addAttribute("photoFood", photoFood);
 
     return "update_recipe";
-    }
-
-    @PutMapping("/update_recipe/{id}")
-    public String updateRecipe(
-            @Valid @ModelAttribute Recipe recipe,
-            BindingResult result,
-            @PathVariable("id") Long id,
-            @RequestParam("photoFood") MultipartFile photoFood,
-            @RequestParam("stepPhotos") MultipartFile[] stepPhotos,
-            @RequestParam("stepDescriptions") String[] stepDescriptions,
-            @RequestParam("ingredientNames") String[] ingredientNames,
-            @RequestParam("ingredientsCounts") Integer[] ingredientsCounts,
-            Model model
-    ) {
-        if (result.hasErrors()) {
-            logger.error("Ошибка валидации: {}", result.getAllErrors());
-            model.addAttribute("errorMessage", "Пожалуйста, заполните все обязательные поля.");
-            return "update_recipe";
-        }
-
-        try {
-            String errorMessage = recipeService.updateRecipe(id, recipe, photoFood, stepPhotos, stepDescriptions, ingredientNames, ingredientsCounts);
-            if (errorMessage != null){
-                logger.warn("Ошибка при обновлении рецепта: {}", errorMessage);
-                model.addAttribute("errorMessage", errorMessage);
-                return "update_recipe";
-            }
-            recipeService.updateRecipe(id, recipe, photoFood, stepPhotos, stepDescriptions, ingredientNames, ingredientsCounts);
-            logger.info("Рецепт успешно обновлён: {}", recipe.getName());
-        } catch (Exception e) {
-            logger.error("Ошибка при обновлении рецепта: {}", e.getMessage());
-            model.addAttribute("errorMessage", "Ошибка при сохранении рецепта: " + e.getMessage());
-            return "update_recipe";
-        }
-
-        return "redirect:/recipe/" + id;
     }
 
     @PostMapping("/create_recipe")
@@ -188,6 +155,43 @@ public class RecipeController {
         }
         return "redirect:/recipe/" + recipe.getId();
     }
+
+
+    @PutMapping("/update_recipe/{id}")
+    public String updateRecipe(
+            @Valid @ModelAttribute Recipe recipe,
+            BindingResult result,
+            @PathVariable("id") Long id,
+            @RequestParam("photoFood") MultipartFile photoFood,
+            @RequestParam("stepPhotos") MultipartFile[] stepPhotos,
+            @RequestParam("stepDescriptions") String[] stepDescriptions,
+            @RequestParam("ingredientNames") String[] ingredientNames,
+            @RequestParam("ingredientsCounts") Integer[] ingredientsCounts,
+            Model model
+    ) {
+        if (result.hasErrors()) {
+            logger.error("Ошибка валидации: {}", result.getAllErrors());
+            model.addAttribute("errorMessage", "Пожалуйста, заполните все обязательные поля.");
+            return "update_recipe";
+        }
+
+        try {
+            String errorMessage = recipeService.updateRecipe(id, recipe, photoFood, stepPhotos, stepDescriptions, ingredientNames, ingredientsCounts);
+            if (errorMessage != null){
+                logger.warn("Ошибка при обновлении рецепта: {}", errorMessage);
+                model.addAttribute("errorMessage", errorMessage);
+                return "update_recipe";
+            }
+            recipeService.updateRecipe(id, recipe, photoFood, stepPhotos, stepDescriptions, ingredientNames, ingredientsCounts);
+            logger.info("Рецепт успешно обновлён: {}", recipe.getName());
+        } catch (Exception e) {
+            logger.error("Ошибка при обновлении рецепта: {}", e.getMessage());
+            model.addAttribute("errorMessage", "Ошибка при сохранении рецепта: " + e.getMessage());
+            return "update_recipe";
+        }
+        return "redirect:/recipe/" + id;
+    }
+
 
     @GetMapping("/recipe/{id}")
     public String viewRecipe(@PathVariable("id") Long id, Model model) {

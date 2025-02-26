@@ -23,7 +23,7 @@
         @Size(min = 3, max = 20)
         private String username;
         @NotBlank(message = "Почта не может быть пустой")
-        @Email(message = "Неккоректный адресс почты")
+        @Email(message = "Некорректный адрес почты")
         private String email;
         @NotBlank
         private String password;

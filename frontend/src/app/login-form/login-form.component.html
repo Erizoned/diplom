@@ -1,0 +1,16 @@
+<div class="login-card">
+    <h1>Вход в аккаунт</h1>
+    <form (ngSubmit)="onSubmitLogin()" #loginForm="ngForm"> 
+      <div ngIf="${error}" class="error-message">Неверный логин или пароль</div>
+      <div class="form-group">
+        <input type="login" id="username" name="login" [(ngModel)]="login" placeholder="Почта" required />
+      </div>
+      <div class="form-group">
+        <input type="password" id="password" name="password" [(ngModel)]="password" placeholder="Пароль" required />
+      </div>
+      <button type="submit" class="button">Войти</button>
+    </form>
+  
+    <a href="/user/registration" class="button">Создать аккаунт</a>
+  </div>
+  

@@ -1,0 +1,58 @@
+<div class="registration-card">
+    <h1>Создание аккаунта</h1>
+  
+    <!-- (ngSubmit)="onSubmitRegister()" вызывает метод onSubmitRegister() в TS -->
+    <form (ngSubmit)="onSubmitRegister()" #registerForm="ngForm">
+      <div class="form-group">
+        <label for="username">Имя пользователя</label>
+        <!-- [(ngModel)]="username" — двусторонняя привязка к свойству username в TS -->
+        <input
+          id="username"
+          name="username"
+          [(ngModel)]="login"
+          required
+        />
+      </div>
+  
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          name="email"
+          [(ngModel)]="email"
+          required
+        />
+      </div>
+  
+      <div class="form-group">
+        <label for="password">Пароль</label>
+        <input
+          id="password"
+          type="password"
+          name="password"
+          [(ngModel)]="password"
+          required
+        />
+      </div>
+  
+      <div class="form-group">
+        <label for="confirmPassword">Подтвердите пароль</label>
+        <input
+          id="confirmPassword"
+          type="password"
+          name="matchingPassword"
+          [(ngModel)]="matchingPassword"
+          required
+        />
+      </div>
+  
+      <button type="submit" class="button">Зарегистрироваться</button>
+    </form>
+  
+    <div class="login-link">
+      <!-- Вместо th:href — routerLink (если у вас настроен Router) -->
+      <a routerLink="/login">Уже есть аккаунт? Войти</a>
+    </div>
+  </div>
+  
