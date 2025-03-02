@@ -6,10 +6,8 @@ import com.college.receipt.repositories.UserRepository;
 import com.college.receipt.service.User.UserService;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
 import com.college.receipt.entities.Role;
 
@@ -23,7 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 @SpringBootTest
 @Transactional
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class UsersTest {
+public class UserTest {
 
     @Autowired
     private UserService userService;

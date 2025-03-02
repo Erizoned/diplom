@@ -11,11 +11,30 @@ export class AxiosService {
     axios.defaults.headers.post["Content-Type"] = "application/json"
    }
 
+   getAuthToken(): string | null {
+    return window.localStorage.getItem("auth_token");
+   }
+
+   setAuthToken(token: string | null): void {
+    if (token !== null){
+      window.localStorage.setItem("auth_token", token);
+    } else{
+      window.localStorage.removeItem("auth_token");
+    }
+   }
+
   request(method: string, url: string, data: any): Promise<any> { 
-   return axios({
+   let headers = {};
+
+   if (this.getAuthToken() !== null){
+    headers = {"Authorization": "Bearer " + this.getAuthToken()};
+   }
+   
+    return axios({
     method: method,
     url: url,
-    data: data
+    data: data,
+    headers: headers
    });
 }
 }

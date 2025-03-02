@@ -1,10 +1,10 @@
-package com.college.receipt.service.Recipe;
+package com.college.receipt.service;
 
 import com.college.receipt.entities.*;
 import com.college.receipt.repositories.IngredientRepository;
+import com.college.receipt.repositories.RecipeRepository;
 import com.college.receipt.repositories.StepRepository;
 import com.college.receipt.repositories.UserRepository;
-import com.college.receipt.service.UploadedFileService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -26,7 +26,7 @@ import static com.college.receipt.controllers.RecipeController.logger;
 @RequiredArgsConstructor
 @Validated
 @Transactional
-public class RecipeServiceImpl {
+public class RecipeService {
 
     private final RecipeRepository recipeRepository;
     private final UploadedFileService uploadedFileService;
@@ -50,7 +50,7 @@ public class RecipeServiceImpl {
         }
 
         if (!photoFood.isEmpty()) {
-            String filePath = "C:/Users/Anton/Documents/photos" + photoFood.getOriginalFilename();
+            String filePath = "C:/User/Anton/Documents/photos" + photoFood.getOriginalFilename();
             photoFood.transferTo(new File(filePath));
 
             UploadedFile uploadedFile = UploadedFile.builder()
@@ -74,7 +74,7 @@ public class RecipeServiceImpl {
                 UploadedFile stepPhotoFile = new UploadedFile();
                 stepPhotoFile.setName(stepPhoto.getOriginalFilename());
                 stepPhotoFile.setType(stepPhoto.getContentType());
-                stepPhotoFile.setFilePath("C:/Users/Anton/Documents/photos" + stepPhoto.getOriginalFilename());
+                stepPhotoFile.setFilePath("C:/User/Anton/Documents/photos" + stepPhoto.getOriginalFilename());
                 stepPhotoFile.setRecipe(recipe);
                 stepPhotoFile.setPhotoFood(false);
                 stepPhoto.transferTo(new File(stepPhotoFile.getFilePath()));
@@ -145,7 +145,7 @@ public class RecipeServiceImpl {
         }
 
         if (photoFood != null && !photoFood.isEmpty()) {
-            String filePath = "C:/Users/Anton/Documents/photos/" + photoFood.getOriginalFilename();
+            String filePath = "C:/User/Anton/Documents/photos/" + photoFood.getOriginalFilename();
             photoFood.transferTo(new File(filePath));
 
             UploadedFile uploadedFile = UploadedFile.builder()
@@ -166,7 +166,7 @@ public class RecipeServiceImpl {
                 Integer stepNumber = j + 1;
 
                 if (!stepPhoto.isEmpty()) {
-                    String stepFilePath = "C:/Users/Anton/Documents/photos/" + stepPhoto.getOriginalFilename();
+                    String stepFilePath = "C:/User/Anton/Documents/photos/" + stepPhoto.getOriginalFilename();
                     stepPhoto.transferTo(new File(stepFilePath));
 
                     UploadedFile stepPhotoFile = UploadedFile.builder()

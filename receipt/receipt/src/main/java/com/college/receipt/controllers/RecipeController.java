@@ -7,8 +7,8 @@ import com.college.receipt.entities.UploadedFile;
 import com.college.receipt.repositories.IngredientRepository;
 import com.college.receipt.repositories.StepRepository;
 import com.college.receipt.repositories.UploadedFileRepository;
-import com.college.receipt.service.Recipe.RecipeRepository;
-import com.college.receipt.service.Recipe.RecipeServiceImpl;
+import com.college.receipt.repositories.RecipeRepository;
+import com.college.receipt.service.RecipeService;
 import com.college.receipt.service.UploadedFileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,11 +33,11 @@ public class RecipeController {
     private final UploadedFileService uploadedFileService;
     private final UploadedFileRepository uploadedFileRepository;
     public static final Logger logger = LoggerFactory.getLogger(RecipeController.class);
-    private final RecipeServiceImpl recipeService;
+    private final RecipeService recipeService;
     private final StepRepository stepRepository;
     private final IngredientRepository ingredientRepository;
 
-    public RecipeController(RecipeRepository recipeRepository, UploadedFileService uploadedFileService, UploadedFileRepository uploadedFileRepository, RecipeServiceImpl recipeService, StepRepository stepRepository, IngredientRepository ingredientRepository) {
+    public RecipeController(RecipeRepository recipeRepository, UploadedFileService uploadedFileService, UploadedFileRepository uploadedFileRepository, RecipeService recipeService, StepRepository stepRepository, IngredientRepository ingredientRepository) {
         this.recipeRepository = recipeRepository;
         this.uploadedFileService = uploadedFileService;
         this.uploadedFileRepository = uploadedFileRepository;

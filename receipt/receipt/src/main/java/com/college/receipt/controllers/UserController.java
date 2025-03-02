@@ -3,29 +3,26 @@ package com.college.receipt.controllers;
 import com.college.receipt.entities.User;
 import com.college.receipt.entities.UserDto;
 import com.college.receipt.exceptions.UserAlreadyExistException;
-import com.college.receipt.service.User.IUserService;
-import jakarta.servlet.http.HttpServletRequest;
+import com.college.receipt.service.User.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.stereotype.Controller;
+
+import javax.naming.AuthenticationException;
+
 
 @RestController
-public class RegistrationController {
+public class UserController {
 
     @Autowired
-    private IUserService userService;
+    private UserService userService;
 
-    @GetMapping("/register")
-    public String showRegistrationForm(Model model) {
-        model.addAttribute("user", new UserDto());
-        return "registration";
+    @PostMapping("/login")
+    public String login(@RequestBody User user) throws AuthenticationException {
+        return userService.verify(user);
     }
 
     @PostMapping("/register")
@@ -46,7 +43,7 @@ public class RegistrationController {
                     .status(HttpStatus.CONFLICT)
                     .body("Ошибка. Аккаунт уже существует");
         }
-        
+
     }
 
 }

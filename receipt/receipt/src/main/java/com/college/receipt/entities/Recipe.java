@@ -3,7 +3,6 @@ package com.college.receipt.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
-import com.college.receipt.entities.Steps;
 
 import java.util.ArrayList;
 import java.util.List;

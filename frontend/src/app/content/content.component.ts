@@ -10,9 +10,13 @@ import { LoginFormComponent } from "../login-form/login-form.component";
   styleUrl: './content.component.css'
 })
 export class ContentComponent {
+  componentToShow: string = "welcome";
 
   constructor(private axiosService: AxiosService){}
 
+  showComponent(ComponentToShow:string): void {
+    this.componentToShow = this.componentToShow
+  }
   onLogin(input: any) {
     this.axiosService.request(
       "POST",
@@ -21,7 +25,10 @@ export class ContentComponent {
         login: input.login,
         password: input.password
       }
-    )
+    ).then(response => {
+      this.axiosService.setAuthToken(response.data.token);
+      this.componentToShow = "messages";
+    });
 }
 
   onRegister(input: any){
@@ -34,7 +41,10 @@ export class ContentComponent {
         password: input.password,
         matchingPassword: input.password
       }
-    )
+    ).then(response => {
+      this.axiosService.setAuthToken(response.data.token);
+      this.componentToShow = "messages";
+    });
   }
 
 }

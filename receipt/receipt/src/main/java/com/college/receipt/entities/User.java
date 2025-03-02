@@ -34,10 +34,4 @@
                 inverseJoinColumns = @JoinColumn(name = "role_id")
         )
         private Set<Role> roles = new HashSet<>();
-
-        public User(Long id, String username, String mail) {
-            this.id = id;
-            this.username = username;
-            this.email = mail;
-        }
     }

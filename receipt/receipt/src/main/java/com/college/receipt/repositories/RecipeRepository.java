@@ -1,4 +1,4 @@
-package com.college.receipt.service.Recipe;
+package com.college.receipt.repositories;
 
 import com.college.receipt.entities.Recipe;
 import org.springframework.data.repository.query.Param;

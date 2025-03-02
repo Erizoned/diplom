@@ -4,8 +4,8 @@ import com.college.receipt.entities.Recipe;
 import com.college.receipt.entities.Steps;
 import com.college.receipt.entities.UploadedFile;
 import com.college.receipt.repositories.StepRepository;
-import com.college.receipt.service.Recipe.RecipeRepository;
-import com.college.receipt.service.Recipe.RecipeServiceImpl;
+import com.college.receipt.repositories.RecipeRepository;
+import com.college.receipt.service.RecipeService;
 import com.college.receipt.service.UploadedFileService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -26,7 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 public class RecipeCreationTest {
 
     @Autowired
-    private RecipeServiceImpl recipeService;
+    private RecipeService recipeService;
 
     @MockBean
     private RecipeRepository recipeRepository;
@@ -57,7 +57,7 @@ public class RecipeCreationTest {
         Mockito.when(stepPhoto1.getContentType()).thenReturn("image/jpeg");
         Mockito.when(stepPhoto2.getContentType()).thenReturn("image/jpeg");
 
-        String filePath = "C:/Users/Anton/Documents/photos/" + photoFood.getOriginalFilename();
+        String filePath = "C:/User/Anton/Documents/photos/" + photoFood.getOriginalFilename();
 
 
         Recipe recipe = Recipe.builder()
@@ -118,7 +118,7 @@ public class RecipeCreationTest {
         Mockito.when(stepPhoto1.getContentType()).thenReturn("image/jpeg");
         Mockito.when(stepPhoto2.getContentType()).thenReturn("image/jpeg");
 
-        String filePath = "C:/Users/Anton/Documents/photos/" + photoFood.getOriginalFilename();
+        String filePath = "C:/User/Anton/Documents/photos/" + photoFood.getOriginalFilename();
 
         Recipe recipe = Recipe.builder()
                 .id(1L)
