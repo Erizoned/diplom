@@ -11,10 +11,10 @@ export class LoginFormComponent {
 
   @Output() onSubmitLoginEvent = new EventEmitter();
 
-  login: string = "";
+  email: string = "";
   password: string = "";
 
   onSubmitLogin(): void{
-    this.onSubmitLoginEvent.emit({"email": this.login, "password": this.password});
+    this.onSubmitLoginEvent.emit({"email": this.email, "password": this.password});
   }
 }

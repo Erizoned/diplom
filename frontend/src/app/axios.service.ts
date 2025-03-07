@@ -7,34 +7,35 @@ import axios from 'axios';
 export class AxiosService {
 
   constructor() {
-    axios.defaults.baseURL = "http://localhost:8081"
-    axios.defaults.headers.post["Content-Type"] = "application/json"
-   }
+    axios.defaults.baseURL = "http://localhost:8081";
+    axios.defaults.headers.post["Content-Type"] = "application/json";
+  }
 
-   getAuthToken(): string | null {
+  getAuthToken(): string | null {
     return window.localStorage.getItem("auth_token");
-   }
+  }
 
-   setAuthToken(token: string | null): void {
+  setAuthToken(token: string | null): void {
     if (token !== null){
+
       window.localStorage.setItem("auth_token", token);
-    } else{
+    } else {
       window.localStorage.removeItem("auth_token");
     }
-   }
+  }
 
   request(method: string, url: string, data: any): Promise<any> { 
-   let headers = {};
-
-   if (this.getAuthToken() !== null){
-    headers = {"Authorization": "Bearer " + this.getAuthToken()};
-   }
-   
+    const token = this.getAuthToken();
+    let headers: any = {};
+    if (token && token.split('.').length === 3) {
+      headers = { "Authorization": "Bearer " + token };
+    }
+    
     return axios({
-    method: method,
-    url: url,
-    data: data,
-    headers: headers
-   });
-}
+      method: method,
+      url: url,
+      data: data,
+      headers: headers,
+    });
+  }
 }

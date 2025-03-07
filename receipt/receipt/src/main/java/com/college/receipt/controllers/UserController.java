@@ -5,6 +5,8 @@ import com.college.receipt.entities.UserDto;
 import com.college.receipt.exceptions.UserAlreadyExistException;
 import com.college.receipt.service.User.UserService;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +14,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.naming.AuthenticationException;
+import java.util.Collections;
+import java.util.Map;
 
 
 @RestController
@@ -20,10 +24,22 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
     @PostMapping("/login")
-    public String login(@RequestBody User user) throws AuthenticationException {
-        return userService.verify(user);
+    public ResponseEntity<Map<String, String>> login(@RequestBody User user) {
+        String token = userService.verify(user);
+        logger.info("Попытка входа в аккаунт");
+
+        if (token != null) {
+            logger.info("Пользователь {} вошёл в аккаунт", user.getEmail());
+            return ResponseEntity.ok(Collections.singletonMap("token", token)); // Возвращаем JSON
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("error", "Invalid credentials"));
+        }
     }
+
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUserAccount(

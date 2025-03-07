@@ -1,1 +1,20 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+    --gradient-start: #667302;
+    --gradient-middle: #F25C05;
+    --gradient-end: #8C3503;
+    --white: #FFFFFF;
+    --gray-light: #F2D0C9;
+    --text-color: #0D0D0D;
+  }
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+  }
+  
+  body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #667302, #F25C05, #8C3503);
+  }
+  
