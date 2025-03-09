@@ -4,7 +4,7 @@ import { RecipesPageComponent } from './recipes-page/recipes-page.component';
 
 
 export const routes: Routes = [  
-    { path: 'login', component: LoginFormComponent },
-    { path: '**', redirectTo: 'login', pathMatch: 'full' }, // Перенаправляет на /login, если страница не найдена
+  { path: 'login', component: LoginFormComponent },
     { path: 'recipes', component: RecipesPageComponent },
+    { path: '**', redirectTo: 'login', pathMatch: 'full' }, // Перенаправляет на /login, если страница не найдена
   ];

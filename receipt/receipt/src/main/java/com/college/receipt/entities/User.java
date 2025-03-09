@@ -19,14 +19,18 @@
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
+
         @NotBlank(message = "Имя не может быть пустым")
         @Size(min = 3, max = 20)
         private String username;
+
         @NotBlank(message = "Почта не может быть пустой")
         @Email(message = "Некорректный адрес почты")
         private String email;
+
         @NotBlank
         private String password;
+
         @ManyToMany(fetch = FetchType.EAGER)
         @JoinTable(
                 name = "users_roles",

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import axios from 'axios';
 
 @Injectable({
@@ -6,9 +7,19 @@ import axios from 'axios';
 })
 export class AxiosService {
 
-  constructor() {
+  constructor(private router: Router) {
     axios.defaults.baseURL = "http://localhost:8081";
     axios.defaults.headers.post["Content-Type"] = "application/json";
+    axios.interceptors.response.use(
+      response => response,
+      error => {
+        if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+          localStorage.removeItem('auth_token');
+          this.router.navigate(['/login']);
+        }
+        return Promise.reject(error);
+      }
+    )
   }
 
   getAuthToken(): string | null {
@@ -24,10 +35,10 @@ export class AxiosService {
     }
   }
 
-  request(method: string, url: string, data: any): Promise<any> { 
-    const token = this.getAuthToken();
+  request(method: string, url: string, data: any): Promise<any> {
     let headers: any = {};
-    if (token && token.split('.').length === 3) {
+    const token = this.getAuthToken();
+    if (token && token.split('.').length === 3 && url !== '/login' && url !== '/register') {
       headers = { "Authorization": "Bearer " + token };
     }
     

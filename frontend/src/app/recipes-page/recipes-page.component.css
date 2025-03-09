@@ -7,54 +7,39 @@
     --gradient-start: #FF6B6B;
     --gradient-middle: #FF758C;
     --gradient-end: #FF8FAB;
-}
-
-body {
-    font-family: Arial, sans-serif;
-    background-color: var(--beige);
-    margin: 0;
-    padding: 0;
-    color: var(--black);
-}
-
-h1 {
-    text-align: center;
-    margin: 20px 0;
-    font-size: 36px;
-    color: var(--brown);
-}
-
-.main-container {
+  }
+  
+  .main-container {
     max-width: 1200px;
     margin: 40px auto;
     padding: 20px;
-}
-
-.search-section {
+  }
+  
+  .search-section {
     margin-bottom: 20px;
-}
-
-.search-container {
+  }
+  
+  .search-container {
     display: flex;
     gap: 10px;
     margin-bottom: 10px;
-}
-
-.search-container input {
+  }
+  
+  .search-container input {
     flex: 1;
     padding: 12px;
     border: 2px solid var(--olive-green);
     border-radius: 8px;
     font-size: 14px;
     transition: all 0.3s ease;
-}
-
-.search-container input:focus {
+  }
+  
+  .search-container input:focus {
     border-color: var(--orange);
     box-shadow: 0 0 0 3px rgba(242, 92, 5, 0.2);
-}
-
-.search-button, .filter-button {
+  }
+  
+  .search-button, .filter-button {
     padding: 10px 20px;
     background-color: var(--orange);
     color: white;
@@ -63,21 +48,21 @@ h1 {
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.search-button:hover, .filter-button:hover {
+  }
+  
+  .search-button:hover, .filter-button:hover {
     background-color: var(--brown);
     transform: translateY(-2px);
-}
-
-.recipe-container {
+  }
+  
+  .recipe-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 15px;
     padding: 10px;
-}
-
-.recipe-card {
+  }
+  
+  .recipe-card {
     background: white;
     border-radius: 15px;
     overflow: hidden;
@@ -85,9 +70,9 @@ h1 {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     cursor: pointer;
-}
-
-.recipe-card::before {
+  }
+  
+  .recipe-card::before {
     content: '';
     position: absolute;
     top: 0;
@@ -99,53 +84,53 @@ h1 {
     transition: opacity 0.4s ease;
     z-index: 1;
     border-radius: 15px;
-}
-
-.recipe-card:hover {
+  }
+  
+  .recipe-card:hover {
     transform: translateY(-10px) scale(1.02);
     box-shadow: 0 20px 30px rgba(0,0,0,0.15);
-}
-
-.recipe-card:hover::before {
+  }
+  
+  .recipe-card:hover::before {
     opacity: 0.1;
-}
-
-.recipe-card img {
+  }
+  
+  .recipe-card img {
     width: 100%;
     height: 200px;
     object-fit: cover;
     transition: transform 0.6s ease;
-}
-
-.recipe-card:hover img {
+  }
+  
+  .recipe-card:hover img {
     transform: scale(1.1);
-}
-
-.recipe-details {
+  }
+  
+  .recipe-details {
     padding: 20px;
     position: relative;
     z-index: 2;
     background: white;
     transition: transform 0.3s ease;
-}
-
-.recipe-card:hover .recipe-details {
+  }
+  
+  .recipe-card:hover .recipe-details {
     transform: translateY(-5px);
-}
-
-.recipe-title {
+  }
+  
+  .recipe-title {
     color: var(--brown);
     font-size: 1.2rem;
     font-weight: bold;
     margin-bottom: 10px;
     transition: color 0.3s ease;
-}
-
-.recipe-card:hover .recipe-title {
+  }
+  
+  .recipe-card:hover .recipe-title {
     color: var(--orange);
-}
-
-.recipe-description {
+  }
+  
+  .recipe-description {
     color: var(--black);
     margin-bottom: 15px;
     line-height: 1.5;
@@ -154,9 +139,9 @@ h1 {
     -webkit-box-orient: vertical;
     overflow: hidden;
     transition: color 0.3s ease;
-}
-
-.recipe-time {
+  }
+  
+  .recipe-time {
     color: var(--olive-green);
     font-weight: bold;
     font-size: 0.9rem;
@@ -164,72 +149,69 @@ h1 {
     align-items: center;
     gap: 5px;
     transition: transform 0.3s ease;
-}
-
-.recipe-card:hover .recipe-time {
+  }
+  
+  .recipe-card:hover .recipe-time {
     transform: scale(1.05);
-}
-
-/* Добавляем анимацию появления */
-@keyframes recipeCardAppear {
+  }
+  
+  @keyframes recipeCardAppear {
     from {
-        opacity: 0;
-        transform: translateY(30px);
+      opacity: 0;
+      transform: translateY(30px);
     }
     to {
-        opacity: 1;
-        transform: translateY(0);
+      opacity: 1;
+      transform: translateY(0);
     }
-}
-
-/* Добавляем пульсацию для новых рецептов */
-@keyframes newRecipePulse {
+  }
+  
+  @keyframes newRecipePulse {
     0% { transform: scale(1); }
     50% { transform: scale(1.05); }
     100% { transform: scale(1); }
-}
-
-.recipe-card.new-recipe {
+  }
+  
+  .recipe-card.new-recipe {
     animation: newRecipePulse 2s infinite;
-}
-
-.filter-container {
+  }
+  
+  .filter-container {
     background: white;
     padding: 20px;
     border-radius: 12px;
     margin-top: 10px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    display: none;
-}
-
-.filter-container form div {
+  }
+  
+  .filter-container form div {
     margin-bottom: 15px;
-}
-
-.filter-container label {
+  }
+  
+  .filter-container label {
     display: block;
     margin-bottom: 5px;
     font-weight: bold;
     color: var(--brown);
-}
-
-.filter-container select,
-.filter-container input {
+  }
+  
+  .filter-container select,
+  .filter-container input {
     width: 100%;
     padding: 10px;
     font-size: 14px;
     border: 2px solid var(--olive-green);
     border-radius: 8px;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.filter-container select:focus,
-.filter-container input:focus {
+  }
+  
+  .filter-container select:focus,
+  .filter-container input:focus {
     border-color: var(--orange);
     box-shadow: 0 0 0 3px rgba(242, 92, 5, 0.2);
-}
-
-.filter-container button {
+  }
+  
+  .filter-container button {
     display: block;
     width: 100%;
     padding: 12px;
@@ -240,14 +222,14 @@ h1 {
     border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.filter-container button:hover {
+  }
+  
+  .filter-container button:hover {
     background-color: var(--brown);
     transform: translateY(-2px);
-}
-
-.create-recipe-button {
+  }
+  
+  .create-recipe-button {
     display: inline-block;
     background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
     color: white;
@@ -261,21 +243,22 @@ h1 {
     cursor: pointer;
     font-size: 16px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-
-.create-recipe-button:hover {
+  }
+  
+  .create-recipe-button:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(0,0,0,0.15);
     background: linear-gradient(135deg, var(--gradient-end), var(--gradient-start));
-}
-
-.recipe-card a {
+  }
+  
+  .recipe-card a {
     text-decoration: none;
     color: inherit;
     display: block;
-}
-
-.actions-container {
+  }
+  
+  .actions-container {
     margin: 20px 0;
     text-align: left;
-}
+  }
+  

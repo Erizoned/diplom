@@ -13,6 +13,7 @@ import com.college.receipt.service.UploadedFileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -24,10 +25,12 @@ import org.springframework.web.multipart.MultipartFile;
 import jakarta.validation.Valid;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @RequestMapping("/")
-@Controller
+@RestController
 public class RecipeController {
     private final RecipeRepository recipeRepository;
     private final UploadedFileService uploadedFileService;
@@ -46,8 +49,8 @@ public class RecipeController {
         this.ingredientRepository = ingredientRepository;
     }
 
-    @GetMapping("/")
-    public String home(Model model, String keyword,
+    @GetMapping("/api/recipes")
+    public ResponseEntity<List<Recipe>> home(String keyword,
                        @RequestParam(value = "countPortion", required = false) Integer countPortion,
                        @RequestParam(value = "kkal", required = false) Integer kkal,
                        @RequestParam(value = "timeToCook", required = false) Integer timeToCook,
@@ -71,30 +74,27 @@ public class RecipeController {
                     typeOfCook,
                     typeOfFood
             );
-            model.addAttribute("recipes", filteredRecipes);
             if (keyword != null){
-                model.addAttribute("recipes", recipeRepository.findByKeyword(keyword));
-                logger.info("поисковое слово:{}",keyword);
+                List<Recipe> keywordRecipe = recipeRepository.findByKeyword(keyword);
+                logger.info("поисковое слово:{}", keyword);
+                return ResponseEntity.ok(keywordRecipe);
             }
             logger.info("Применяем фильтры: countPortion={}, kkal={}, timeToCook={}, nationalKitchen={}, restrictions={}, theme={}, typeOfCook={}, typeOfFood={}", countPortion, kkal, timeToCook, nationalKitchen, restrictions, theme, typeOfCook, typeOfFood);
-            List<Recipe> recipes = recipeRepository.findByFilter( countPortion, kkal, timeToCook, nationalKitchen, restrictions, theme, typeOfCook, typeOfFood);
-            logger.info("Найдено отфильтрованных рецептов: {}", recipes.size());
-            if (recipes.size() == 0) {
-                model.addAttribute("errorMessage", "Ошибка. Рецепты не были найдены");
-                model.addAttribute("recipes", List.of());
+            logger.info("Найдено отфильтрованных рецептов: {}", filteredRecipes.size());
+            if (filteredRecipes.isEmpty()) {
                 logger.warn("Ошибка, рецепты не найдены");
-                return "index";
+                return ResponseEntity.badRequest().body(Collections.emptyList());
             }
             else{
-                logger.info("Найдено рецептов: {}", recipes.size());
-                recipes.forEach(recipe -> logger.info("Рецепт: id={}, name={}", recipe.getId(), recipe.getName()));
+                logger.info("Найдено рецептов: {}", filteredRecipes.size());
+                filteredRecipes.forEach(recipe -> logger.info("Рецепт: id={}, name={}", recipe.getId(), recipe.getName()));
+                return ResponseEntity.ok(filteredRecipes);
             }
         }
         else{
             List<Recipe> recipes = recipeRepository.findAll();
-            model.addAttribute("recipes", recipes);
+            return ResponseEntity.ok(recipes);
         }
-        return "index";
     }
 
     @GetMapping("/create_recipe")

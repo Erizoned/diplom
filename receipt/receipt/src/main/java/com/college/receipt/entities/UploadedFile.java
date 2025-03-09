@@ -1,5 +1,6 @@
 package com.college.receipt.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import jakarta.persistence.*;
@@ -26,7 +27,7 @@ public class UploadedFile {
 
     public boolean isPhotoFood;
 
-
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "recipe_id")
     private Recipe recipe;
@@ -39,7 +40,7 @@ public class UploadedFile {
                 ", type='" + type + '\'' +
                 ", filePath='" + filePath + '\'' +
                 ", isPhotoFood=" + isPhotoFood +
-                '}'; // Не включайте поле recipe, чтобы избежать рекурсии
+                '}';
     }
 
 }
