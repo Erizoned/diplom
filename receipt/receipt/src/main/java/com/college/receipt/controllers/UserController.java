@@ -1,7 +1,7 @@
 package com.college.receipt.controllers;
 
 import com.college.receipt.entities.User;
-import com.college.receipt.entities.UserDto;
+import com.college.receipt.DTO.UserDto;
 import com.college.receipt.exceptions.UserAlreadyExistException;
 import com.college.receipt.service.User.UserService;
 import jakarta.validation.Valid;
@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.naming.AuthenticationException;
 import java.util.Collections;
 import java.util.Map;
 

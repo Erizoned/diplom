@@ -1,5 +1,6 @@
 package com.college.receipt.controllers;
 
+import com.college.receipt.DTO.RecipeDto;
 import com.college.receipt.entities.Ingredients;
 import com.college.receipt.entities.Recipe;
 import com.college.receipt.entities.Steps;
@@ -29,7 +30,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-@RequestMapping("/")
+@RequestMapping("/api")
 @RestController
 public class RecipeController {
     private final RecipeRepository recipeRepository;
@@ -49,7 +50,7 @@ public class RecipeController {
         this.ingredientRepository = ingredientRepository;
     }
 
-    @GetMapping("/api/recipes")
+    @GetMapping("/recipes")
     public ResponseEntity<List<Recipe>> home(String keyword,
                        @RequestParam(value = "countPortion", required = false) Integer countPortion,
                        @RequestParam(value = "kkal", required = false) Integer kkal,
@@ -194,9 +195,8 @@ public class RecipeController {
 
 
     @GetMapping("/recipe/{id}")
-    public String viewRecipe(@PathVariable("id") Long id, Model model) {
+    public ResponseEntity<RecipeDto> viewRecipe(@PathVariable("id") Long id) {
         logger.info("Открыта страница просмотра рецепта с id={}", id);
-
         Recipe recipe = recipeRepository.findById(id)
                 .orElseThrow(() -> {
                     logger.error("Рецепт с id={} не найден", id);
@@ -209,24 +209,20 @@ public class RecipeController {
 
         logger.info("Найдено шагов: {}", steps.size());
 
-        model.addAttribute("recipe", recipe);
-        model.addAttribute("photoFood", photoFood);
-        model.addAttribute("steps", steps);
-        model.addAttribute("ingredients", ingredients);
-        model.addAttribute("author", recipe.getCreatedBy());
+        RecipeDto response = new RecipeDto(
+          recipe,
+          photoFood,
+          steps,
+          ingredients,
+          recipe.getCreatedBy().getUsername()
+        );
 
-        return "recipe";
+        return ResponseEntity.ok().body(response);
     }
 
     @DeleteMapping("/recipe/{id}/delete")
-    public String deleteRecipe(@PathVariable("id") Long id) {
-            String errorMessage = recipeService.deleteRecipe(id);
-            if(errorMessage != null){
-                logger.warn("Ошибка при создании рецепта:{}", errorMessage);
-                return "recipe";
-            }
-        recipeService.deleteRecipe(id);
-        return "redirect:/";
+    public ResponseEntity<String> deleteRecipe(@PathVariable("id") Long id) {
+        return recipeService.deleteRecipe(id);
     }
 
 

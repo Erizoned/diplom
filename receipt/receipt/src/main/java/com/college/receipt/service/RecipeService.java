@@ -7,12 +7,15 @@ import com.college.receipt.repositories.StepRepository;
 import com.college.receipt.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.io.IOException;
@@ -193,29 +196,20 @@ public class RecipeService {
         return null;
     }
 
-    public String deleteRecipe(Long id){
+    public ResponseEntity<String> deleteRecipe(Long id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUserEmail = authentication.getName();
-        Recipe recipe = recipeRepository.findById(id).orElseThrow(() -> new RuntimeException("Рецепт с id: " + id + " не найден"));
+        Recipe recipe = recipeRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Рецепт с id: " + id + " не найден"));
         boolean isOwner = recipe.getCreatedBy().getEmail().equals(currentUserEmail);
         boolean isAdmin = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
         if (!isAdmin && !isOwner){
-            return "У вас недостаточно прав для удаления рецепта";
+            logger.warn("Пользователь {} попытался удалить рецепт {}, но у него недостаточно прав.", currentUserEmail, recipe.getName());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("У вас недостаточно прав для удаления рецепта");
         }
         recipeRepository.deleteById(id);
-        logger.info("Рецепт {} удалён", recipe.getName());
+        logger.info("Пользователь {} удалил рецепт {}", currentUserEmail, recipe.getName());
 
-        return null;
-    }
-
-    public Optional<Recipe> findRecipeById(Long id){
-        return recipeRepository.findById(id);
-    }
-
-    public Recipe deleteRecipeById(Long id){
-        Recipe recipe = findRecipeById(id).orElseThrow(() -> new NoSuchElementException("Recipe not found with id: " + id));
-        recipeRepository.delete(recipe);
-        return recipe;
+        return ResponseEntity.ok("Рецепт успешно удалён");
     }
 
     public List<Recipe> findAllRecipes() {

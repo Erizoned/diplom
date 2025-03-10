@@ -1,0 +1,74 @@
+<div class="container">
+    <h1>{{ recipe.name }}</h1>
+    <div class="recipe-description">
+      <p>{{ recipe.description }}</p>
+    </div>
+  
+    <h2>Фото блюда:</h2>
+    <div class="photos">
+      <ng-container *ngIf="recipe.photoFood?.length > 0; else noPhoto">
+        <img
+          *ngFor="let photo of recipe.photoFood"
+          [src]="getPhotoUrl(photo.name)"
+          alt="Фото блюда"
+        />
+      </ng-container>
+      <ng-template #noPhoto>
+        <p>Фото блюда отсутствует.</p>
+      </ng-template>
+    </div>
+  
+    <h2>Ингредиенты:</h2>
+    <div class="ingredients">
+      <ng-container *ngIf="recipe.ingredients?.length > 0; else noIngredients">
+        <div *ngFor="let ingredient of recipe.ingredients">
+          <p>
+            <strong>{{ ingredient.name }}</strong>: {{ ingredient.count }}
+          </p>
+        </div>
+      </ng-container>
+      <ng-template #noIngredients>
+        <p>Ингредиенты отсутствуют.</p>
+      </ng-template>
+    </div>
+  
+    <h2>Шаги приготовления:</h2>
+    <div class="steps">
+      <ng-container *ngIf="recipe.steps?.length > 0; else noSteps">
+        <div *ngFor="let step of recipe.steps">
+          <h3>Шаг {{ step.stepNumber }}</h3>
+          <p>{{ step.description }}</p>
+          <img
+            *ngIf="step.photo"
+            [src]="getPhotoUrl(step.photo.name)"
+            alt="Фото шага приготовления"
+          />
+        </div>
+      </ng-container>
+      <ng-template #noSteps>
+        <p>Шаги приготовления отсутствуют.</p>
+      </ng-template>
+    </div>
+  
+    <div class="details">
+      <p><strong>Тема блюда:</strong> {{ recipe.theme }}</p>
+      <p><strong>Тип блюда:</strong> {{ recipe.typeOfFood }}</p>
+      <p><strong>Национальная кухня:</strong> {{ recipe.nationalKitchen }}</p>
+      <p><strong>Тип приготовления:</strong> {{ recipe.typeOfCook }}</p>
+      <p><strong>Ограничения:</strong> {{ recipe.restrictions }}</p>
+      <p><strong>Количество порций:</strong> {{ recipe.countPortion }}</p>
+      <p><strong>Калорийность (ккал):</strong> {{ recipe.kkal }}</p>
+      <p><strong>Время приготовления:</strong> {{ recipe.timeToCook }} минут</p>
+    </div>
+  
+    <p><strong>Автор рецепта:</strong> {{ recipe.authorUsername }}</p>
+    <button class="delete-button" (click)="onDeleteRecipe()">Удалить рецепт</button>
+    <button class="button" (click)="onUpdateRecipe()">Обновить рецепт</button>
+  
+    <div *ngIf="errorMessage" style="color: red; font-weight: bold; margin-bottom: 20px;">
+      <p>{{ errorMessage }}</p>
+    </div>
+  
+    <a (click)="goBack()" class="back-link">Назад к списку рецептов</a>
+  </div>
+  

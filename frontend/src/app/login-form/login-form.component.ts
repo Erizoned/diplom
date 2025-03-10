@@ -25,7 +25,6 @@ export class LoginFormComponent {
     })
     .then(response => {
       if (response.data && response.data.token) {
-        console.log("Сохраняем токен:", response.data.token);
         this.axiosService.setAuthToken(response.data.token);
         this.router.navigate(['/recipes']);
       } else {

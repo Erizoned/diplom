@@ -1,8 +1,7 @@
-package com.college.receipt.entities;
+package com.college.receipt.DTO;
 
 import com.college.receipt.validation.PasswordMatches;
 import com.college.receipt.validation.ValidEmail;
-import jakarta.persistence.Entity;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

@@ -3,7 +3,7 @@ package com.college.receipt.service.User;
 import com.college.receipt.entities.Role;
 import com.college.receipt.entities.User;
 import com.college.receipt.repositories.RoleRepository;
-import com.college.receipt.entities.UserDto;
+import com.college.receipt.DTO.UserDto;
 import com.college.receipt.exceptions.UserAlreadyExistException;
 import com.college.receipt.repositories.UserRepository;
 import com.college.receipt.service.JWTService;
@@ -19,7 +19,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
