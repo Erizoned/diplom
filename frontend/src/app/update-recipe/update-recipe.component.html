@@ -1,0 +1,79 @@
+<div class="update-recipe-container">
+  <h1>Обновить рецепт</h1>
+  <form (ngSubmit)="onUpdateRecipe()">
+    <div>
+      <label for="name">Название рецепта:</label>
+      <input type="text" id="name" [(ngModel)]="recipe.name" name="name" required>
+    </div>
+
+    <div>
+      <label for="description">Описание:</label>
+      <textarea id="description" [(ngModel)]="recipe.description" name="description" required></textarea>
+    </div>
+
+    <div>
+      <label for="theme">Тема блюда:</label>
+      <select id="theme" [(ngModel)]="recipe.theme" name="theme">
+        <option value="Завтрак">Завтрак</option>
+        <option value="Обед">Обед</option>
+        <option value="Ужин">Ужин</option>
+        <option value="Перекус">Перекус</option>
+        <option value="Праздничное">Праздничное блюдо</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="countPortion">Количество порций:</label>
+      <input type="number" id="countPortion" [(ngModel)]="recipe.countPortion" name="countPortion" required>
+    </div>
+
+    <div>
+      <label for="kkal">Калорийность (ккал):</label>
+      <input type="number" id="kkal" [(ngModel)]="recipe.kkal" name="kkal" required>
+    </div>
+
+    <div>
+      <label for="timeToCook">Время приготовления (мин):</label>
+      <input type="number" id="timeToCook" [(ngModel)]="recipe.timeToCook" name="timeToCook" required>
+    </div>
+
+    <div class="photos">
+      <img
+      *ngFor="let photo of recipe.photoFood"
+      [src]="getPhotoUrl(photo.name)"
+      alt="Фото блюда"
+    />
+    </div>
+
+    <div>
+      <label for="photoFood">Обновить фото блюда:</label>
+      <input type="file" id="photoFood" (change)="onPhotoFoodSelected($event)" accept="image/*">
+    </div>
+
+    <div id="stepsContainer">
+      <h3>Шаги приготовления</h3>
+      <div class="step" *ngFor="let desc of stepDescriptions; let i = index">
+        <label>Описание шага:</label>
+        <textarea [(ngModel)]="stepDescriptions[i]" name="stepDescriptions{{ i }}" required></textarea>
+        <label>Обновить фото шага:</label>
+        <input type="file" (change)="onStepPhotoSelected($event, i)" accept="image/*">
+      </div>
+    </div>
+
+    <button type="button" (click)="addStep()">Добавить шаг</button>
+
+    <div id="ingredientsContainer">
+      <h3>Ингредиенты</h3>
+      <div class="ingredient" *ngFor="let ing of ingredientNames; let j = index">
+        <label>Название ингредиента:</label>
+        <input type="text" [(ngModel)]="ingredientNames[j]" name="ingredientNames{{ j }}" required>
+        <label>Количество:</label>
+        <input type="number" [(ngModel)]="ingredientsCounts[j]" name="ingredientsCounts{{ j }}" required>
+      </div>
+    </div>
+
+    <button type="button" (click)="addIngredient()">Добавить ингредиент</button>
+
+    <button type="submit">Обновить рецепт</button>
+  </form>
+</div>

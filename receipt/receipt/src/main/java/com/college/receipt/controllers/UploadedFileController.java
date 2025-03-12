@@ -21,13 +21,13 @@ public class UploadedFileController {
     public UploadedFileController(UploadedFileService fileService) {
         this.fileService = fileService;
     }
-
-    @PostMapping("/file_system")
-    public ResponseEntity<?> uploadImageToFileSystem(@RequestParam("image")MultipartFile file) throws IOException{
-        String uploadImage = fileService.uploadImageToDataSystem(file);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(uploadImage);
-    }
+//  Возможно стоит создать отдельный метод для загрузки отдельных файлов
+//    @PostMapping("/file_system")
+//    public ResponseEntity<?> uploadImageToFileSystem(@RequestParam("image")MultipartFile file) throws IOException{
+//        String uploadImage = fileService.uploadImageToDataSystem(file);
+//        return ResponseEntity.status(HttpStatus.OK)
+//                .body(uploadImage);
+//    }
 
     @GetMapping("/file_system")
     public ResponseEntity<?> downloadImageFromFileSystem(@RequestParam("file_name") String fileName) throws IOException {

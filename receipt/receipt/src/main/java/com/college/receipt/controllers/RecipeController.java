@@ -14,6 +14,7 @@ import com.college.receipt.service.UploadedFileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -112,7 +113,7 @@ public class RecipeController {
             return new RuntimeException("Recipe not found");
         });
 
-        List<UploadedFile> photoFood = uploadedFileRepository.findByRecipeAndIsPhotoFoodTrue(savedRecipe);
+        UploadedFile photoFood = uploadedFileRepository.findByRecipeAndIsPhotoFoodTrue(savedRecipe);
         List<Steps> steps = stepRepository.findByRecipe(savedRecipe);
         List<Ingredients> ingredients = ingredientRepository.findByRecipe(savedRecipe);
         model.addAttribute("recipe", savedRecipe);
@@ -134,15 +135,13 @@ public class RecipeController {
             @RequestParam("ingredientsCounts") Integer[] ingredientsCounts,
             Model model
     ){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userName = authentication.getName();
         if (result.hasErrors()) {
             logger.error("Ошибка валидации: {}", result.getAllErrors());
             model.addAttribute("errorMessage", "Пожалуйста, заполните все обязательные поля.");
-            return "create_recipe";
+            throw new RuntimeException("Ошибка, заполнены не все поля");
         }
         try {
-            Recipe savedRecipe = recipeService.createRecipe(recipe, photoFood, stepPhotos, stepDescriptions, userName, ingredientNames, ingredientsCounts);
+            Recipe savedRecipe = recipeService.createRecipe(recipe, photoFood, stepPhotos, stepDescriptions, ingredientNames, ingredientsCounts);
             logger.info("Рецепт успешно сохранён: {}", savedRecipe);
         }
         catch (DataIntegrityViolationException e){
@@ -159,7 +158,7 @@ public class RecipeController {
 
 
     @PutMapping("/update_recipe/{id}")
-    public String updateRecipe(
+    public ResponseEntity<?> updateRecipe(
             @Valid @ModelAttribute Recipe recipe,
             BindingResult result,
             @PathVariable("id") Long id,
@@ -167,32 +166,25 @@ public class RecipeController {
             @RequestParam("stepPhotos") MultipartFile[] stepPhotos,
             @RequestParam("stepDescriptions") String[] stepDescriptions,
             @RequestParam("ingredientNames") String[] ingredientNames,
-            @RequestParam("ingredientsCounts") Integer[] ingredientsCounts,
-            Model model
-    ) {
+            @RequestParam("ingredientsCounts") Integer[] ingredientsCounts
+            ) {
         if (result.hasErrors()) {
             logger.error("Ошибка валидации: {}", result.getAllErrors());
-            model.addAttribute("errorMessage", "Пожалуйста, заполните все обязательные поля.");
-            return "update_recipe";
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.getAllErrors());
         }
-
         try {
             String errorMessage = recipeService.updateRecipe(id, recipe, photoFood, stepPhotos, stepDescriptions, ingredientNames, ingredientsCounts);
             if (errorMessage != null){
                 logger.warn("Ошибка при обновлении рецепта: {}", errorMessage);
-                model.addAttribute("errorMessage", errorMessage);
-                return "update_recipe";
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
             }
-            recipeService.updateRecipe(id, recipe, photoFood, stepPhotos, stepDescriptions, ingredientNames, ingredientsCounts);
             logger.info("Рецепт успешно обновлён: {}", recipe.getName());
-        } catch (Exception e) {
-            logger.error("Ошибка при обновлении рецепта: {}", e.getMessage());
-            model.addAttribute("errorMessage", "Ошибка при сохранении рецепта: " + e.getMessage());
-            return "update_recipe";
-        }
-        return "redirect:/recipe/" + id;
+            return ResponseEntity.ok("Рецепт успешно обновлен.");
+            } catch (Exception e) {
+                logger.error("Внутренняя ошибка сервера: {}", e.getMessage());
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Внутренняя ошибка сервера.");
+            }
     }
-
 
     @GetMapping("/recipe/{id}")
     public ResponseEntity<RecipeDto> viewRecipe(@PathVariable("id") Long id) {
@@ -203,7 +195,7 @@ public class RecipeController {
                     return new RuntimeException("Recipe not found");
                 });
 
-        List<UploadedFile> photoFood = uploadedFileRepository.findByRecipeAndIsPhotoFoodTrue(recipe);
+        UploadedFile photoFood = uploadedFileRepository.findByRecipeAndIsPhotoFoodTrue(recipe);
         List<Steps> steps = stepRepository.findByRecipe(recipe);
         List<Ingredients> ingredients = ingredientRepository.findByRecipe(recipe);
 

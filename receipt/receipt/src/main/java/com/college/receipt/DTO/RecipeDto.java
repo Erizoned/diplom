@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 public class RecipeDto {
     private Recipe recipe;
-    private List<UploadedFile> photoFood;
+    private UploadedFile photoFood;
     private List<Steps> steps;
     private List<Ingredients> ingredients;
     private String authorUsername;

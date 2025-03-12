@@ -1,10 +1,7 @@
 package com.college.receipt.service;
 
 import com.college.receipt.entities.*;
-import com.college.receipt.repositories.IngredientRepository;
-import com.college.receipt.repositories.RecipeRepository;
-import com.college.receipt.repositories.StepRepository;
-import com.college.receipt.repositories.UserRepository;
+import com.college.receipt.repositories.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -36,8 +33,11 @@ public class RecipeService {
     private final StepRepository stepRepository;
     private final UserRepository userRepository;
     private final IngredientRepository ingredientRepository;
+    private final UploadedFileRepository uploadedFileRepository;
 
-    public Recipe createRecipe(Recipe recipe, MultipartFile photoFood, MultipartFile[] stepPhotos, String[] stepDescriptions, String userName, String[] ingredientNames , Integer[] ingredientsCounts) throws IOException {
+    public Recipe createRecipe(Recipe recipe, MultipartFile photoFood, MultipartFile[] stepPhotos, String[] stepDescriptions, String[] ingredientNames , Integer[] ingredientsCounts) throws IOException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userName = authentication.getName();
         User user = userRepository.findByEmail(userName);
         recipe.setCreatedBy(user);
         Recipe savedRecipe = recipeRepository.save(recipe);
@@ -53,18 +53,7 @@ public class RecipeService {
         }
 
         if (!photoFood.isEmpty()) {
-            String filePath = "C:/User/Anton/Documents/photos" + photoFood.getOriginalFilename();
-            photoFood.transferTo(new File(filePath));
-
-            UploadedFile uploadedFile = UploadedFile.builder()
-                    .name(photoFood.getOriginalFilename())
-                    .type(photoFood.getContentType())
-                    .filePath(filePath)
-                    .recipe(recipe)
-                    .isPhotoFood(true)
-                    .build();
-
-            uploadedFileService.save(uploadedFile);
+            uploadedFileService.uploadImageToDataSystem(photoFood, recipe, "PHOTOFOOD");
             logger.info("Фото блюда {} успешно сохранено", photoFood.getOriginalFilename());
         }
         logger.info("Получено photoFood: {}", photoFood != null ? photoFood.getOriginalFilename() : "null");
@@ -74,24 +63,16 @@ public class RecipeService {
             Integer stepNumber = i + 1;
 
             if (!stepPhoto.isEmpty()) {
-                UploadedFile stepPhotoFile = new UploadedFile();
-                stepPhotoFile.setName(stepPhoto.getOriginalFilename());
-                stepPhotoFile.setType(stepPhoto.getContentType());
-                stepPhotoFile.setFilePath("C:/User/Anton/Documents/photos" + stepPhoto.getOriginalFilename());
-                stepPhotoFile.setRecipe(recipe);
-                stepPhotoFile.setPhotoFood(false);
-                stepPhoto.transferTo(new File(stepPhotoFile.getFilePath()));
-                uploadedFileService.save(stepPhotoFile);
+                UploadedFile photo = uploadedFileService.uploadImageToDataSystem(stepPhoto, recipe,"STEPPHOTO");
 
                 logger.info("Фото шага {} успешно сохранено: {}", stepNumber, stepPhoto.getOriginalFilename());
 
-                Steps step = new Steps();
-                step.setStepNumber(stepNumber);
-                step.setDescription(stepDescription);
-                step.setPhoto(stepPhotoFile);
-                step.setRecipe(recipe);
-                stepRepository.save(step);
-
+                Steps step = Steps.builder()
+                        .stepNumber(stepNumber)
+                        .description(stepDescription)
+                        .photo(photo)
+                        .recipe(recipe)
+                        .build();
                 logger.info("Шаг {} успешно сохранён: {}", stepNumber, stepDescription);
             } else {
                 logger.warn("Фото для шага {} не передано.", stepNumber);
@@ -110,9 +91,7 @@ public class RecipeService {
             String[] ingredientNames,
             Integer[] ingredientsCounts
     ) throws IOException {
-        Recipe savedRecipe = recipeRepository.findRecipeById(id).orElseThrow(() -> {
-            throw new RuntimeException("Recipe not found");
-        });
+        Recipe savedRecipe = recipeRepository.findRecipeById(id).orElseThrow(() -> new RuntimeException("Recipe not found"));
 
         savedRecipe.setName(recipe.getName());
         savedRecipe.setDescription(recipe.getDescription());
@@ -148,18 +127,7 @@ public class RecipeService {
         }
 
         if (photoFood != null && !photoFood.isEmpty()) {
-            String filePath = "C:/User/Anton/Documents/photos/" + photoFood.getOriginalFilename();
-            photoFood.transferTo(new File(filePath));
-
-            UploadedFile uploadedFile = UploadedFile.builder()
-                    .name(photoFood.getOriginalFilename())
-                    .type(photoFood.getContentType())
-                    .filePath(filePath)
-                    .recipe(savedRecipe)
-                    .isPhotoFood(true)
-                    .build();
-
-            uploadedFileService.save(uploadedFile);
+            uploadedFileService.uploadImageToDataSystem(photoFood, recipe, "PHOTOFOOD");
         }
 
         if (stepDescriptions != null && stepPhotos != null && stepDescriptions.length == stepPhotos.length) {
@@ -169,26 +137,14 @@ public class RecipeService {
                 Integer stepNumber = j + 1;
 
                 if (!stepPhoto.isEmpty()) {
-                    String stepFilePath = "C:/User/Anton/Documents/photos/" + stepPhoto.getOriginalFilename();
-                    stepPhoto.transferTo(new File(stepFilePath));
-
-                    UploadedFile stepPhotoFile = UploadedFile.builder()
-                            .name(stepPhoto.getOriginalFilename())
-                            .type(stepPhoto.getContentType())
-                            .filePath(stepFilePath)
-                            .recipe(savedRecipe)
-                            .isPhotoFood(false)
-                            .build();
-
-                    uploadedFileService.save(stepPhotoFile);
+                    UploadedFile savedFile = uploadedFileService.uploadImageToDataSystem(stepPhoto, recipe, "STEPPHOTO");
 
                     Steps step = Steps.builder()
                             .stepNumber(stepNumber)
                             .description(stepDescription)
-                            .photo(stepPhotoFile)
                             .recipe(savedRecipe)
+                            .photo(savedFile)
                             .build();
-
                     stepRepository.save(step);
                 }
             }

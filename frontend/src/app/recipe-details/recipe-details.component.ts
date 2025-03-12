@@ -121,11 +121,11 @@ export class RecipeDetailsComponent implements OnInit, AfterViewInit {
   });
   }
 
-  onUpdateRecipe(): void {
-    const id = this.route.snapshot.paramMap.get('id');
+  // onUpdateRecipe(): void {
+  //   const id = this.route.snapshot.paramMap.get('id');
 
-    
-  }
+  //   this.axiosService.request("PUT", "/api")
+  // }
 
   goBack(): void {
     this.router.navigate(['/']);

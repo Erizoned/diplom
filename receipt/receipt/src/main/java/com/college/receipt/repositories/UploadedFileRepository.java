@@ -13,5 +13,6 @@ public interface UploadedFileRepository extends JpaRepository<UploadedFile, Inte
     Optional<UploadedFile> findByName(String file);
     Optional<UploadedFile> findById(Long id);
 
-    List<UploadedFile> findByRecipeAndIsPhotoFoodTrue(Recipe recipe);
+    UploadedFile findByRecipeAndIsPhotoFoodFalse(Recipe recipe);
+    UploadedFile findByRecipeAndIsPhotoFoodTrue(Recipe recipe);
 }
