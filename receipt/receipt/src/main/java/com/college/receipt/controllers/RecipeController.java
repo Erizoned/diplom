@@ -108,7 +108,7 @@ public class RecipeController {
 
     @GetMapping("/update_recipe/{id}")
     public String updateRecipe(@PathVariable("id") Long id,Model model) {
-        Recipe savedRecipe = recipeRepository.findRecipeById(id).orElseThrow(() -> {
+        Recipe savedRecipe = recipeRepository.findById(id).orElseThrow(() -> {
             logger.error("Рецепт с id={} не найден", id);
             return new RuntimeException("Recipe not found");
         });
@@ -173,13 +173,9 @@ public class RecipeController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.getAllErrors());
         }
         try {
-            String errorMessage = recipeService.updateRecipe(id, recipe, photoFood, stepPhotos, stepDescriptions, ingredientNames, ingredientsCounts);
-            if (errorMessage != null){
-                logger.warn("Ошибка при обновлении рецепта: {}", errorMessage);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
-            }
+            Recipe updatedRecipe = recipeService.updateRecipe(id, recipe, photoFood, stepPhotos, stepDescriptions, ingredientNames, ingredientsCounts);
             logger.info("Рецепт успешно обновлён: {}", recipe.getName());
-            return ResponseEntity.ok("Рецепт успешно обновлен.");
+            return ResponseEntity.ok(updatedRecipe);
             } catch (Exception e) {
                 logger.error("Внутренняя ошибка сервера: {}", e.getMessage());
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Внутренняя ошибка сервера.");

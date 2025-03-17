@@ -17,7 +17,7 @@ import java.util.List;
 public class Recipe {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @NotBlank(message = "Название не может быть пустым")
     private String name;
@@ -45,10 +45,10 @@ public class Recipe {
     private String nationalKitchen;
 
     @Column(name = "kkal")
-    private int kkal;
+    private Integer kkal;
 
     @Column(name = "time_to_cook")
-    private int timeToCook;
+    private Integer timeToCook;
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Ingredients> ingredients = new ArrayList<>();

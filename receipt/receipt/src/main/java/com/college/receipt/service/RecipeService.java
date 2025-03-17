@@ -4,6 +4,7 @@ import com.college.receipt.entities.*;
 import com.college.receipt.repositories.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -22,6 +23,7 @@ import java.util.Optional;
 
 import static com.college.receipt.controllers.RecipeController.logger;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Validated
@@ -82,7 +84,7 @@ public class RecipeService {
         return savedRecipe;
     }
 
-    public String updateRecipe(
+    public Recipe updateRecipe(
             Long id,
             Recipe recipe,
             MultipartFile photoFood,
@@ -91,7 +93,19 @@ public class RecipeService {
             String[] ingredientNames,
             Integer[] ingredientsCounts
     ) throws IOException {
-        Recipe savedRecipe = recipeRepository.findRecipeById(id).orElseThrow(() -> new RuntimeException("Recipe not found"));
+        logger.info("Айди изменяемого рецепта:{}", id);
+
+        Recipe savedRecipe = recipeRepository.findById(id).orElseThrow(() -> new RuntimeException("Рецепт не найден. Айди рецепта:" + id));
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserEmail = authentication.getName();
+        boolean isOwner = savedRecipe.getCreatedBy().getEmail().equals(currentUserEmail);
+        boolean isAdmin = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"));
+
+        if(!isAdmin && !isOwner){
+            logger.warn("Пользователь {} неудачно попытался изменить рецепт: {}", currentUserEmail, recipe.getName());
+            throw new IllegalArgumentException("У пользователя недостаточно прав для редактирования рецепта");
+        }
 
         savedRecipe.setName(recipe.getName());
         savedRecipe.setDescription(recipe.getDescription());
@@ -102,15 +116,6 @@ public class RecipeService {
         savedRecipe.setTimeToCook(recipe.getTimeToCook());
         savedRecipe.setCountPortion(recipe.getCountPortion());
         savedRecipe.setTheme(recipe.getTheme());
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUserEmail = authentication.getName();
-        boolean isOwner = savedRecipe.getCreatedBy().getEmail().equals(currentUserEmail);
-        boolean isAdmin = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"));
-
-        if(!isAdmin && !isOwner){
-            return "У вас недостаточно прав для редактирования";
-        }
 
         ingredientRepository.deleteByRecipeId(id);
         stepRepository.deleteByRecipeId(id);
@@ -127,7 +132,7 @@ public class RecipeService {
         }
 
         if (photoFood != null && !photoFood.isEmpty()) {
-            uploadedFileService.uploadImageToDataSystem(photoFood, recipe, "PHOTOFOOD");
+            uploadedFileService.uploadImageToDataSystem(photoFood, savedRecipe, "PHOTOFOOD");
         }
 
         if (stepDescriptions != null && stepPhotos != null && stepDescriptions.length == stepPhotos.length) {
@@ -137,7 +142,7 @@ public class RecipeService {
                 Integer stepNumber = j + 1;
 
                 if (!stepPhoto.isEmpty()) {
-                    UploadedFile savedFile = uploadedFileService.uploadImageToDataSystem(stepPhoto, recipe, "STEPPHOTO");
+                    UploadedFile savedFile = uploadedFileService.uploadImageToDataSystem(stepPhoto, savedRecipe, "STEPPHOTO");
 
                     Steps step = Steps.builder()
                             .stepNumber(stepNumber)
@@ -149,7 +154,9 @@ public class RecipeService {
                 }
             }
         }
-        return null;
+        recipeRepository.save(savedRecipe);
+        logger.info("Рецепт {} с id {} успешно изменился",savedRecipe.getName(), savedRecipe.getId());
+        return savedRecipe;
     }
 
     public ResponseEntity<String> deleteRecipe(Long id){
