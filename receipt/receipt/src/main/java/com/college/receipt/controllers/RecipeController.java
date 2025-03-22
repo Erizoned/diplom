@@ -1,5 +1,6 @@
 package com.college.receipt.controllers;
 
+import com.college.receipt.DTO.RecipeDto;
 import com.college.receipt.entities.Ingredients;
 import com.college.receipt.entities.Recipe;
 import com.college.receipt.entities.Steps;
@@ -7,12 +8,14 @@ import com.college.receipt.entities.UploadedFile;
 import com.college.receipt.repositories.IngredientRepository;
 import com.college.receipt.repositories.StepRepository;
 import com.college.receipt.repositories.UploadedFileRepository;
-import com.college.receipt.service.Recipe.RecipeRepository;
-import com.college.receipt.service.Recipe.RecipeServiceImpl;
+import com.college.receipt.repositories.RecipeRepository;
+import com.college.receipt.service.RecipeService;
 import com.college.receipt.service.UploadedFileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -24,20 +27,22 @@ import org.springframework.web.multipart.MultipartFile;
 import jakarta.validation.Valid;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
-@RequestMapping("/")
-@Controller
+@RequestMapping("/api")
+@RestController
 public class RecipeController {
     private final RecipeRepository recipeRepository;
     private final UploadedFileService uploadedFileService;
     private final UploadedFileRepository uploadedFileRepository;
     public static final Logger logger = LoggerFactory.getLogger(RecipeController.class);
-    private final RecipeServiceImpl recipeService;
+    private final RecipeService recipeService;
     private final StepRepository stepRepository;
     private final IngredientRepository ingredientRepository;
 
-    public RecipeController(RecipeRepository recipeRepository, UploadedFileService uploadedFileService, UploadedFileRepository uploadedFileRepository, RecipeServiceImpl recipeService, StepRepository stepRepository, IngredientRepository ingredientRepository) {
+    public RecipeController(RecipeRepository recipeRepository, UploadedFileService uploadedFileService, UploadedFileRepository uploadedFileRepository, RecipeService recipeService, StepRepository stepRepository, IngredientRepository ingredientRepository) {
         this.recipeRepository = recipeRepository;
         this.uploadedFileService = uploadedFileService;
         this.uploadedFileRepository = uploadedFileRepository;
@@ -46,8 +51,8 @@ public class RecipeController {
         this.ingredientRepository = ingredientRepository;
     }
 
-    @GetMapping("/")
-    public String home(Model model, String keyword,
+    @GetMapping("/recipes")
+    public ResponseEntity<List<Recipe>> home(String keyword,
                        @RequestParam(value = "countPortion", required = false) Integer countPortion,
                        @RequestParam(value = "kkal", required = false) Integer kkal,
                        @RequestParam(value = "timeToCook", required = false) Integer timeToCook,
@@ -71,30 +76,27 @@ public class RecipeController {
                     typeOfCook,
                     typeOfFood
             );
-            model.addAttribute("recipes", filteredRecipes);
             if (keyword != null){
-                model.addAttribute("recipes", recipeRepository.findByKeyword(keyword));
-                logger.info("поисковое слово:{}",keyword);
+                List<Recipe> keywordRecipe = recipeRepository.findByKeyword(keyword);
+                logger.info("поисковое слово:{}", keyword);
+                return ResponseEntity.ok(keywordRecipe);
             }
             logger.info("Применяем фильтры: countPortion={}, kkal={}, timeToCook={}, nationalKitchen={}, restrictions={}, theme={}, typeOfCook={}, typeOfFood={}", countPortion, kkal, timeToCook, nationalKitchen, restrictions, theme, typeOfCook, typeOfFood);
-            List<Recipe> recipes = recipeRepository.findByFilter( countPortion, kkal, timeToCook, nationalKitchen, restrictions, theme, typeOfCook, typeOfFood);
-            logger.info("Найдено отфильтрованных рецептов: {}", recipes.size());
-            if (recipes.size() == 0) {
-                model.addAttribute("errorMessage", "Ошибка. Рецепты не были найдены");
-                model.addAttribute("recipes", List.of());
+            logger.info("Найдено отфильтрованных рецептов: {}", filteredRecipes.size());
+            if (filteredRecipes.isEmpty()) {
                 logger.warn("Ошибка, рецепты не найдены");
-                return "index";
+                return ResponseEntity.badRequest().body(Collections.emptyList());
             }
             else{
-                logger.info("Найдено рецептов: {}", recipes.size());
-                recipes.forEach(recipe -> logger.info("Рецепт: id={}, name={}", recipe.getId(), recipe.getName()));
+                logger.info("Найдено рецептов: {}", filteredRecipes.size());
+                filteredRecipes.forEach(recipe -> logger.info("Рецепт: id={}, name={}", recipe.getId(), recipe.getName()));
+                return ResponseEntity.ok(filteredRecipes);
             }
         }
         else{
             List<Recipe> recipes = recipeRepository.findAll();
-            model.addAttribute("recipes", recipes);
+            return ResponseEntity.ok(recipes);
         }
-        return "index";
     }
 
     @GetMapping("/create_recipe")
@@ -106,53 +108,20 @@ public class RecipeController {
 
     @GetMapping("/update_recipe/{id}")
     public String updateRecipe(@PathVariable("id") Long id,Model model) {
-        Recipe savedRecipe = recipeRepository.findRecipeById(id).orElseThrow(() -> {
+        Recipe savedRecipe = recipeRepository.findById(id).orElseThrow(() -> {
             logger.error("Рецепт с id={} не найден", id);
             return new RuntimeException("Recipe not found");
         });
+
+        UploadedFile photoFood = uploadedFileRepository.findByRecipeAndIsPhotoFoodTrue(savedRecipe);
         List<Steps> steps = stepRepository.findByRecipe(savedRecipe);
         List<Ingredients> ingredients = ingredientRepository.findByRecipe(savedRecipe);
         model.addAttribute("recipe", savedRecipe);
         model.addAttribute("steps", steps);
         model.addAttribute("ingredients", ingredients);
+        model.addAttribute("photoFood", photoFood);
 
     return "update_recipe";
-    }
-
-    @PutMapping("/update_recipe/{id}")
-    public String updateRecipe(
-            @Valid @ModelAttribute Recipe recipe,
-            BindingResult result,
-            @PathVariable("id") Long id,
-            @RequestParam("photoFood") MultipartFile photoFood,
-            @RequestParam("stepPhotos") MultipartFile[] stepPhotos,
-            @RequestParam("stepDescriptions") String[] stepDescriptions,
-            @RequestParam("ingredientNames") String[] ingredientNames,
-            @RequestParam("ingredientsCounts") Integer[] ingredientsCounts,
-            Model model
-    ) {
-        if (result.hasErrors()) {
-            logger.error("Ошибка валидации: {}", result.getAllErrors());
-            model.addAttribute("errorMessage", "Пожалуйста, заполните все обязательные поля.");
-            return "update_recipe";
-        }
-
-        try {
-            String errorMessage = recipeService.updateRecipe(id, recipe, photoFood, stepPhotos, stepDescriptions, ingredientNames, ingredientsCounts);
-            if (errorMessage != null){
-                logger.warn("Ошибка при обновлении рецепта: {}", errorMessage);
-                model.addAttribute("errorMessage", errorMessage);
-                return "update_recipe";
-            }
-            recipeService.updateRecipe(id, recipe, photoFood, stepPhotos, stepDescriptions, ingredientNames, ingredientsCounts);
-            logger.info("Рецепт успешно обновлён: {}", recipe.getName());
-        } catch (Exception e) {
-            logger.error("Ошибка при обновлении рецепта: {}", e.getMessage());
-            model.addAttribute("errorMessage", "Ошибка при сохранении рецепта: " + e.getMessage());
-            return "update_recipe";
-        }
-
-        return "redirect:/recipe/" + id;
     }
 
     @PostMapping("/create_recipe")
@@ -166,15 +135,13 @@ public class RecipeController {
             @RequestParam("ingredientsCounts") Integer[] ingredientsCounts,
             Model model
     ){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userName = authentication.getName();
         if (result.hasErrors()) {
             logger.error("Ошибка валидации: {}", result.getAllErrors());
             model.addAttribute("errorMessage", "Пожалуйста, заполните все обязательные поля.");
-            return "create_recipe";
+            throw new RuntimeException("Ошибка, заполнены не все поля");
         }
         try {
-            Recipe savedRecipe = recipeService.createRecipe(recipe, photoFood, stepPhotos, stepDescriptions, userName, ingredientNames, ingredientsCounts);
+            Recipe savedRecipe = recipeService.createRecipe(recipe, photoFood, stepPhotos, stepDescriptions, ingredientNames, ingredientsCounts);
             logger.info("Рецепт успешно сохранён: {}", savedRecipe);
         }
         catch (DataIntegrityViolationException e){
@@ -189,40 +156,62 @@ public class RecipeController {
         return "redirect:/recipe/" + recipe.getId();
     }
 
-    @GetMapping("/recipe/{id}")
-    public String viewRecipe(@PathVariable("id") Long id, Model model) {
-        logger.info("Открыта страница просмотра рецепта с id={}", id);
 
+    @PutMapping("/update_recipe/{id}")
+    public ResponseEntity<?> updateRecipe(
+            @Valid @ModelAttribute Recipe recipe,
+            BindingResult result,
+            @PathVariable("id") Long id,
+            @RequestParam(value = "photoFood", required = false) MultipartFile photoFood,
+            @RequestParam(value = "stepPhotos", required = false) MultipartFile[] stepPhotos,
+            @RequestParam(value = "stepDescriptions", required = false) String[] stepDescriptions,
+            @RequestParam(value = "ingredientNames", required = false) String[] ingredientNames,
+            @RequestParam(value = "ingredientsCounts", required = false) Integer[] ingredientsCounts
+            ) {
+        logger.info("Попытка изменить рецепт");
+        if (result.hasErrors()) {
+            logger.error("Ошибка валидации: {}", result.getAllErrors());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.getAllErrors());
+        }
+        try {
+            Recipe updatedRecipe = recipeService.updateRecipe(id, recipe, photoFood, stepPhotos, stepDescriptions, ingredientNames, ingredientsCounts);
+            logger.info("Рецепт успешно обновлён: {}", recipe.getName());
+            return ResponseEntity.ok(updatedRecipe);
+            } catch (Exception e) {
+                logger.error("Внутренняя ошибка сервера: {}", e.getMessage());
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Внутренняя ошибка сервера.");
+            }
+    }
+
+    @GetMapping("/recipe/{id}")
+    public ResponseEntity<RecipeDto> viewRecipe(@PathVariable("id") Long id) {
+        logger.info("Открыта страница просмотра рецепта с id={}", id);
         Recipe recipe = recipeRepository.findById(id)
                 .orElseThrow(() -> {
                     logger.error("Рецепт с id={} не найден", id);
                     return new RuntimeException("Recipe not found");
                 });
 
-        List<UploadedFile> photoFood = uploadedFileRepository.findByRecipeAndIsPhotoFoodTrue(recipe);
+        UploadedFile photoFood = uploadedFileRepository.findByRecipeAndIsPhotoFoodTrue(recipe);
         List<Steps> steps = stepRepository.findByRecipe(recipe);
         List<Ingredients> ingredients = ingredientRepository.findByRecipe(recipe);
 
         logger.info("Найдено шагов: {}", steps.size());
 
-        model.addAttribute("recipe", recipe);
-        model.addAttribute("photoFood", photoFood);
-        model.addAttribute("steps", steps);
-        model.addAttribute("ingredients", ingredients);
-        model.addAttribute("author", recipe.getCreatedBy());
+        RecipeDto response = new RecipeDto(
+          recipe,
+          photoFood,
+          steps,
+          ingredients,
+          recipe.getCreatedBy().getUsername()
+        );
 
-        return "recipe";
+        return ResponseEntity.ok().body(response);
     }
 
     @DeleteMapping("/recipe/{id}/delete")
-    public String deleteRecipe(@PathVariable("id") Long id) {
-            String errorMessage = recipeService.deleteRecipe(id);
-            if(errorMessage != null){
-                logger.warn("Ошибка при создании рецепта:{}", errorMessage);
-                return "recipe";
-            }
-        recipeService.deleteRecipe(id);
-        return "redirect:/";
+    public ResponseEntity<String> deleteRecipe(@PathVariable("id") Long id) {
+        return recipeService.deleteRecipe(id);
     }
 
 

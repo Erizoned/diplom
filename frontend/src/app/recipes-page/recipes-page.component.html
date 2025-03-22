@@ -1,0 +1,107 @@
+<app-header [pageTitle]="'Рецепты'"></app-header>
+<div class="main-container" style="margin-top: 80px; padding: 20px;">
+  <div class="search-section">
+    <form (submit)="onFilter($event)" class="search-form">
+      <div class="search-container">
+        <input id="search" type="text" name="keyword" [(ngModel)]="keyword" placeholder="Поиск рецептов..." />
+        <button type="submit" class="search-button">Найти</button>
+        <button type="button" class="filter-button" (click)="toggleDiv()">Фильтры</button>
+      </div>
+    </form>
+
+    <div id="filterDiv" class="filter-container"   [ngStyle]="{ display: filterVisible ? 'block' : 'none' }">
+      <form (submit)="onFilter($event)">
+        <div>
+          <label for="theme">Тема блюда:</label>
+          <select id="theme" name="theme" [(ngModel)]="filter.theme">
+            <option value="">Все</option>
+            <option value="Завтрак">Завтрак</option>
+            <option value="Обед">Обед</option>
+            <option value="Ужин">Ужин</option>
+            <option value="Перекус">Перекус</option>
+            <option value="Праздничное">Праздничное блюдо</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="typeOfFood">Тип блюда:</label>
+          <select id="typeOfFood" name="typeOfFood" [(ngModel)]="filter.typeOfFood">
+            <option value="">Все</option>
+            <option value="Суп">Суп</option>
+            <option value="Мясо">Мясо</option>
+            <option value="Салат">Салат</option>
+            <option value="Десерт">Десерт</option>
+            <option value="Гарнир">Гарнир</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="typeOfCook">Тип приготовления:</label>
+          <select id="typeOfCook" name="typeOfCook" [(ngModel)]="filter.typeOfCook">
+            <option value="">Все</option>
+            <option value="Сковорода">Сковорода</option>
+            <option value="Кастрюля">Кастрюля</option>
+            <option value="Духовка">Духовка</option>
+            <option value="Гриль">Гриль</option>
+            <option value="Пароварка">Пароварка</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="restrictions">Ограничения:</label>
+          <select id="restrictions" name="restrictions" [(ngModel)]="filter.restrictions">
+            <option value="">Все</option>
+            <option value="Без сахара">Без сахара</option>
+            <option value="Без глютена">Без глютена</option>
+            <option value="Без молочных продуктов">Без молочных продуктов</option>
+            <option value="Веган">Веган</option>
+            <option value="Без орехов">Без орехов</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="countPortion">Количество порций:</label>
+          <input type="number" id="countPortion" name="countPortion" [(ngModel)]="filter.countPortion">
+        </div>
+
+        <div>
+          <label for="kkal">Калорийность (ккал):</label>
+          <input type="number" id="kkal" name="kkal" [(ngModel)]="filter.kkal">
+        </div>
+
+        <div>
+          <label for="timeToCook">Время приготовления (мин):</label>
+          <input type="number" id="timeToCook" name="timeToCook" [(ngModel)]="filter.timeToCook">
+        </div>
+
+        <button type="submit">Отфильтровать</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="actions-container">
+    <a routerLink="/create_recipe" class="create-recipe-button">
+      + Создать новый рецепт
+    </a>
+  </div>
+
+  <div class="recipe-container">
+    <div *ngFor="let recipe of recipes; let i = index" class="recipe-card" [ngClass]="{'new-recipe': recipe.new}">
+      <a [routerLink]="['/recipe', recipe.id]">
+        <img *ngIf="recipe.photos && recipe.photos.length > 0"
+             [src]="getPhotoUrl(recipe.photos[0].name)"
+             alt="Фото блюда"
+             class="recipe-image" />
+        <img *ngIf="!recipe.photos || recipe.photos.length === 0"
+             src="/static/images/default-recipe.png"
+             alt="Нет фото"
+             class="recipe-image" />
+        <div class="recipe-details">
+          <div class="recipe-title">{{ recipe.name }}</div>
+          <div class="recipe-description">{{ recipe.description }}</div>
+          <div class="recipe-time">Время приготовления: {{ recipe.timeToCook }} минут</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>

@@ -1,6 +1,6 @@
 package com.college.receipt.validation;
 
-import com.college.receipt.entities.UserDto;
+import com.college.receipt.DTO.UserDto;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

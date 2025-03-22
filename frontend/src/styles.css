@@ -1,0 +1,124 @@
+:root {
+  --olive-green: #667302;
+  --orange: #F25C05;
+  --beige: #F2D0C9;
+  --brown: #8C3503;
+  --black: #0D0D0D;
+  --gradient-start: #667302;
+  --gradient-middle: #F25C05;
+  --gradient-end: #8C3503;
+}
+
+/* Пример: styles.css (или styles.scss) */
+
+/* Базовые стили для инпутов */
+input {
+  background: var(--beige) !important;
+  color: var(--black);
+  border: none;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+/* Псевдоклассы автозаполнения (Chrome/Edge/Safari) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  background: var(--beige) !important;
+  -webkit-box-shadow: 0 0 0 9999px var(--beige) inset !important;
+  box-shadow: 0 0 0 9999px var(--beige) inset !important;
+  -webkit-text-fill-color: var(--black) !important;
+}
+
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-middle), var(--gradient-end));
+  min-height: 100vh;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, var(--brown), var(--orange));
+  padding: 15px 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  flex-wrap: wrap;
+}
+
+.main-container {
+  margin-top: 80px;
+}
+
+.header-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--beige);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-name {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--beige);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.logout-button {
+  background-color: var(--olive-green);
+  color: var(--beige);
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 20px;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.logout-button:hover {
+  background-color: var(--orange);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(242, 92, 5, 0.4);
+}
+
+@media (max-width: 768px) {
+  header {
+      flex-direction: column;
+      align-items: flex-start;
+  }
+
+  .header-actions {
+      margin-top: 10px;
+      justify-content: space-between;
+      width: 100%;
+  }
+
+  .main-container {
+      margin-top: 120px;
+  }
+}
