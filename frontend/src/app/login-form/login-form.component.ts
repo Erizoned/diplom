@@ -12,6 +12,9 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./login-form.component.css']
 })
 export class LoginFormComponent {
+create() {
+  this.router.navigate(['/user/registration']);
+}
   email: string = "";
   password: string = "";
   error: boolean = false;

@@ -38,11 +38,7 @@
     </div>
 
     <div class="photos">
-      <img
-      *ngFor="let photo of recipe.photoFood"
-      [src]="getPhotoUrl(photo.name)"
-      alt="Фото блюда"
-    />
+      <img *ngFor="let photo of recipe.photoFood" [src]="getPhotoUrl(photo.name)" alt="Фото блюда">
     </div>
 
     <div>

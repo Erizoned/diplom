@@ -162,12 +162,13 @@ public class RecipeController {
             @Valid @ModelAttribute Recipe recipe,
             BindingResult result,
             @PathVariable("id") Long id,
-            @RequestParam("photoFood") MultipartFile photoFood,
-            @RequestParam("stepPhotos") MultipartFile[] stepPhotos,
-            @RequestParam("stepDescriptions") String[] stepDescriptions,
-            @RequestParam("ingredientNames") String[] ingredientNames,
-            @RequestParam("ingredientsCounts") Integer[] ingredientsCounts
+            @RequestParam(value = "photoFood", required = false) MultipartFile photoFood,
+            @RequestParam(value = "stepPhotos", required = false) MultipartFile[] stepPhotos,
+            @RequestParam(value = "stepDescriptions", required = false) String[] stepDescriptions,
+            @RequestParam(value = "ingredientNames", required = false) String[] ingredientNames,
+            @RequestParam(value = "ingredientsCounts", required = false) Integer[] ingredientsCounts
             ) {
+        logger.info("Попытка изменить рецепт");
         if (result.hasErrors()) {
             logger.error("Ошибка валидации: {}", result.getAllErrors());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.getAllErrors());

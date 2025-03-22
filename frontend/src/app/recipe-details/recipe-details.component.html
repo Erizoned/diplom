@@ -6,16 +6,14 @@
   
     <h2>Фото блюда:</h2>
     <div class="photos">
-      <ng-container *ngIf="recipe.photoFood?.length > 0; else noPhoto">
-        <img
-          *ngFor="let photo of recipe.photoFood"
-          [src]="getPhotoUrl(photo.name)"
-          alt="Фото блюда"
-        />
-      </ng-container>
-      <ng-template #noPhoto>
-        <p>Фото блюда отсутствует.</p>
-      </ng-template>
+      <img *ngIf="recipe.photos && recipe.photos.length > 0"
+      [src]="getPhotoUrl(recipe.photos[0].name)"
+      alt="Фото блюда"
+      class="recipe-image" />
+ <img *ngIf="!recipe.photos || recipe.photos.length === 0"
+      src="/static/images/default-recipe.png"
+      alt="Нет фото"
+      class="recipe-image" />
     </div>
   
     <h2>Ингредиенты:</h2>

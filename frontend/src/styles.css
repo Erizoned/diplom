@@ -9,6 +9,31 @@
   --gradient-end: #8C3503;
 }
 
+/* Пример: styles.css (или styles.scss) */
+
+/* Базовые стили для инпутов */
+input {
+  background: var(--beige) !important;
+  color: var(--black);
+  border: none;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+/* Псевдоклассы автозаполнения (Chrome/Edge/Safari) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  background: var(--beige) !important;
+  -webkit-box-shadow: 0 0 0 9999px var(--beige) inset !important;
+  box-shadow: 0 0 0 9999px var(--beige) inset !important;
+  -webkit-text-fill-color: var(--black) !important;
+}
+
+
 html, body {
   margin: 0;
   padding: 0;

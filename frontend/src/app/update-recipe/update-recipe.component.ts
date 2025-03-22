@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-update-recipe',
-  imports:[FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule],
   templateUrl: './update-recipe.component.html',
   styleUrls: ['./update-recipe.component.css']
 })
@@ -26,7 +26,8 @@ export class UpdateRecipeComponent implements OnInit, AfterViewInit {
     steps: [] as any[],
   };
   photoFoodFile: File | null = null;
-  stepPhotos: File[] = [];
+  // Разрешаем в массиве хранить как File, так и null
+  stepPhotos: (File | null)[] = [];
   stepDescriptions: string[] = [];
   ingredientNames: string[] = [];
   ingredientsCounts: number[] = [];
@@ -42,22 +43,40 @@ export class UpdateRecipeComponent implements OnInit, AfterViewInit {
     this.axiosService.request('GET', '/api/recipe/' + this.recipeId, null)
       .then(response => {
         const data = response.data;
-        this.recipe.photoFood = data.photoFood;
-        this.recipe.id = data.id;
-        this.recipe.name = data.name;
-        this.recipe.description = data.description;
-        this.recipe.theme = data.theme;
-        this.recipe.countPortion = data.countPortion;
-        this.recipe.kkal = data.kkal;
-        this.recipe.timeToCook = data.timeToCook;
-        if (data.steps && data.steps.length > 0) {
-          data.steps.forEach((s: any) => {
+        // Если данные рецепта вложены в data.recipe, берем их оттуда
+        const recipeData = data.recipe ? data.recipe : data;
+        
+        // Заполняем основные поля рецепта
+        this.recipe.id = recipeData.id;
+        this.recipe.name = recipeData.name;
+        this.recipe.description = recipeData.description;
+        this.recipe.theme = recipeData.theme;
+        this.recipe.countPortion = recipeData.countPortion;
+        this.recipe.kkal = recipeData.kkal;
+        this.recipe.timeToCook = recipeData.timeToCook;
+
+        // Заполняем список фото блюда (фильтруем только фото с photoFood === true)
+        if (recipeData.photos && recipeData.photos.length > 0) {
+          this.recipe.photoFood = recipeData.photos.filter((photo: any) => photo.photoFood);
+        } else if (data.photoFood) {
+          // Если фото блюда приходит отдельно
+          this.recipe.photoFood = [data.photoFood];
+        }
+        
+        // Заполняем шаги приготовления (ищем их сначала в data.steps, затем в recipeData.steps)
+        const steps = data.steps ? data.steps : recipeData.steps;
+        if (steps && steps.length > 0) {
+          steps.forEach((s: any) => {
             this.stepDescriptions.push(s.description);
-            this.stepPhotos.push(null as any);
+            // Файл фото шага изначально отсутствует (будет добавлен, если пользователь выберет новый)
+            this.stepPhotos.push(null);
           });
         }
-        if (data.ingredients && data.ingredients.length > 0) {
-          data.ingredients.forEach((ing: any) => {
+        
+        // Заполняем ингредиенты (ищем их сначала в data.ingredients, затем в recipeData.ingredients)
+        const ingredients = data.ingredients ? data.ingredients : recipeData.ingredients;
+        if (ingredients && ingredients.length > 0) {
+          ingredients.forEach((ing: any) => {
             this.ingredientNames.push(ing.name);
             this.ingredientsCounts.push(ing.count);
           });
@@ -80,7 +99,7 @@ export class UpdateRecipeComponent implements OnInit, AfterViewInit {
 
   getPhotoUrl(fileName: string): string {
     return 'http://localhost:8081/file_system?file_name=' + encodeURIComponent(fileName);
- }
+  }
 
   onStepPhotoSelected(event: any, index: number) {
     if (event.target.files && event.target.files.length > 0) {
@@ -90,7 +109,7 @@ export class UpdateRecipeComponent implements OnInit, AfterViewInit {
 
   addStep() {
     this.stepDescriptions.push('');
-    this.stepPhotos.push(null as any);
+    this.stepPhotos.push(null);
   }
 
   addIngredient() {
@@ -118,6 +137,7 @@ export class UpdateRecipeComponent implements OnInit, AfterViewInit {
       if (file) {
         formData.append('stepPhotos', file);
       } else {
+        // Если файл не выбран, передаём пустой Blob (можно изменить логику обработки на сервере)
         formData.append('stepPhotos', new Blob([]), '');
       }
     });
@@ -129,7 +149,7 @@ export class UpdateRecipeComponent implements OnInit, AfterViewInit {
     });
     this.axiosService.request(
       'PUT',
-      '/update_recipe/' + this.recipeId,
+      '/api/update_recipe/' + this.recipeId,
       formData,
     )
     .then(response => {
