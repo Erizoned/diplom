@@ -70,12 +70,13 @@ public class UploadedFileService {
             recipeFolder.mkdirs();
             logger.info("Создана директория: {}", FOLDER_PATH);
         }
-        String filePath = Paths.get(recipeFolderPath, UUID.randomUUID() + "_" + file.getOriginalFilename()).toString();
+        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        String filePath = Paths.get(recipeFolderPath, fileName).toString();
         UploadedFile uploadedFile = null;
         if (entityType.equals("PHOTOFOOD")){
             logger.info("Логика для добавления заставки фотографии еды");
             uploadedFile = UploadedFile.builder()
-                    .name(file.getOriginalFilename())
+                    .name(fileName)
                     .type(contentType)
                     .filePath(filePath)
                     .recipe(recipe)
@@ -84,7 +85,7 @@ public class UploadedFileService {
         } else if (entityType.equals("STEPPHOTO")) {
             logger.info("Логика для добавления фотографии шага");
             uploadedFile = UploadedFile.builder()
-                    .name(file.getOriginalFilename())
+                    .name(fileName)
                     .type(contentType)
                     .filePath(filePath)
 //                добавить в бд

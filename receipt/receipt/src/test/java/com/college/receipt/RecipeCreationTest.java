@@ -33,12 +33,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(MockitoExtension.class)
 public class RecipeCreationTest {
-
-    @InjectMocks
-    private RecipeService recipeService;
 
     @Mock
     private IngredientRepository ingredientRepository;
@@ -57,6 +53,9 @@ public class RecipeCreationTest {
 
     @Mock
     private StepRepository stepRepository;
+
+    @InjectMocks
+    private RecipeService recipeService;
 
     @BeforeEach
     void setUp() {
@@ -158,7 +157,7 @@ public class RecipeCreationTest {
         //Act
 
         when(recipeRepository.save(any(Recipe.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(recipeRepository.findById(anyLong())).thenReturn(Optional.ofNullable(existingRecipe));
+        when(recipeRepository.findById(anyLong())).thenReturn(Optional.ofNullable(((existingRecipe))));
 
         Recipe savedRecipe = recipeService.updateRecipe(1L, updatedData, photoFood, stepPhotos, stepDescriptions, ingredientNames, ingredientCounts);
 

@@ -10,6 +10,7 @@ import { AxiosService } from '../axios.service';
 gsap.registerPlugin(ScrollTrigger);
 
 export interface Recipe {
+photoFood: any;
   id: number;
   name: string;
   description: string;

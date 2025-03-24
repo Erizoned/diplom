@@ -137,7 +137,6 @@ export class UpdateRecipeComponent implements OnInit, AfterViewInit {
       if (file) {
         formData.append('stepPhotos', file);
       } else {
-        // Если файл не выбран, передаём пустой Blob (можно изменить логику обработки на сервере)
         formData.append('stepPhotos', new Blob([]), '');
       }
     });

@@ -1,0 +1,184 @@
+<div class="create-recipe-container">
+  <h1>Создание нового рецепта</h1>
+  <form (ngSubmit)="onCreateRecipe()" #createRecipeForm="ngForm" enctype="multipart/form-data">
+    <div>
+      <label for="name">Название рецепта:</label>
+      <input
+        type="text"
+        id="name"
+        name="name"
+        [(ngModel)]="recipe.name"
+        required
+      />
+    </div>
+
+    <div>
+      <label for="description">Описание:</label>
+      <textarea
+        id="description"
+        name="description"
+        [(ngModel)]="recipe.description"
+        required
+      ></textarea>
+    </div>
+
+    <div>
+      <label for="theme">Тема блюда:</label>
+      <select
+        id="theme"
+        name="theme"
+        [(ngModel)]="recipe.theme"
+        required
+      >
+        <option value="Завтрак">Завтрак</option>
+        <option value="Обед">Обед</option>
+        <option value="Ужин">Ужин</option>
+        <option value="Перекус">Перекус</option>
+        <option value="Праздничное">Праздничное блюдо</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="typeOfFood">Тип блюда:</label>
+      <select
+        id="typeOfFood"
+        name="typeOfFood"
+        [(ngModel)]="recipe.typeOfFood"
+      >
+        <option value="Суп">Суп</option>
+        <option value="Мясо">Мясо</option>
+        <option value="Салат">Салат</option>
+        <option value="Десерт">Десерт</option>
+        <option value="Гарнир">Гарнир</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="typeOfCook">Тип приготовления:</label>
+      <select
+        id="typeOfCook"
+        name="typeOfCook"
+        [(ngModel)]="recipe.typeOfCook"
+      >
+        <option value="Сковорода">Сковорода</option>
+        <option value="Кастрюля">Кастрюля</option>
+        <option value="Духовка">Духовка</option>
+        <option value="Гриль">Гриль</option>
+        <option value="Пароварка">Пароварка</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="restrictions">Ограничения:</label>
+      <select
+        id="restrictions"
+        name="restrictions"
+        [(ngModel)]="recipe.restrictions"
+      >
+        <option value=" - ">Выберите ограничение</option>
+        <option value="без сахара">Без сахара</option>
+        <option value="без глютена">Без глютена</option>
+        <option value="без молочных продуктов">Без молочных продуктов</option>
+        <option value="веган">Веган</option>
+        <option value="без орехов">Без орехов</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="countPortion">Количество порций:</label>
+      <input
+        type="number"
+        id="countPortion"
+        name="countPortion"
+        [(ngModel)]="recipe.countPortion"
+        required
+      />
+    </div>
+
+    <div>
+      <label for="kkal">Калорийность (ккал):</label>
+      <input
+        type="number"
+        id="kkal"
+        name="kkal"
+        [(ngModel)]="recipe.kkal"
+        required
+      />
+    </div>
+
+    <div>
+      <label for="timeToCook">Время приготовления (мин):</label>
+      <input
+        type="number"
+        id="timeToCook"
+        name="timeToCook"
+        [(ngModel)]="recipe.timeToCook"
+        required
+      />
+    </div>
+
+    <div>
+      <label for="photoFood">Фото блюда:</label>
+      <input
+        type="file"
+        id="photoFood"
+        name="photoFood"
+        (change)="onPhotoFoodSelected($event)"
+        accept="image/*"
+        required
+      />
+    </div>
+
+    <div id="ingredientsContainer">
+      <h3>Ингредиенты</h3>
+      <div
+        class="ingredient"
+        *ngFor="let ing of ingredientNames; let i = index"
+      >
+        <label>Название ингредиента:</label>
+        <input
+          type="text"
+          [(ngModel)]="ingredientNames[i]"
+          name="ingredientNames{{i}}"
+          required
+        />
+        <label>Количество:</label>
+        <input
+          type="number"
+          [(ngModel)]="ingredientsCounts[i]"
+          name="ingredientsCounts{{i}}"
+          required
+        />
+      </div>
+    </div>
+    <button type="button" (click)="addIngredient()">Добавить ингредиент</button>
+
+    <div id="stepsContainer">
+      <h3>Шаги</h3>
+      <div
+        class="step"
+        *ngFor="let desc of stepDescriptions; let j = index"
+      >
+        <h3>Шаг {{ j + 1 }}</h3>
+        <label for="stepDescription{{j}}">Описание шага:</label>
+        <textarea
+          id="stepDescription{{j}}"
+          [(ngModel)]="stepDescriptions[j]"
+          name="stepDescriptions{{j}}"
+          required
+        ></textarea>
+        <label for="stepPhoto{{j}}">Фото шага:</label>
+        <input
+          type="file"
+          id="stepPhoto{{j}}"
+          (change)="onStepPhotoSelected($event, j)"
+          accept="image/*"
+          required
+        />
+      </div>
+    </div>
+    <button type="button" (click)="addStep()">Добавить шаг</button>
+
+    <button type="submit">Создать рецепт</button>
+  </form>
+</div>

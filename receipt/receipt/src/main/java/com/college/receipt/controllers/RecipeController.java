@@ -125,35 +125,31 @@ public class RecipeController {
     }
 
     @PostMapping("/create_recipe")
-    public String createRecipe(
+    public ResponseEntity<?> createRecipe(
             @Valid @ModelAttribute Recipe recipe,
             BindingResult result,
             @RequestParam("photoFood") MultipartFile photoFood,
             @RequestParam("stepPhotos") MultipartFile[] stepPhotos,
             @RequestParam("stepDescriptions") String[] stepDescriptions,
             @RequestParam("ingredientNames") String[] ingredientNames,
-            @RequestParam("ingredientsCounts") Integer[] ingredientsCounts,
-            Model model
+            @RequestParam("ingredientsCounts") Integer[] ingredientsCounts
     ){
         if (result.hasErrors()) {
             logger.error("Ошибка валидации: {}", result.getAllErrors());
-            model.addAttribute("errorMessage", "Пожалуйста, заполните все обязательные поля.");
-            throw new RuntimeException("Ошибка, заполнены не все поля");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.getAllErrors());
         }
         try {
             Recipe savedRecipe = recipeService.createRecipe(recipe, photoFood, stepPhotos, stepDescriptions, ingredientNames, ingredientsCounts);
             logger.info("Рецепт успешно сохранён: {}", savedRecipe);
         }
         catch (DataIntegrityViolationException e){
-            model.addAttribute("errorMessage","Ошибка, количество слов превышает допустимый лимит" + e.getMessage());
-            return "create_recipe";
+            return ResponseEntity.badRequest().body("Ошибка, количество слов превышает допустимый лимит. " + e.getMessage());
         }
         catch (IOException e){
             logger.error("Ошибка при сохранении рецепта: {}", e.getMessage());
-            model.addAttribute("errorMessage", "Ошибка при сохранении рецепта: " + e.getMessage());
-            return "create_recipe";
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-        return "redirect:/recipe/" + recipe.getId();
+        return ResponseEntity.ok(recipe);
     }
 
 

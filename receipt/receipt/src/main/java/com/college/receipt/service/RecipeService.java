@@ -40,6 +40,9 @@ public class RecipeService {
     public Recipe createRecipe(Recipe recipe, MultipartFile photoFood, MultipartFile[] stepPhotos, String[] stepDescriptions, String[] ingredientNames , Integer[] ingredientsCounts) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
+        if (userName == null){
+            throw new RuntimeException("Ошибка. Пользователь не найден либо не авторизован");
+        }
         User user = userRepository.findByEmail(userName);
         recipe.setCreatedBy(user);
         Recipe savedRecipe = recipeRepository.save(recipe);
@@ -58,7 +61,9 @@ public class RecipeService {
             uploadedFileService.uploadImageToDataSystem(photoFood, recipe, "PHOTOFOOD");
             logger.info("Фото блюда {} успешно сохранено", photoFood.getOriginalFilename());
         }
-        logger.info("Получено photoFood: {}", photoFood != null ? photoFood.getOriginalFilename() : "null");
+
+        logger.info("Получено photoFood: {}", photoFood.getOriginalFilename());
+
         for (int i = 0; i < stepPhotos.length; i++) {
             MultipartFile stepPhoto = stepPhotos[i];
             String stepDescription = stepDescriptions[i];
@@ -75,6 +80,7 @@ public class RecipeService {
                         .photo(photo)
                         .recipe(recipe)
                         .build();
+                stepRepository.save(step);
                 logger.info("Шаг {} успешно сохранён: {}", stepNumber, stepDescription);
             } else {
                 logger.warn("Фото для шага {} не передано.", stepNumber);

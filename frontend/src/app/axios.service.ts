@@ -9,7 +9,6 @@ export class AxiosService {
 
   constructor(private router: Router) {
     axios.defaults.baseURL = "http://localhost:8081";
-    axios.defaults.headers.post["Content-Type"] = "application/json";
     axios.interceptors.response.use(
       response => response,
       error => {
@@ -40,6 +39,12 @@ export class AxiosService {
     const token = this.getAuthToken();
     if (token && token.split('.').length === 3 && url !== '/login' && url !== '/register') {
       headers = { "Authorization": "Bearer " + token };
+    }
+    
+    if (data instanceof FormData) {
+      headers['Content-Type'] = 'multipart/form-data';
+    } else {
+      headers['Content-Type'] = 'application/json';
     }
     
     return axios({
