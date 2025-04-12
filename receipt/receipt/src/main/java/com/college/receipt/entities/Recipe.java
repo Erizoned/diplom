@@ -39,7 +39,7 @@ public class Recipe {
     private String restrictions;
 
     @Column(name = "count_portion")
-    private int countPortion;
+    private Integer countPortion;
 
     @Column(name = "national_kitchen")
     private String nationalKitchen;
@@ -73,6 +73,12 @@ public class Recipe {
                 ", theme='" + theme + '\'' +
                 ", typeOfFood='" + typeOfFood + '\'' +
                 ", timeToCook=" + timeToCook +
+                ", nationalKitchen='" + nationalKitchen + '\'' +
+                ", restrictions='" + restrictions + '\'' +
+                ", typeOfCook='" + typeOfCook + '\'' +
+                ", kkal=" + kkal +
+                ", countPortion=" + countPortion +
                 '}';
     }
+
 }

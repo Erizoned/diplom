@@ -10,10 +10,20 @@ import java.util.List;
 @Setter
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class RecipeDto {
     private Recipe recipe;
     private UploadedFile photoFood;
     private List<Steps> steps;
     private List<Ingredients> ingredients;
     private String authorUsername;
+
+    @Override
+    public String toString() {
+        return "RecipeDto{" +
+                "ingredients=" + ingredients +
+                ", recipe=" + recipe +
+                '}';
+    }
+
 }

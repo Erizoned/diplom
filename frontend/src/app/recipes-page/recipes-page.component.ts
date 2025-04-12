@@ -6,6 +6,8 @@ import { HeaderComponent } from '../header/header.component';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AxiosService } from '../axios.service';
+import { GeminiSearchComponent } from '../gemini-search/gemini-search.component';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -22,7 +24,7 @@ photoFood: any;
 
 @Component({
   selector: 'app-recipes-page',
-  imports:[HeaderComponent, FormsModule, CommonModule, RouterModule],
+  imports:[HeaderComponent, FormsModule, CommonModule, RouterModule, MatDialogModule],
   templateUrl: './recipes-page.component.html',
   styleUrls: ['./recipes-page.component.css']
 })
@@ -43,7 +45,14 @@ export class RecipesPageComponent implements OnInit, AfterViewInit {
 
   filterVisible = false;
 
-  constructor(private router: Router, private axiosService: AxiosService) {}
+  constructor(private router: Router, private axiosService: AxiosService, private dialog: MatDialog) {}
+
+  openGemini() {
+    this.dialog.open(GeminiSearchComponent, {
+      width: '500px',
+      disableClose: false
+    });
+  }
 
   ngOnInit(): void {
     this.axiosService.request("GET", "/api/recipes", null)

@@ -85,6 +85,11 @@
     </a>
   </div>
 
+  <button (click)="openGemini()" class="bg-purple-600 text-white px-4 py-2 rounded">
+    Поиск рецептов с Gemini
+  </button>
+  
+
   <div class="recipe-container">
     <div *ngFor="let recipe of recipes; let i = index" class="recipe-card" [ngClass]="{'new-recipe': recipe.new}">
       <a [routerLink]="['/recipe', recipe.id]">

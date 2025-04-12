@@ -15,11 +15,11 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             "WHERE (:count_portion IS NULL OR r.count_portion = :count_portion) " +
             "AND (:kkal IS NULL OR r.kkal <= :kkal) " +
             "AND (:time_to_cook IS NULL OR r.time_to_cook <= :time_to_cook) " +
-            "AND (:national_kitchen IS NULL OR r.national_kitchen = :national_kitchen) " +
-            "AND (:restrictions IS NULL OR r.restrictions = :restrictions) " +
-            "AND (:theme IS NULL OR r.theme = :theme) " +
-            "AND (:type_of_cook IS NULL OR r.type_of_cook = :type_of_cook) " +
-            "AND (:type_of_food IS NULL OR r.type_of_food = :type_of_food)",
+            "AND (:national_kitchen IS NULL OR LOWER(r.national_kitchen) = LOWER(:national_kitchen)) " +
+            "AND (:restrictions IS NULL OR LOWER(r.restrictions) = LOWER(:restrictions)) " +
+            "AND (:theme IS NULL OR LOWER(r.theme) = LOWER(:theme)) " +
+            "AND (:type_of_cook IS NULL OR LOWER(r.type_of_cook) = LOWER(:type_of_cook)) " +
+            "AND (:type_of_food IS NULL OR LOWER(r.type_of_food) = LOWER(:type_of_food))",
             nativeQuery = true)
     List<Recipe> findByFilter(@Param("count_portion") Integer countPortion,
                               @Param("kkal") Integer kkal,
