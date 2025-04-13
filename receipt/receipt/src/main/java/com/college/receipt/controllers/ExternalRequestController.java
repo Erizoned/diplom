@@ -3,6 +3,7 @@ package com.college.receipt.controllers;
 import com.college.receipt.DTO.RecipeDto;
 import com.college.receipt.entities.Ingredients;
 import com.college.receipt.entities.Recipe;
+import com.college.receipt.repositories.IngredientRepository;
 import com.college.receipt.repositories.RecipeRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
@@ -29,6 +30,9 @@ public class ExternalRequestController {
 
     @Autowired
     private RecipeRepository recipeRepository;
+
+    @Autowired
+    private IngredientRepository ingredientRepository;
 
     @PostMapping("/gemini")
     public ResponseEntity<?> sendRequestToGemini(@RequestBody Map<String, String> request) throws IOException, InterruptedException {
@@ -61,6 +65,8 @@ public class ExternalRequestController {
                     recipeDto.getRecipe().getTypeOfCook(),
                     recipeDto.getRecipe().getTypeOfFood()
             );
+
+            recipes = recipes.stream().filter(recipe -> recipe.getIngredients().stream().map(ing -> ing.getName().toLowerCase()).collect(Collectors.toSet()).containsAll(recipeDto.getIngredients().stream().map(ing -> ing.getName().toLowerCase()).collect(Collectors.toSet()))).collect(Collectors.toList());
 
             int exitCode = process.waitFor();
 

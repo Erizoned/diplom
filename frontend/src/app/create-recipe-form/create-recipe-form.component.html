@@ -133,7 +133,7 @@
       <h3>Ингредиенты</h3>
       <div
         class="ingredient"
-        *ngFor="let ing of ingredientNames; let i = index"
+        *ngFor="let ing of ingredientNames; let i = index; trackBy: trackByIndex"
       >
         <label>Название ингредиента:</label>
         <input
@@ -157,7 +157,7 @@
       <h3>Шаги</h3>
       <div
         class="step"
-        *ngFor="let desc of stepDescriptions; let j = index"
+        *ngFor="let desc of stepDescriptions; let j = index; trackBy: trackByIndex"
       >
         <h3>Шаг {{ j + 1 }}</h3>
         <label for="stepDescription{{j}}">Описание шага:</label>

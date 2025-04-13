@@ -48,11 +48,20 @@ export class RecipesPageComponent implements OnInit, AfterViewInit {
   constructor(private router: Router, private axiosService: AxiosService, private dialog: MatDialog) {}
 
   openGemini() {
-    this.dialog.open(GeminiSearchComponent, {
+    const dialogRef = this.dialog.open(GeminiSearchComponent, {
       width: '500px',
       disableClose: false
     });
+  
+    dialogRef.afterClosed().subscribe((result: any[]) => {
+      if (result && Array.isArray(result)) {
+        this.recipes = result;
+        console.log('Рецепты из Gemini:', result);
+      }
+    });
   }
+  
+  
 
   ngOnInit(): void {
     this.axiosService.request("GET", "/api/recipes", null)

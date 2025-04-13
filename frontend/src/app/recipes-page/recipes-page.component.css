@@ -262,3 +262,12 @@
     text-align: left;
   }
   
+  .gemini-button {
+      padding: 8px 14px;
+      font-weight: bold;
+      background: #f97316;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+  }

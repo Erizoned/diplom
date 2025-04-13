@@ -36,6 +36,11 @@ export class CreateRecipeComponent implements OnInit, AfterViewInit {
     private axiosService: AxiosService
   ) {}
 
+  trackByIndex(index: number, obj: any): any {
+    return index;
+  }
+  
+
   ngOnInit(): void {
     this.addIngredient();
     this.addStep();
