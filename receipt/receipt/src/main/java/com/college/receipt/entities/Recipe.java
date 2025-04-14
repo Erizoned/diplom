@@ -64,6 +64,9 @@ public class Recipe {
     @JoinColumn(name= "user_id", nullable = false)
     private User createdBy;
 
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comments> comments;
+
     @Override
     public String toString() {
         return "Recipe{" +
