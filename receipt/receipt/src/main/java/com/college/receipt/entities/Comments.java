@@ -22,11 +22,13 @@ public class Comments {
 
     private String content;
 
-    private Integer likes;
+    @Column()
+    private int likes;
 
-    private Integer dislikes;
+    private int dislikes;
 
-    @OneToOne
+    @ManyToOne
+    @JsonIgnore
     private User author;
 
     @ManyToOne

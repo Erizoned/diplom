@@ -17,6 +17,7 @@ public class RecipeDto {
     private List<Steps> steps;
     private List<Ingredients> ingredients;
     private String authorUsername;
+    private List<CommentDto> comments;
 
     @Override
     public String toString() {

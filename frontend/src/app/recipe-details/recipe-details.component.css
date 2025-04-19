@@ -185,3 +185,66 @@
     animation: slideIn 0.8s ease 0.3s forwards;
   }
   
+/* Стили для комментариев */
+.comments-section {
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+.comment {
+  background: var(--beige);
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  border-left: 3px solid var(--orange);
+}
+
+.comment-header {
+  margin-bottom: 10px;
+  color: var(--brown);
+  font-size: 1.1rem;
+}
+
+.comment-content p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.comment-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.likes.active, .dislikes.active {
+  color: #007bff;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+
+.likes, .dislikes {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.9rem;
+  color: var(--olive-green);
+}
+
+/* Стили для формы комментариев */
+.comment-form {
+  display: flex;
+  margin-bottom: 20px;
+  gap: 10px;
+}
+
+.comment-input {
+  flex-grow: 1;
+  background: var(--beige);
+  border: none;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 16px;
+}
+  

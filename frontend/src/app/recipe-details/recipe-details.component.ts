@@ -31,6 +31,9 @@ export class RecipeDetailsComponent implements OnInit, AfterViewInit {
   };
 
   errorMessage: string | null = null;
+  comments: Array<any> = [];
+  newComment: string = '';
+
 
   constructor(
     private route: ActivatedRoute,
@@ -43,16 +46,22 @@ export class RecipeDetailsComponent implements OnInit, AfterViewInit {
 
     this.axiosService.request("GET", "/api/recipe/" + id, null)
     .then(response => {
+      console.log("Полный response:", response);
+console.log("data:", response.data);
+
       const data = response.data;
       this.recipe = data.recipe;
       this.recipe.photoFood = data.photoFood;
       this.recipe.steps = data.steps;
       this.recipe.ingredients = data.ingredients; 
       this.recipe.authorUsername = data.authorUsername;     
+      this.comments = data.comments || [];
       console.log("Рецепт загружен.");
+      console.log("Комментарии:", data.comments);
+
     })
     .catch(error => {
-      console.error('Ошибка при получении рецепта', error),
+      console.error('Ошибка при получении рецепта', error);
       this.errorMessage = 'Не удалось загрузить рецепт';
     })
   }
@@ -99,7 +108,48 @@ export class RecipeDetailsComponent implements OnInit, AfterViewInit {
       stagger: 0.1,
       ease: 'power3.out'
     });
+    
+    gsap.from('.comment', {
+      opacity: 0,
+      y: 20,
+      duration: 0.6,
+      stagger: 0.15,
+      delay: 0.5,
+      ease: 'power3.out'
+    });
   }
+  likeComment(commentId: number): void {
+    this.axiosService.request("POST", `/api/comment/${commentId}/like`, null)
+      .then((response) => {
+        const updated = response.data;
+        const comment = this.comments.find(c => c.id === commentId);
+        if (comment) {
+          comment.likes = updated.likes;
+          comment.dislikes = updated.dislikes;
+          comment.reaction = updated.reaction; // для стилизации кнопок (опционально)
+        }
+      })
+      .catch(error => {
+        alert(error.response?.data || "Ошибка при добавлении лайка");
+      });
+  }
+  
+  dislikeComment(commentId: number): void {
+    this.axiosService.request("POST", `/api/comment/${commentId}/dislike`, null)
+      .then((response) => {
+        const updated = response.data;
+        const comment = this.comments.find(c => c.id === commentId);
+        if (comment) {
+          comment.likes = updated.likes;
+          comment.dislikes = updated.dislikes;
+          comment.reaction = updated.reaction;
+        }
+      })
+      .catch(error => {
+        alert(error.response?.data || "Ошибка при добавлении дизлайка");
+      });
+  }
+  
 
   onDeleteRecipe(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -121,13 +171,39 @@ export class RecipeDetailsComponent implements OnInit, AfterViewInit {
   });
   }
 
-  // onUpdateRecipe(): void {
-  //   const id = this.route.snapshot.paramMap.get('id');
-
-  //   this.axiosService.request("PUT", "/api")
-  // }
 
   goBack(): void {
     this.router.navigate(['/']);
+  }
+
+  addComment(): void {
+    if (!this.newComment.trim()) {
+      return; 
+    }
+
+    const id = this.route.snapshot.paramMap.get('id');
+    const commentData = {
+      content: this.newComment
+    };
+
+    this.axiosService.request("POST", `/api/recipe/${id}/comment`, commentData)
+      .then(response => {
+        if (response.data) {
+          this.comments.push(response.data);
+        } else {
+          // Заглушка
+          this.comments.push({
+            content: this.newComment,
+            likes: 0,
+            dislikes: 0,
+            author: 'Вы'
+          });
+        }
+        this.newComment = '';
+      })
+      .catch(error => {
+        console.error('Ошибка при отправке комментария', error);
+        alert('Не удалось отправить комментарий');
+      });
   }
 }

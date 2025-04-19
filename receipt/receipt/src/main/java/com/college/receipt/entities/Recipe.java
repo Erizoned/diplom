@@ -64,6 +64,7 @@ public class Recipe {
     @JoinColumn(name= "user_id", nullable = false)
     private User createdBy;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comments> comments;
 

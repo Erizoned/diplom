@@ -15,6 +15,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -76,6 +77,16 @@ public class UserService {
             throw new RuntimeException("Ошибка. Пользователь не вошёл в аккаунт: " + e.getMessage());
         }
         throw new RuntimeException("Ошибка. Пользователь не вошёл в аккаунт");
+    }
+
+    public User findAuthenticatedUser(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication.isAuthenticated()){
+            return userRepository.findByEmail(authentication.getName());
+        }
+        else {
+            throw new RuntimeException("Пользователь не вошёл в аккаунт");
+        }
     }
 
     private boolean emailExists(String email) {

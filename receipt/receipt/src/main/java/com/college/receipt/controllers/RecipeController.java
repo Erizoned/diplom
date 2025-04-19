@@ -1,14 +1,9 @@
 package com.college.receipt.controllers;
 
+import com.college.receipt.DTO.CommentDto;
 import com.college.receipt.DTO.RecipeDto;
-import com.college.receipt.entities.Ingredients;
-import com.college.receipt.entities.Recipe;
-import com.college.receipt.entities.Steps;
-import com.college.receipt.entities.UploadedFile;
-import com.college.receipt.repositories.IngredientRepository;
-import com.college.receipt.repositories.StepRepository;
-import com.college.receipt.repositories.UploadedFileRepository;
-import com.college.receipt.repositories.RecipeRepository;
+import com.college.receipt.entities.*;
+import com.college.receipt.repositories.*;
 import com.college.receipt.service.RecipeService;
 import com.college.receipt.service.UploadedFileService;
 import org.slf4j.Logger;
@@ -30,6 +25,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequestMapping("/api")
 @RestController
@@ -41,14 +37,16 @@ public class RecipeController {
     private final RecipeService recipeService;
     private final StepRepository stepRepository;
     private final IngredientRepository ingredientRepository;
+    private final CommentsRepository commentsRepository;
 
-    public RecipeController(RecipeRepository recipeRepository, UploadedFileService uploadedFileService, UploadedFileRepository uploadedFileRepository, RecipeService recipeService, StepRepository stepRepository, IngredientRepository ingredientRepository) {
+    public RecipeController(RecipeRepository recipeRepository, UploadedFileService uploadedFileService, UploadedFileRepository uploadedFileRepository, RecipeService recipeService, StepRepository stepRepository, IngredientRepository ingredientRepository, CommentsRepository commentsRepository) {
         this.recipeRepository = recipeRepository;
         this.uploadedFileService = uploadedFileService;
         this.uploadedFileRepository = uploadedFileRepository;
         this.recipeService = recipeService;
         this.stepRepository = stepRepository;
         this.ingredientRepository = ingredientRepository;
+        this.commentsRepository = commentsRepository;
     }
 
     @GetMapping("/recipes")
@@ -194,12 +192,15 @@ public class RecipeController {
 
         logger.info("Найдено шагов: {}", steps.size());
 
+        List<CommentDto> commentsDtos = recipe.getComments().stream().map(CommentDto::new).collect(Collectors.toList());
+
         RecipeDto response = new RecipeDto(
           recipe,
           photoFood,
           steps,
           ingredients,
-          recipe.getCreatedBy().getUsername()
+          recipe.getCreatedBy().getUsername(),
+          commentsDtos
         );
 
         return ResponseEntity.ok().body(response);

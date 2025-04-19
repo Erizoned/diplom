@@ -1,8 +1,11 @@
 package com.college.receipt.controllers;
 
+import com.college.receipt.DTO.CommentDto;
+import com.college.receipt.entities.CommentReaction;
 import com.college.receipt.entities.Comments;
 import com.college.receipt.entities.Recipe;
 import com.college.receipt.entities.User;
+import com.college.receipt.repositories.CommentReactionRepository;
 import com.college.receipt.repositories.CommentsRepository;
 import com.college.receipt.repositories.RecipeRepository;
 import com.college.receipt.repositories.UserRepository;
@@ -15,6 +18,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -35,43 +41,47 @@ public class CommentController {
     @Autowired
     private CommentService commentsService;
 
+    @Autowired
+    private CommentReactionRepository commentReactionRepository;
+
     private static final Logger logger = LoggerFactory.getLogger(CommentController.class);
 
-    @PostMapping("/{id}/comment")
-    private ResponseEntity<Comments> addComment(@RequestParam String content, @PathVariable("id") Long id){
+    @GetMapping("/{id}/comment")
+    private ResponseEntity<Comments> getComment(@PathVariable("id") Long id){
+        Comments comments = commentsRepository.findById(id).orElseThrow(() -> new RuntimeException("Комментарий не найден"));
+        return ResponseEntity.ok().body(comments);
+    }
+
+    @PostMapping("/recipe/{id}/comment")
+    private ResponseEntity<Comments> addComment(@RequestBody CommentDto commentDto, @PathVariable("id") Long id){
+        String content = commentDto.getContent();
         Comments comments = commentsService.createComment(content, id);
         logger.info("Комментарий {} для рецепта {} создан. Автор: {}", comments.getContent(), comments.getRecipe().getName(),comments.getAuthor());
         return ResponseEntity.ok().body(comments);
     }
 
     @PostMapping("/comment/{id}/like")
-    private ResponseEntity<String> addLikeToComment(@PathVariable("id") Long id){
+    private ResponseEntity<?> addLikeToComment(@PathVariable("id") Long id){
         Comments comment = commentsRepository.findById(id).orElseThrow(() -> new RuntimeException("Комментарий не найден"));
-        if (comment.getLikes() != null){
-            comment.setLikes(comment.getLikes() + 1);
-        }
-        else {
-            comment.setLikes(1);
-        }
-        commentsRepository.save(comment);
+        commentsService.likeComment(comment);
         logger.info("Лайк к комментарию автора {} добавлен. Общее количество лайков: {}", comment.getAuthor().getUsername(), comment.getLikes());
-
-        return ResponseEntity.ok().body("Лайк добавлен");
+        Map<String, Object> result = new HashMap<>();
+        result.put("likes", comment.getLikes());
+        result.put("dislikes", comment.getDislikes());
+        result.put("reaction", "liked");
+        return ResponseEntity.ok().body(result);
     }
 
     @PostMapping("/comment/{id}/dislike")
-    private ResponseEntity<String> addDislikeToComment(@PathVariable("id") Long id){
+    private ResponseEntity<?> addDislikeToComment(@PathVariable("id") Long id){
         Comments comment = commentsRepository.findById(id).orElseThrow(() -> new RuntimeException("Комментарий не найден"));
-        if (comment.getDislikes() != null){
-            comment.setLikes(comment.getDislikes() + 1);
-        }
-        else {
-            comment.setDislikes(1);
-        }
-        commentsRepository.save(comment);
+        commentsService.dislikeComment(comment);
         logger.info("Дизлайк к комментарию автора {} добавлен. Общее количество дизлайков: {}", comment.getAuthor().getUsername(), comment.getDislikes());
-
-        return ResponseEntity.ok().body("Дизлайк добавлен");
+        Map<String, Object> result = new HashMap<>();
+        result.put("likes", comment.getLikes());
+        result.put("dislikes", comment.getDislikes());
+        result.put("reaction", "disliked");
+        return ResponseEntity.ok().body(result);
     }
     @DeleteMapping("/comment/{id}")
     private ResponseEntity<String> deleteComment(@PathVariable("id") Long id){

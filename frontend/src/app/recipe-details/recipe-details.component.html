@@ -66,7 +66,43 @@
     <div *ngIf="errorMessage" style="color: red; font-weight: bold; margin-bottom: 20px;">
       <p>{{ errorMessage }}</p>
     </div>
-  
+    <!-- Секция комментариев -->
+    <h2>Комментарии:</h2>
+    <div class="comment-form">
+      <input 
+        [(ngModel)]="newComment" 
+        placeholder="Напишите ваш комментарий..." 
+        class="comment-input"
+      />
+      <button class="button" (click)="addComment()">Отправить</button>
+    </div>
+    <div class="comments-section">
+      <ng-container *ngIf="comments !== undefined && comments.length > 0; else noComments">
+        <div *ngFor="let comment of comments" class="comment">
+          <div class="comment-header">
+            <strong>{{ comment.author || 'Анонимный пользователь' }}</strong>
+          </div>
+          <div class="comment-content">
+            <p>{{ comment.content }}</p>
+          </div>
+          <div class="comment-actions">
+            <span class="likes" 
+            [class.active]="comment.reaction === 'liked'"
+            (click)="likeComment(comment.id)">
+        <span class="like-count">{{ comment.likes || 0 }}</span> 👍
+      </span>
+      <span class="dislikes" 
+            [class.active]="comment.reaction === 'disliked'"
+            (click)="dislikeComment(comment.id)">
+        <span class="dislike-count">{{ comment.dislikes || 0 }}</span> 👎
+      </span>
+          </div>          
+        </div>
+      </ng-container>
+      <ng-template #noComments>
+        <p>Комментарии отсутствуют.</p>
+      </ng-template>
+    </div>
     <a (click)="goBack()" class="back-link">Назад к списку рецептов</a>
   </div>
   
