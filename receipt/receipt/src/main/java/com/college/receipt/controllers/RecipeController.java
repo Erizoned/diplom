@@ -75,7 +75,7 @@ public class RecipeController {
                     typeOfFood
             );
             if (keyword != null){
-                List<Recipe> keywordRecipe = recipeRepository.findByKeyword(keyword);
+                List<Recipe> keywordRecipe = recipeRepository.findByKeyword(keyword.toLowerCase());
                 logger.info("поисковое слово:{}", keyword);
                 return ResponseEntity.ok(keywordRecipe);
             }
@@ -130,7 +130,7 @@ public class RecipeController {
             @RequestParam("stepPhotos") MultipartFile[] stepPhotos,
             @RequestParam("stepDescriptions") String[] stepDescriptions,
             @RequestParam("ingredientNames") String[] ingredientNames,
-            @RequestParam("ingredientsCounts") Integer[] ingredientsCounts
+            @RequestParam("ingredientsCounts") double[] ingredientsCounts
     ){
         if (result.hasErrors()) {
             logger.error("Ошибка валидации: {}", result.getAllErrors());
@@ -160,7 +160,7 @@ public class RecipeController {
             @RequestParam(value = "stepPhotos", required = false) MultipartFile[] stepPhotos,
             @RequestParam(value = "stepDescriptions", required = false) String[] stepDescriptions,
             @RequestParam(value = "ingredientNames", required = false) String[] ingredientNames,
-            @RequestParam(value = "ingredientsCounts", required = false) Integer[] ingredientsCounts
+            @RequestParam(value = "ingredientsCounts", required = false) double[] ingredientsCounts
             ) {
         logger.info("Попытка изменить рецепт");
         if (result.hasErrors()) {

@@ -25,6 +25,8 @@ public class UploadedFile {
 
     private String filePath;
 
+    private int fileSize;
+
     public boolean isPhotoFood;
 
     @JsonIgnore

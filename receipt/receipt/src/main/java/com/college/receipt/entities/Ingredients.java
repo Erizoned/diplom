@@ -23,7 +23,9 @@ public class Ingredients {
     private String name;
 
     @NotNull(message = "Количество ингредиента не может быть пустым")
-    private Integer count;
+    private double count;
+
+    private String unit;
 
     @JsonIgnore
     @ManyToOne

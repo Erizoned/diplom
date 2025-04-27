@@ -88,8 +88,7 @@ public class UploadedFileService {
                     .name(fileName)
                     .type(contentType)
                     .filePath(filePath)
-//                добавить в бд
-//                .fileSize(fileSize)
+                    .fileSize(fileSize)
                     .recipe(recipe)
                     .isPhotoFood(false)
                     .build();

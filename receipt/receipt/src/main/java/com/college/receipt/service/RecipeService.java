@@ -37,7 +37,7 @@ public class RecipeService {
     private final IngredientRepository ingredientRepository;
     private final UploadedFileRepository uploadedFileRepository;
 
-    public Recipe createRecipe(Recipe recipe, MultipartFile photoFood, MultipartFile[] stepPhotos, String[] stepDescriptions, String[] ingredientNames , Integer[] ingredientsCounts) throws IOException {
+    public Recipe createRecipe(Recipe recipe, MultipartFile photoFood, MultipartFile[] stepPhotos, String[] stepDescriptions, String[] ingredientNames , double[] ingredientsCounts) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
         if (userName == null){
@@ -97,7 +97,7 @@ public class RecipeService {
             MultipartFile[] stepPhotos,
             String[] stepDescriptions,
             String[] ingredientNames,
-            Integer[] ingredientsCounts
+            double[] ingredientsCounts
     ) throws IOException {
         logger.info("Айди изменяемого рецепта:{}", id);
 
