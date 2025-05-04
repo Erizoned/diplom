@@ -35,7 +35,7 @@
                     .csrf(csrf -> csrf.disable())
                     .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                     .authorizeHttpRequests(auth -> auth
-                            .requestMatchers("/login", "/logout", "/resources/**", "/registration","/file_system","/register","/api/preferences","api/gemini", "/api/recipes", "/api/recipe/*","/api/diet").permitAll()
+                            .requestMatchers("/login", "/logout", "/resources/**", "/registration","/file_system","/register","/api/preferences","api/gemini", "/api/recipes", "/api/recipe/*","/api/diet","/api/script/create_image", "/api/script/show_image").permitAll()
                             .requestMatchers("/admin/**").hasRole("ADMIN")
                             .requestMatchers(HttpMethod.POST, "/login/done").permitAll()
                             .requestMatchers("/anonymous*").anonymous()

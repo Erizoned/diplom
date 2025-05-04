@@ -4,10 +4,12 @@ import com.college.receipt.DTO.RecipeDto;
 import com.college.receipt.entities.Diet;
 import com.college.receipt.entities.Ingredients;
 import com.college.receipt.entities.Recipe;
+import com.college.receipt.entities.UploadedFile;
 import com.college.receipt.repositories.IngredientRepository;
 import com.college.receipt.repositories.RecipeRepository;
 import com.college.receipt.service.DietService;
 import com.college.receipt.service.RecipeService;
+import com.college.receipt.service.UploadedFileService;
 import com.college.receipt.service.User.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,10 +17,13 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -49,6 +54,60 @@ public class ExternalRequestController {
     @Autowired
     private RecipeService recipeService;
 
+    @Autowired
+    private UploadedFileService uploadedFileService;
+
+    @PostMapping("/show_image")
+    public ResponseEntity<?> showGeneratedImage(@RequestBody MultipartFile file) throws IOException {
+        UploadedFile newImage = uploadedFileService.uploadImageToDataSystem(file,null, "");
+        return ResponseEntity.ok(newImage);
+    }
+
+    @PostMapping("/create_image")
+    public ResponseEntity<?> generateImage() throws IOException {
+        String scriptPath = Paths.get("scripts", "generateImage.py").toAbsolutePath().toString();
+        String pythonPath = Paths.get("venv", "Scripts", "python.exe").toAbsolutePath().toString();
+        ProcessBuilder pb = new ProcessBuilder(
+                pythonPath, scriptPath
+        );
+        pb.redirectErrorStream(true);
+        Process process = pb.start();
+        StringBuilder out = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8)
+        )) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                logger.info("script: {}", line);
+                out.append(line).append("\n");
+            }
+        }
+
+        int exitCode;
+        try {
+            exitCode = process.waitFor();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.error("Задача была прервана во время исполнения скрипта:", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(MediaType.valueOf("text/plain; charset=UTF-8")).body("Скрипт прерван");
+        }
+        if (exitCode != 0) {
+            logger.error("Скрипт питона завершился с кодом {}", exitCode);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(MediaType.valueOf("text/plain; charset=UTF-8")).body("Ошибка скрипта, код ошибки: " + exitCode);
+        }
+        return ResponseEntity.ok().contentType(MediaType.valueOf("text/plain; charset=UTF-8")).body("Изображение успешно сгенерировано " + out);
+
+    }
+
+    @Value("${hf.token}")
+    private String hfKey;
+
+    @Value("${google.token}")
+    private String googleKey;
+
+    @Value("${unsplash.token}")
+    private String unsplashKey;
+    
     @PostMapping("/create_recipe")
     public ResponseEntity<?> createRecipe(@RequestBody Map<String, String> promptRequest, HttpServletRequest request) throws IOException {
         String prompt = promptRequest.get("prompt");
@@ -62,8 +121,9 @@ public class ExternalRequestController {
                     pythonPath, scriptPath, prompt
             );
             Map<String, String> env = pb.environment();
-            env.put("UNSPLASH_ACCESS_KEY", "yGnypRK4-hMMOV6iESjv2D0pwhAaTI-6tjYUm9HZlNA");
-            env.put("GOOGLE_API_KEY", "AIzaSyD3Vz_KGLvVk74VTdgI33rnkpGDKGUGMWg");
+            env.put("UNSPLASH_ACCESS_KEY", unsplashKey);
+            env.put("GOOGLE_API_KEY", googleKey);
+            env.put("HF_TOKEN", hfKey);
             env.put("JWT_TOKEN", jwtToken);
             pb.redirectErrorStream(true);
             Process process = pb.start();
@@ -84,15 +144,15 @@ public class ExternalRequestController {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 logger.error("Задача была прервана во время исполнения скрипта:", e);
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Скрипт прерван");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(MediaType.valueOf("text/plain; charset=UTF-8")).body("Скрипт прерван");
             }
             if (exitCode != 0) {
                 logger.error("Скрипт питона завершился с кодом {}", exitCode);
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ошибка скрипта, код ошибки: " + exitCode);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(MediaType.valueOf("text/plain; charset=UTF-8")).body("Ошибка скрипта, код ошибки: " + exitCode);
             }
-            return ResponseEntity.ok(out.toString());
+            return ResponseEntity.ok().contentType(MediaType.valueOf("text/plain; charset=UTF-8")).body("Рецепт успешно сформирован: " + out);
         }
-        return ResponseEntity.badRequest().body("Пользователь не авторизован");
+        return ResponseEntity.badRequest().contentType(MediaType.valueOf("text/plain; charset=UTF-8")).body("Пользователь не авторизован");
     }
 
     @PostMapping("/diet")
@@ -129,7 +189,7 @@ public class ExternalRequestController {
         //        Потом включить
 //        Diet diet = dietService.createDiet(recipes);
 
-        return ResponseEntity.ok().body(recipes + "\n" + recommendation + "\n" );
+        return ResponseEntity.ok().contentType(MediaType.valueOf("text/plain; charset=UTF-8")).body(recipes + "\n" + recommendation + "\n" );
     }
 
     @PostMapping("/gemini")

@@ -44,7 +44,6 @@ public class UploadedFileService {
         UploadedFile existingFile = null;
         if (entityType.equals("PHOTOFOOD")){
             existingFile = uploadedFileRepository.findByRecipeAndIsPhotoFoodTrue(recipe);
-
         }
         if(existingFile != null){
             logger.info("Найден старый файл {}. Удаление...", existingFile.getFilePath());
@@ -91,6 +90,14 @@ public class UploadedFileService {
                     .fileSize(fileSize)
                     .recipe(recipe)
                     .isPhotoFood(false)
+                    .build();
+        } else if (entityType.isEmpty()){
+            logger.info("Сохранение обычного изображения");
+            uploadedFile = UploadedFile.builder()
+                    .name(fileName)
+                    .type(contentType)
+                    .filePath(filePath)
+                    .fileSize(fileSize)
                     .build();
         }
         try {
