@@ -14,7 +14,11 @@ def to_markdown(text):
     return textwrap.indent(text, '> ', predicate=lambda _: True)
 
 url = "http://localhost:8081/api/preferences"
-GOOGLE_API_KEY = 'AIzaSyD3Vz_KGLvVk74VTdgI33rnkpGDKGUGMWg'
+
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+if not GOOGLE_API_KEY:
+    raise RuntimeError("Env var GOOGLE_API_KEY is not set")
+
 
 genai.configure(api_key=GOOGLE_API_KEY)
 model = genai.GenerativeModel('gemini-1.5-flash')

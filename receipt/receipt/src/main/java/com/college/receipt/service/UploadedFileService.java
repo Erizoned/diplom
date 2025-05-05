@@ -30,6 +30,61 @@ public class UploadedFileService {
 
     private final String FOLDER_PATH = System.getProperty("user.dir") + "/uploads";
 
+    public UploadedFile uploadRegularFile(MultipartFile file) throws IOException {
+        logger.info("Сохранение обычного изображения");
+        String contentType = file.getContentType();
+        logger.debug("MIME Type: " + contentType);
+        int fileSize = Math.toIntExact(file.getSize() / 1024);
+        if ( fileSize > 2 * 1024){
+            throw new IllegalArgumentException("Ошибка. Файл не должен весить больше 2 мегабайт. Вес файла: " + fileSize / 1024 + " мегабайт");
+        }
+
+        if (contentType != null && !contentType.startsWith("image")) {
+            throw new IllegalArgumentException("Ошибка. Доступны только изображения");
+        }
+        UploadedFile existingFile = null;
+
+        if(existingFile != null){
+            logger.info("Найден старый файл {}. Удаление...", existingFile.getFilePath());
+            File oldFile = new File(existingFile.getFilePath());
+            if(oldFile.exists()){
+                if (oldFile.delete()){
+                    logger.info("Старая фотография профиля была удалена");
+                }
+                else {
+                    logger.error("Ошибка. Не вышло удалить старую фотографию профиля {}", existingFile.getFilePath());
+                }
+            }
+            uploadedFileRepository.delete(existingFile);
+        }
+        String FolderPath = Paths.get(FOLDER_PATH, file.getOriginalFilename()).toString();
+
+        File recipeFolder = new File(FolderPath);
+        if(!recipeFolder.exists()){
+            recipeFolder.mkdirs();
+            logger.info("Создана директория: {}", FOLDER_PATH);
+        }
+        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        String filePath = Paths.get(FolderPath, fileName).toString();
+
+        UploadedFile uploadedFile = UploadedFile.builder()
+                    .name(fileName)
+                    .type(contentType)
+                    .filePath(filePath)
+                    .fileSize(fileSize)
+                    .build();
+        try {
+            file.transferTo(new File(filePath));
+        } catch (Exception e) {
+            logger.error("Файл {} не найден на пути: {}, ошибка: {}", file.getOriginalFilename(), filePath, e.getMessage());
+            throw new IOException(e);
+        }
+
+        logger.info("Файл {} был сохранён в: {}", file.getOriginalFilename(), filePath);
+        assert uploadedFile != null;
+        return uploadedFileRepository.save(uploadedFile);
+    }
+
     public UploadedFile uploadImageToDataSystem(MultipartFile file, Recipe recipe, String entityType) throws IOException {
         String contentType = file.getContentType();
         logger.debug("MIME Type: " + contentType);
@@ -90,14 +145,6 @@ public class UploadedFileService {
                     .fileSize(fileSize)
                     .recipe(recipe)
                     .isPhotoFood(false)
-                    .build();
-        } else if (entityType.isEmpty()){
-            logger.info("Сохранение обычного изображения");
-            uploadedFile = UploadedFile.builder()
-                    .name(fileName)
-                    .type(contentType)
-                    .filePath(filePath)
-                    .fileSize(fileSize)
                     .build();
         }
         try {

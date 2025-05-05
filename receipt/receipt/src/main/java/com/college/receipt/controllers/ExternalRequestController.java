@@ -58,8 +58,8 @@ public class ExternalRequestController {
     private UploadedFileService uploadedFileService;
 
     @PostMapping("/show_image")
-    public ResponseEntity<?> showGeneratedImage(@RequestBody MultipartFile file) throws IOException {
-        UploadedFile newImage = uploadedFileService.uploadImageToDataSystem(file,null, "");
+    public ResponseEntity<?> showGeneratedImage(@RequestParam("image") MultipartFile file) throws IOException {
+        UploadedFile newImage = uploadedFileService.uploadRegularFile(file);
         return ResponseEntity.ok(newImage);
     }
 
@@ -107,7 +107,7 @@ public class ExternalRequestController {
 
     @Value("${unsplash.token}")
     private String unsplashKey;
-    
+
     @PostMapping("/create_recipe")
     public ResponseEntity<?> createRecipe(@RequestBody Map<String, String> promptRequest, HttpServletRequest request) throws IOException {
         String prompt = promptRequest.get("prompt");
@@ -184,7 +184,7 @@ public class ExternalRequestController {
 
         List<Recipe> recipes = listOfRecipes.stream().map(recipeRepository::findByKeyword).filter(Objects::nonNull).flatMap(List::stream).toList();
 
-        logger.info("Найденные рецепты для диеты: {}", recipes);
+        logger.info("Найдено {} рецептов для диеты: {}", recipes.size() , recipes);
 
         //        Потом включить
 //        Diet diet = dietService.createDiet(recipes);
