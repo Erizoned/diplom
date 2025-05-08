@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RequestMapping("/api")
@@ -132,12 +133,13 @@ public class RecipeController {
             @RequestParam("ingredientNames") String[] ingredientNames,
             @RequestParam("ingredientsCounts") double[] ingredientsCounts
     ){
+        Recipe savedRecipe = null;
         if (result.hasErrors()) {
             logger.error("Ошибка валидации: {}", result.getAllErrors());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.getAllErrors());
         }
         try {
-            Recipe savedRecipe = recipeService.createRecipe(recipe, photoFood, stepPhotos, stepDescriptions, ingredientNames, ingredientsCounts);
+            savedRecipe = recipeService.createRecipe(recipe, photoFood, stepPhotos, stepDescriptions, ingredientNames, ingredientsCounts);
             logger.info("Рецепт успешно сохранён: {}", savedRecipe);
         }
         catch (DataIntegrityViolationException e){
@@ -147,7 +149,9 @@ public class RecipeController {
             logger.error("Ошибка при сохранении рецепта: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-        return ResponseEntity.ok(recipe);
+        return ResponseEntity.ok(Map.of("id", savedRecipe.getId()));
+        //Если сломается то вернуть вот это
+//        return ResponseEntity.ok(recipe);
     }
 
 

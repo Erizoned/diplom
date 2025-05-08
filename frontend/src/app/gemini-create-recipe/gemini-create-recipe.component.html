@@ -1,0 +1,19 @@
+<div class="gemini-dialog">
+    <h2 >Автоматическое создание рецепта</h2>
+  
+    <textarea [(ngModel)]="prompt"
+              rows="4"
+              placeholder="Например: Суп с рыбой..." mat-form-field></textarea>
+  
+    <div mat-dialog-actions class="buttons">
+      <button mat-raised-button color="accent" (click)="sendPrompt()" [disabled]="loading">
+        {{ loading ? 'Обработка...' : 'Создать рецепт' }}
+      </button>
+      <button mat-raised-button color="warn" class="secondary" (click)="close()">Закрыть</button>
+    </div>
+  
+    <div *ngIf="error" class="error">
+      Ошибка: {{ error }}
+    </div>
+  </div>
+  

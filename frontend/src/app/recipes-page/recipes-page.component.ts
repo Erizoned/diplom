@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AxiosService } from '../axios.service';
 import { GeminiSearchComponent } from '../gemini-search/gemini-search.component';
+import { GeminiCreateRecipeComponent } from '../gemini-create-recipe/gemini-create-recipe.component';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -29,6 +30,7 @@ photoFood: any;
   styleUrls: ['./recipes-page.component.css']
 })
 export class RecipesPageComponent implements OnInit, AfterViewInit {
+
   keyword: string = '';
   filter = {
     countPortion: null as number | null,
@@ -61,6 +63,20 @@ export class RecipesPageComponent implements OnInit, AfterViewInit {
     });
   }
   
+  openRecipeCreator() {
+    const dialogRef = this.dialog.open(GeminiCreateRecipeComponent, {
+      width: '500px',
+      disableClose: false
+    });
+  
+    dialogRef.afterClosed().subscribe((result: any[]) => {
+      if (result) {
+        this.recipes = result;
+        console.log('Айди созданного рецепта:', result);
+        this.router.navigate(['/recipe', result]); 
+      }
+    });
+  }
   
 
   ngOnInit(): void {

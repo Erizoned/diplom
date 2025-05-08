@@ -15,6 +15,7 @@ export class AxiosService {
         if (error.response && (error.response.status === 401 || error.response.status === 403)) {
           localStorage.removeItem('auth_token');
           this.router.navigate(['/login']);
+          console.log("Пользователь не авторизирован")
         }
         return Promise.reject(error);
       }

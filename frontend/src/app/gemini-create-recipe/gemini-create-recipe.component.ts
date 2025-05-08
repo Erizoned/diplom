@@ -9,17 +9,17 @@ import { AxiosService } from '../axios.service';
 @Component({
   selector: 'app-gemini-search',
   standalone: true,
-  templateUrl: './gemini-search.component.html',
+  templateUrl: './gemini-create-recipe.component.html',
   imports: [CommonModule, FormsModule, MatDialogModule],
 })
-export class GeminiSearchComponent {
+export class GeminiCreateRecipeComponent {
   prompt: string = '';
-  recipes: any[] = [];
+  recipeId: number | null = null;
   loading: boolean = false;
   error: string = '';
 
   constructor(
-    private dialogRef: MatDialogRef<GeminiSearchComponent>,
+    private dialogRef: MatDialogRef<GeminiCreateRecipeComponent>,
     private axiosService: AxiosService,
     private matDialog: MatDialog
   ) {}
@@ -32,12 +32,12 @@ export class GeminiSearchComponent {
     if (!this.prompt.trim()) return;
     this.loading = true;
     this.error = '';
-    this.recipes = [];
   
-    this.axiosService.request('POST', '/api/script/gemini/', { prompt: this.prompt })
+    this.axiosService.request('POST', '/api/script/create_recipe', { prompt: this.prompt })
       .then((response) => {
-        console.log(this.recipes);
-        this.dialogRef.close(response.data); 
+        this.recipeId = response.data;
+        console.log("Рецепт: " + this.recipeId);
+        this.dialogRef.close(response.recipe); 
       })
       .catch((error) => {
         this.error = 'Ошибка при обработке промпта';

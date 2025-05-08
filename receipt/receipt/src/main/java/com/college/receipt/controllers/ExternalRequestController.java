@@ -31,6 +31,8 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @RestController
@@ -137,6 +139,16 @@ public class ExternalRequestController {
                     out.append(line).append("\n");
                 }
             }
+            Pattern pattern = Pattern.compile("ID[:\\s]+(\\d+)");
+            Matcher matcher  = pattern.matcher(out);
+            Long recipeId = null;
+            if (matcher.find()){
+                recipeId = Long.parseLong(matcher.group(1));
+                logger.info("Извлечён ID рецепта: {}", recipeId);
+            }
+            else {
+                logger.error("Айди рецепта не найден!");
+            }
 
             int exitCode;
             try {
@@ -150,7 +162,7 @@ public class ExternalRequestController {
                 logger.error("Скрипт питона завершился с кодом {}", exitCode);
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(MediaType.valueOf("text/plain; charset=UTF-8")).body("Ошибка скрипта, код ошибки: " + exitCode);
             }
-            return ResponseEntity.ok().contentType(MediaType.valueOf("text/plain; charset=UTF-8")).body("Рецепт успешно сформирован: " + out);
+            return ResponseEntity.ok().body(recipeId);
         }
         return ResponseEntity.badRequest().contentType(MediaType.valueOf("text/plain; charset=UTF-8")).body("Пользователь не авторизован");
     }
@@ -175,6 +187,12 @@ public class ExternalRequestController {
         }
 
         String answer = response.toString();
+
+        String[] parts = answer.split("!");
+        if (parts.length < 2){
+            logger.error("Ошибка при создании рекомендаций. В ответе отсутствует восклицательный знак.");
+            return ResponseEntity.badRequest().contentType(MediaType.valueOf("text/plain; charset=UTF-8")).body("Неверный формат ответа от скрипта.");
+        }
 
         List<String> listOfRecipes = Arrays.stream(answer.split("!")[0].toLowerCase().split(",")).map(String::trim).filter(s ->!s.isEmpty()).toList();
 

@@ -9,17 +9,17 @@ import { AxiosService } from '../axios.service';
 @Component({
   selector: 'app-gemini-search',
   standalone: true,
-  templateUrl: './gemini-search.component.html',
+  templateUrl: './create-diet.component.html',
   imports: [CommonModule, FormsModule, MatDialogModule],
 })
-export class GeminiSearchComponent {
+export class CreateDietComponent {
   prompt: string = '';
   recipes: any[] = [];
   loading: boolean = false;
   error: string = '';
 
   constructor(
-    private dialogRef: MatDialogRef<GeminiSearchComponent>,
+    private dialogRef: MatDialogRef<CreateDietComponent>,
     private axiosService: AxiosService,
     private matDialog: MatDialog
   ) {}

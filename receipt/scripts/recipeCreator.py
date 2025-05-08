@@ -1,8 +1,8 @@
 import base64
-from PIL import Image
 import sys
 import io
 import os
+import re
 import requests
 from google import genai
 from google.genai import types
@@ -31,9 +31,6 @@ urlForCreation = "http://localhost:8081/api/create_recipe"
 
 # Вспомогательная функция для блоков Markdown
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-def to_markdown(text):
-    text = text.replace('•', '  *')
-    return textwrap.indent(text, '> ', predicate=lambda _: True)
 
 # Генерация JSON-рецепта
 def gen_recipe(prompt_text: str) -> dict:
@@ -58,37 +55,44 @@ def gen_recipe(prompt_text: str) -> dict:
         print("Response was:", response.text)
         sys.exit(1)
 
+def sanitize_filename(name: str) -> str:
+    return re.sub(r'[<>:"/\\|?*]', '', name.replace(' ', '_'))[:100]
+
 # Генерация изображения через Gemini с использованием generate_images
 def generate_image(prompt: str, folder="images") -> str | None:
-        result = client.models.generate_content(
-            model="gemini-2.0-flash-exp-image-generation",
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                response_modalities=['TEXT', 'IMAGE']
+        try:
+            result = client.models.generate_content(
+                model="gemini-2.0-flash-exp-image-generation",
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    response_modalities=['TEXT', 'IMAGE']
+                )
             )
-        )
-        inline = next((p.inline_data for p in result.candidates[0].content.parts if p.inline_data), None)
-        if not inline:
-            print("Gemini не вернул изображение")
+            inline = next((p.inline_data for p in result.candidates[0].content.parts if p.inline_data), None)
+            if not inline:
+                print("Gemini не вернул изображение")
+                return None
+            raw = inline.data
+            image_bytes = base64.b64decode(raw) if isinstance(raw, str) else raw
+            safe_name = sanitize_filename(prompt) + ".png"
+            return safe_name, image_bytes
+        except Exception as e:
+            print(f"[ERROR] Image generation failed: {e}")
             return None
-        raw = inline.data
-        image_bytes = base64.b64decode(raw) if isinstance(raw, str) else raw
-        safe_name = prompt.replace(" ", "_")[:50] + ".png"
-        return safe_name, image_bytes
 
 # Обогащение рецепта изображениями
 def enrich_with_images(recipe: dict) -> dict:
+    title_eng = translator.translate(recipe["recipe"]["name"])
     for step in recipe.get("steps", []):
         eng = translator.translate(step["description"])
-        newPrompt = "Hi, create an image, where a user can see this step:" + eng + "send only 1 image without any text. Image need to be without any text on it"
+        newPrompt = f"A clean, realistic illustration of one step of cooking {title_eng}: {eng}. No text, no labels."
         print("Запрос для изображения:", newPrompt)
         img = generate_image(newPrompt)
         if img:
             name, data = img
             step["image_name"] = name
             step["image_data"] = data
-    title_eng = translator.translate(recipe["recipe"]["name"])
-    newTitlePrompt = "Hi, create an image, where a user can see this recipe:" + title_eng + "send only 1 image without any text"
+    newTitlePrompt = f"A realistic image of the dish: {title_eng}. Do not include any text or labels."
     cover = generate_image(newTitlePrompt)
     if cover:
         cn, cd = cover
@@ -133,11 +137,17 @@ def post_recipe(recipe: dict):
     headers = {"Authorization": f"Bearer {os.getenv('JWT_TOKEN')}"}
     print(">>> files:", [f[0] for f in files])
     print(">>> data keys:", data.keys())
-    print(">>> headers:", headers)
     resp = requests.post(urlForCreation, files=files, data=data, headers=headers)
-    print(">> Request headers:", resp.request.headers)
-    print("status:", resp.status_code)
-    print("body:", resp.text)
+    try:
+        print("<<< Response status:", resp.status_code)
+        print("<<< Response content-type:", resp.headers.get("Content-Type"))
+        print("<<< RAW body:", resp.text)
+        response_data = resp.json()
+        recipe_id = response_data.get("id")
+        print(f" Recipe ID: {recipe_id}")
+    except requests.exceptions.JSONDecodeError:
+        print(" Ошибка: Сервер вернул не-JSON. ")
+        print("Ответ:", resp.text)
 
 # Основной запуск
 if __name__ == "__main__":

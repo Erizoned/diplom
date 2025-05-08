@@ -64,7 +64,9 @@ public class UploadedFileService {
             recipeFolder.mkdirs();
             logger.info("Создана директория: {}", FOLDER_PATH);
         }
-        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+
+        String originalName = sanitizeFilename(file.getOriginalFilename());
+        String fileName = UUID.randomUUID() + "_" + originalName;
         String filePath = Paths.get(FolderPath, fileName).toString();
 
         UploadedFile uploadedFile = UploadedFile.builder()
@@ -167,6 +169,12 @@ public class UploadedFileService {
 
         byte[] images = Files.readAllBytes(new File(filePath).toPath());
         return images;
+    }
+
+    public static String sanitizeFilename(String originalName) {
+        if (originalName == null) return "unknown";
+
+        return originalName.replaceAll("[\\\\/:*?\"<>|]", "_");
     }
 }
 
