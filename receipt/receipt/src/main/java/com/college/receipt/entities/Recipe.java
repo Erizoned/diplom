@@ -68,6 +68,24 @@ public class Recipe {
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comments> comments;
 
+    public boolean hasOnlyName() {
+        return name != null && !name.isBlank()
+                && (description == null || description.isBlank())
+                && (theme == null || theme.isBlank())
+                && (typeOfFood == null || typeOfFood.isBlank())
+                && (typeOfCook == null || typeOfCook.isBlank())
+                && (restrictions == null || restrictions.isBlank())
+                && countPortion == null
+                && nationalKitchen == null
+                && kkal == null
+                && timeToCook == null
+                && (ingredients == null || ingredients.isEmpty());
+    }
+
+    public boolean hasIngredients(){
+        return !this.getIngredients().isEmpty();
+    }
+
     @Override
     public String toString() {
         return "Recipe{" +

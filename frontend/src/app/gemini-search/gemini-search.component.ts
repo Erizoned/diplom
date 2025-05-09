@@ -34,7 +34,7 @@ export class GeminiSearchComponent {
     this.error = '';
     this.recipes = [];
   
-    this.axiosService.request('POST', '/api/script/gemini/', { prompt: this.prompt })
+    this.axiosService.request('POST', '/api/script/gemini', { prompt: this.prompt })
       .then((response) => {
         console.log(this.recipes);
         this.dialogRef.close(response.data); 

@@ -196,7 +196,7 @@ public class RecipeService {
     }
 
     public List<Recipe> findByFilter(Integer countPortion, Integer kkal, Integer timeToCook, String nationalKitchen, String restrictions, String theme, String typeOfCook, String typeOfFood){
-        return recipeRepository.findByFilter(countPortion, kkal, timeToCook, nationalKitchen, restrictions, theme, typeOfCook, typeOfFood);
+        return recipeRepository.findByFilter(null, countPortion, kkal, timeToCook, nationalKitchen, restrictions, theme, typeOfCook, typeOfFood);
     }
 
 }

@@ -183,6 +183,7 @@ public class ExternalRequestController {
         StringBuilder response = new StringBuilder();
         String line;
         while ((line = reader.readLine()) != null){
+            logger.info("script: {}", line);
             response.append(line);
         }
 
@@ -231,7 +232,14 @@ public class ExternalRequestController {
         try {
             RecipeDto recipeDto = mapper.readValue(json, RecipeDto.class);
 
+            String name = recipeDto.getRecipe().getName();
+            if (name != null && !name.isBlank()) {
+                name = "%" + name.trim() + "%";
+                recipeDto.getRecipe().setName(name);
+            }
+
             List<Recipe> recipes = recipeRepository.findByFilter(
+                    recipeDto.getRecipe().getName(),
                     recipeDto.getRecipe().getCountPortion(),
                     recipeDto.getRecipe().getKkal(),
                     recipeDto.getRecipe().getTimeToCook(),
@@ -242,13 +250,24 @@ public class ExternalRequestController {
                     recipeDto.getRecipe().getTypeOfFood()
             );
 
-            recipes = recipes.stream().filter(recipe -> recipe.getIngredients().stream().map(ing -> ing.getName().toLowerCase()).collect(Collectors.toSet()).containsAll(recipeDto.getIngredients().stream().map(ing -> ing.getName().toLowerCase()).collect(Collectors.toSet()))).collect(Collectors.toList());
+            logger.info("Найденные рецепты до фильтрации: {}", recipes);
 
+            if (recipes.stream().anyMatch(Recipe::hasOnlyName)){
+                recipes = recipes.stream().map(recipe -> recipeRepository.findByKeyword(recipe.getName())).filter(Objects::nonNull).flatMap(List::stream).toList();
+                logger.info("Найденные рецепты, где есть только имя: {}", recipes);
+            }
+
+            if (recipeDto.getIngredients() != null && !recipeDto.getIngredients().isEmpty()) {
+                logger.info("Найдены рецепты с ингредиентами: {}", recipeDto.getIngredients());
+                recipes = recipes.stream().filter(recipe -> recipe.getIngredients().stream().map(ing -> ing.getName().toLowerCase()).collect(Collectors.toSet()).containsAll(recipeDto.getIngredients().stream().map(ing -> ing.getName().toLowerCase()).collect(Collectors.toSet()))).collect(Collectors.toList());
+                logger.info("Найденные рецепты с ингредиентами: {}", recipes);
+            }
+            else {
+                logger.info("Найденные рецепты без ингредиентов: {}", recipes);
+            }
             int exitCode = process.waitFor();
 
             logger.info("Скрипт завершился с кодом: {}", exitCode);
-
-            logger.info("Найденные рецепты: {}", recipes);
 
             return ResponseEntity.ok(recipes);
         }catch (Exception e){

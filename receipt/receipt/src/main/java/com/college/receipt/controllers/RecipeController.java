@@ -66,6 +66,7 @@ public class RecipeController {
                 typeOfCook != null || typeOfFood != null) {
             logger.info("Фильтрация");
             List<Recipe> filteredRecipes = recipeRepository.findByFilter(
+                    null,
                     countPortion,
                     kkal,
                     timeToCook,

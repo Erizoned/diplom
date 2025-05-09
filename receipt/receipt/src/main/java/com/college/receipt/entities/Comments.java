@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -26,6 +28,9 @@ public class Comments {
     private int likes;
 
     private int dislikes;
+
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<CommentReaction> reaction;
 
     @ManyToOne
     @JsonIgnore

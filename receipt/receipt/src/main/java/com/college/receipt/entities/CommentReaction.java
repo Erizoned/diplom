@@ -14,6 +14,7 @@ public class CommentReaction {
     private User user;
 
     @ManyToOne
+    @JoinColumn(name= "comment_id", nullable = false)
     private Comments comment;
 
     private boolean isLiked;
