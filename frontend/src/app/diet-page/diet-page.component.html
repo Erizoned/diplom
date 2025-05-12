@@ -1,1 +1,92 @@
-<p>diet-page works!</p>
+<app-header [pageTitle]="'Моя диета'"></app-header>
+
+<div class="main-container" *ngIf="diet">
+  <div class="diet-info">
+    <div class="diet-header">
+      <h1>Диета</h1>
+      <div class="diet-meta">
+        <p><strong>Автор:</strong> {{ diet.user.username }}</p>
+        <p><strong>Дата создания:</strong> {{ formatDate(diet.dateOfCreation) }}</p>
+        <p><strong>Срок действия:</strong> {{ formatDate(diet.term) }}</p>
+      </div>
+    </div>
+
+    <div class="recommendation-section">
+      <h2>Рекомендации</h2>
+      <p>{{ diet.recommendation }}</p>
+    </div>
+  </div>
+
+  <div class="diet-section">
+    <h2>Завтрак</h2>
+    <div class="recipe-container">
+      <div *ngFor="let recipe of diet.recipesForBreakfast" class="recipe-card">
+        <a [routerLink]="['/recipe', recipe.id]">
+          <img *ngIf="recipe.photos && recipe.photos.length > 0"
+               [src]="getPhotoUrl(recipe.photos[0].name)"
+               alt="Фото блюда"
+               class="recipe-image" />
+          <img *ngIf="!recipe.photos || recipe.photos.length === 0"
+               src="/static/images/default-recipe.png"
+               alt="Нет фото"
+               class="recipe-image" />
+          <div class="recipe-details">
+            <div class="recipe-title">{{ recipe.name }}</div>
+            <div class="recipe-description">{{ recipe.description }}</div>
+            <div class="recipe-time">Время приготовления: {{ recipe.timeToCook }} минут</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="diet-section">
+    <h2>Обед</h2>
+    <div class="recipe-container">
+      <div *ngFor="let recipe of diet.recipesForLunch" class="recipe-card">
+        <a [routerLink]="['/recipe', recipe.id]">
+          <img *ngIf="recipe.photos && recipe.photos.length > 0"
+               [src]="getPhotoUrl(recipe.photos[0].name)"
+               alt="Фото блюда"
+               class="recipe-image" />
+          <img *ngIf="!recipe.photos || recipe.photos.length === 0"
+               src="/static/images/default-recipe.png"
+               alt="Нет фото"
+               class="recipe-image" />
+          <div class="recipe-details">
+            <div class="recipe-title">{{ recipe.name }}</div>
+            <div class="recipe-description">{{ recipe.description }}</div>
+            <div class="recipe-time">Время приготовления: {{ recipe.timeToCook }} минут</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="diet-section">
+    <h2>Ужин</h2>
+    <div class="recipe-container">
+      <div *ngFor="let recipe of diet.recipesForDiner" class="recipe-card">
+        <a [routerLink]="['/recipe', recipe.id]">
+          <img *ngIf="recipe.photos && recipe.photos.length > 0"
+               [src]="getPhotoUrl(recipe.photos[0].name)"
+               alt="Фото блюда"
+               class="recipe-image" />
+          <img *ngIf="!recipe.photos || recipe.photos.length === 0"
+               src="/static/images/default-recipe.png"
+               alt="Нет фото"
+               class="recipe-image" />
+          <div class="recipe-details">
+            <div class="recipe-title">{{ recipe.name }}</div>
+            <div class="recipe-description">{{ recipe.description }}</div>
+            <div class="recipe-time">Время приготовления: {{ recipe.timeToCook }} минут</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="loading" *ngIf="!diet">
+  <p>Загрузка диеты...</p>
+</div>

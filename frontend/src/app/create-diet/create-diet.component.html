@@ -3,17 +3,17 @@
   
     <textarea [(ngModel)]="prompt"
               rows="4"
-              placeholder="Например: Что-нибудь с картошкой и рыбой, 500 калорий..." mat-form-field></textarea>
+              placeholder="Например: Хочу похудеть..." mat-form-field></textarea>
   
     <div mat-dialog-actions class="buttons">
       <button mat-raised-button color="accent" (click)="sendPrompt()" [disabled]="loading">
-        {{ loading ? 'Обработка...' : 'Найти рецепты' }}
+        {{ loading ? 'Обработка...' : 'Составить диету' }}
       </button>
       <button mat-raised-button color="warn" class="secondary" (click)="close()">Закрыть</button>
     </div>
   
     <div *ngIf="recipes.length" class="results">
-      <h3>Найденные рецепты:</h3>
+      <h3>Созданная диета:</h3>
       <ul>
         <li *ngFor="let recipe of recipes">
           <strong>{{ recipe.name }}</strong> — {{ recipe.kkal }} ккал

@@ -197,18 +197,23 @@ public class ExternalRequestController {
 
         List<String> listOfRecipes = Arrays.stream(answer.split("!")[0].toLowerCase().split(",")).map(String::trim).filter(s ->!s.isEmpty()).toList();
 
+        List<String> listOfRecipesBreakfast = listOfRecipes.stream().limit(3).toList();
+
+        List<String> listOfRecipesLunch = listOfRecipes.stream().skip(3).limit(3).toList();
+
+        List<String> listOfRecipesDiner = listOfRecipes.stream().skip(6).limit(3).toList();
+
         String recommendation = answer.split("!")[1];
 
-        logger.info("Нейросеть предложила следующие рецепты: {}, с рекомендацией {}", listOfRecipes, recommendation);
+        logger.info("Нейросеть предложила следующие рецепты на завтрак: {}, обед: {} и ужин: {}, с рекомендацией {}", listOfRecipesBreakfast, listOfRecipesLunch, listOfRecipesDiner, recommendation);
 
         List<Recipe> recipes = listOfRecipes.stream().map(recipeRepository::findByKeyword).filter(Objects::nonNull).flatMap(List::stream).toList();
 
         logger.info("Найдено {} рецептов для диеты: {}", recipes.size() , recipes);
 
-        //        Потом включить
-//        Diet diet = dietService.createDiet(recipes);
+        Diet diet = dietService.createDiet(listOfRecipesBreakfast, listOfRecipesLunch, listOfRecipesDiner, recommendation);
 
-        return ResponseEntity.ok().contentType(MediaType.valueOf("text/plain; charset=UTF-8")).body(recipes + "\n" + recommendation + "\n" );
+        return ResponseEntity.ok().body(diet);
     }
 
     @PostMapping("/gemini")

@@ -94,6 +94,10 @@
   </button>
   
 
+  <button (click)="openDietCreator()" class="gemini-button">
+    Создание диеты.
+  </button>
+
   <div class="recipe-container">
     <div *ngFor="let recipe of recipes; let i = index" class="recipe-card" [ngClass]="{'new-recipe': recipe.new}">
       <a [routerLink]="['/recipe', recipe.id]">

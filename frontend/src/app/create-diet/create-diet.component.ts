@@ -1,5 +1,4 @@
 import { Component, Inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDialog } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
@@ -34,7 +33,7 @@ export class CreateDietComponent {
     this.error = '';
     this.recipes = [];
   
-    this.axiosService.request('POST', '/api/script/gemini/', { prompt: this.prompt })
+    this.axiosService.request('POST', '/api/script/diet', { prompt: this.prompt })
       .then((response) => {
         console.log(this.recipes);
         this.dialogRef.close(response.data); 

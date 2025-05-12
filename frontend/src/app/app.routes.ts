@@ -5,6 +5,7 @@ import { RecipeDetailsComponent } from './recipe-details/recipe-details.componen
 import { UpdateRecipeComponent } from './update-recipe/update-recipe.component';
 import { RegisterComponent } from './register/register.component';
 import { CreateRecipeComponent } from './create-recipe-form/create-recipe-form.component';
+import { DietPageComponent } from './diet-page/diet-page.component';
 
 
 export const routes: Routes = [  
@@ -14,5 +15,6 @@ export const routes: Routes = [
     { path: 'update_recipe/:id', component: UpdateRecipeComponent },
     { path: 'user/registration', component: RegisterComponent},
     { path: 'create_recipe', component: CreateRecipeComponent},
+    { path: 'diet/:id', component: DietPageComponent},
     { path: '**', redirectTo: 'login', pathMatch: 'full' }, // Перенаправляет на /login, если страница не найдена
   ];
