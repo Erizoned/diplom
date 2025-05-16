@@ -4,6 +4,7 @@ import { RouterModule, ActivatedRoute } from '@angular/router';
 import axios from 'axios';
 import { HeaderComponent } from '../header/header.component';
 import { AxiosService } from '../axios.service';
+import { MatDialogRef } from '@angular/material/dialog';
 
 interface Recipe {
   id: number;
@@ -11,7 +12,9 @@ interface Recipe {
   description: string;
   photos: { name: string }[];
   timeToCook: number;
+  default: boolean;
 }
+
 
 interface User {
   id: number;
@@ -37,11 +40,31 @@ interface Diet {
   styleUrl: './diet-page.component.css'
 })
 export class DietPageComponent implements OnInit {
+  loading: boolean = false;
+  error: string = '';
+  recipeId: number | null = null;
+
+onCreateRecipeFromDefault(prompt: string) {
+  if (!prompt.trim()) return;
+  this.loading = true;
+  this.error = '';
+
+  this.axiosService.request('POST', '/api/script/create_recipe', { prompt: prompt })
+    .then((response) => {
+      this.recipeId = response.data;
+      console.log("Рецепт: " + this.recipeId);
+    })
+    .catch((error) => {
+      this.error = 'Ошибка при обработке промпта';
+      console.error(error);
+      this.loading = false;
+    });
+}
   diet: Diet | null = null;
 
   constructor(
     private axiosService: AxiosService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
   ) {}
 
   ngOnInit(): void {

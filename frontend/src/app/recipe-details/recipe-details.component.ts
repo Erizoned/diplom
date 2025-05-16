@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
 })
 export class RecipeDetailsComponent implements OnInit, AfterViewInit {
 
+  id: string | null = null;
   recipe: any = {
     name: '',
     description: '',
@@ -27,13 +28,13 @@ export class RecipeDetailsComponent implements OnInit, AfterViewInit {
     photoFood: [],
     ingredients: [],
     steps: [],      
-    author: { username: '' } 
+    author: { username: '' },
   };
 
   errorMessage: string | null = null;
   comments: Array<any> = [];
   newComment: string = '';
-
+  
 
   constructor(
     private route: ActivatedRoute,
@@ -41,10 +42,10 @@ export class RecipeDetailsComponent implements OnInit, AfterViewInit {
     private axiosService: AxiosService
   ) {}
 
-  ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
 
-    this.axiosService.request("GET", "/api/recipe/" + id, null)
+  ngOnInit(): void {
+    this.id = this.route.snapshot.paramMap.get('id');
+    this.axiosService.request("GET", "/api/recipe/" + this.id, null)
     .then(response => {
       console.log("Полный response:", response);
 console.log("data:", response.data);
@@ -64,6 +65,10 @@ console.log("data:", response.data);
       console.error('Ошибка при получении рецепта', error);
       this.errorMessage = 'Не удалось загрузить рецепт';
     })
+  }
+
+  onUpdateRecipe() {
+    this.router.navigate(['/update_recipe', this.id]);
   }
 
   getPhotoUrl(fileName: string): string {

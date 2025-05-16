@@ -50,6 +50,9 @@ public class Recipe {
     @Column(name = "time_to_cook")
     private Integer timeToCook;
 
+    @Column
+    private boolean isDefault;
+
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Ingredients> ingredients = new ArrayList<>();
 

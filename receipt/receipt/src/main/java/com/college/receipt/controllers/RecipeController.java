@@ -78,6 +78,7 @@ public class RecipeController {
             );
             if (keyword != null){
                 List<Recipe> keywordRecipe = recipeRepository.findByKeyword(keyword.toLowerCase());
+                keywordRecipe = keywordRecipe.stream().filter(recipe -> !recipe.isDefault()).toList();
                 logger.info("поисковое слово:{}", keyword);
                 return ResponseEntity.ok(keywordRecipe);
             }
@@ -89,12 +90,14 @@ public class RecipeController {
             }
             else{
                 logger.info("Найдено рецептов: {}", filteredRecipes.size());
+                filteredRecipes = filteredRecipes.stream().filter(recipe -> !recipe.isDefault()).toList();
                 filteredRecipes.forEach(recipe -> logger.info("Рецепт: id={}, name={}", recipe.getId(), recipe.getName()));
                 return ResponseEntity.ok(filteredRecipes);
             }
         }
         else{
             List<Recipe> recipes = recipeRepository.findAll();
+            recipes = recipes.stream().filter(recipe -> !recipe.isDefault()).toList();
             return ResponseEntity.ok(recipes);
         }
     }
@@ -183,14 +186,16 @@ public class RecipeController {
     }
 
     @GetMapping("/recipe/{id}")
-    public ResponseEntity<RecipeDto> viewRecipe(@PathVariable("id") Long id) {
+    public ResponseEntity<?> viewRecipe(@PathVariable("id") Long id) {
         logger.info("Открыта страница просмотра рецепта с id={}", id);
         Recipe recipe = recipeRepository.findById(id)
                 .orElseThrow(() -> {
                     logger.error("Рецепт с id={} не найден", id);
                     return new RuntimeException("Recipe not found");
                 });
-
+        if (recipe.isDefault()){
+            return ResponseEntity.badRequest().body("Рецепт не существует");
+        }
         UploadedFile photoFood = uploadedFileRepository.findByRecipeAndIsPhotoFoodTrue(recipe);
         List<Steps> steps = stepRepository.findByRecipe(recipe);
         List<Ingredients> ingredients = ingredientRepository.findByRecipe(recipe);

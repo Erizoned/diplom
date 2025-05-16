@@ -162,6 +162,15 @@ public class ExternalRequestController {
                 logger.error("Скрипт питона завершился с кодом {}", exitCode);
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(MediaType.valueOf("text/plain; charset=UTF-8")).body("Ошибка скрипта, код ошибки: " + exitCode);
             }
+            if (recipeId != null){
+                Recipe newRecipe = recipeRepository.findById(recipeId).orElseThrow(() -> new RuntimeException("Рецепт не найден"));
+                List<Recipe> oldRecipeList = recipeRepository.findByName(newRecipe.getName());
+                Recipe oldRecipe = oldRecipeList.stream().min(Comparator.comparing(Recipe::getId)).orElse(null);
+                if (oldRecipe != null){
+                    logger.info("Старый рецепт найден. Замена на новый.");
+                    dietService.updateRecipeInDiet(oldRecipe.getId(), recipeId);
+                }
+            }
             return ResponseEntity.ok().body(recipeId);
         }
         return ResponseEntity.badRequest().contentType(MediaType.valueOf("text/plain; charset=UTF-8")).body("Пользователь не авторизован");

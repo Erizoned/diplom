@@ -12,6 +12,16 @@
   padding: 20px;
 }
 
+.gemini-button {
+  padding: 8px 14px;
+  font-weight: bold;
+  background: #f97316;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
 .diet-info {
   background: white;
   border-radius: 12px;
@@ -177,4 +187,8 @@
 
 .diet-section:nth-child(3) {
   animation-delay: 0.4s;
+}
+
+.warning{
+  text-align: center;
 }

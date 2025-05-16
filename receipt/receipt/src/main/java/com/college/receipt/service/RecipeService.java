@@ -122,6 +122,7 @@ public class RecipeService {
         savedRecipe.setTimeToCook(recipe.getTimeToCook());
         savedRecipe.setCountPortion(recipe.getCountPortion());
         savedRecipe.setTheme(recipe.getTheme());
+        savedRecipe.setDefault(false);
 
         ingredientRepository.deleteByRecipeId(id);
         stepRepository.deleteByRecipeId(id);

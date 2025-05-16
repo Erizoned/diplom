@@ -32,6 +32,39 @@ public class DietService {
     @Autowired
     private RecipeRepository recipeRepository;
 
+    public void updateRecipeInDiet(Long recipeId, Long newRecipeId){
+        Recipe oldRecipe = recipeRepository.findById(recipeId).orElseThrow(() -> new RuntimeException("Рецепт не найден"));
+        Recipe newRecipe = recipeRepository.findById(newRecipeId).orElseThrow(() -> new RuntimeException("Рецепт не найден"));
+        Diet diet = dietRepository.findByRecipe(oldRecipe);
+        logger.info("Обновление рецепта {} с id {} на id {}", oldRecipe.getName(), oldRecipe.getId(), newRecipe.getId());
+        boolean found = false;
+
+        if (diet.getRecipesForBreakfast().contains(oldRecipe)) {
+            diet.getRecipesForBreakfast().remove(oldRecipe);
+            diet.getRecipesForBreakfast().add(newRecipe);
+            found = true;
+        }
+
+        if (diet.getRecipesForLunch().contains(oldRecipe)) {
+            diet.getRecipesForLunch().remove(oldRecipe);
+            diet.getRecipesForLunch().add(newRecipe);
+            found = true;
+        }
+
+        if (diet.getRecipesForDiner().contains(oldRecipe)) {
+            diet.getRecipesForDiner().remove(oldRecipe);
+            diet.getRecipesForDiner().add(newRecipe);
+            found = true;
+        }
+
+        if (!found) {
+            throw new RuntimeException("Рецепт не найден ни в одном из приёмов пищи");
+        }
+
+        recipeRepository.delete(oldRecipe);
+        dietRepository.save(diet);
+    }
+
     public List<Recipe> searchRecipeInList(List<String> recipeList){
 
         return recipeList.stream().flatMap(keyword -> {
@@ -42,6 +75,7 @@ public class DietService {
                 r.setName(keyword);
                 r.setDescription("default");
                 r.setTheme("default");
+                r.setDefault(true);
 
                 Recipe saved = recipeRepository.save(r);
                 return Stream.of(saved);

@@ -22,13 +22,13 @@
     <div class="recipe-container">
       <div *ngFor="let recipe of diet.recipesForBreakfast" class="recipe-card">
         <a [routerLink]="['/recipe', recipe.id]">
-          <img *ngIf="recipe.photos && recipe.photos.length > 0"
+          <img *ngIf="recipe.photos  && recipe.photos.length > 0"
                [src]="getPhotoUrl(recipe.photos[0].name)"
                alt="Фото блюда"
                class="recipe-image" />
           <img *ngIf="!recipe.photos || recipe.photos.length === 0"
                src="/static/images/default-recipe.png"
-               alt="Нет фото"
+               alt=" "
                class="recipe-image" />
           <div class="recipe-details">
             <div class="recipe-title">{{ recipe.name }}</div>
@@ -36,6 +36,12 @@
             <div class="recipe-time">Время приготовления: {{ recipe.timeToCook }} минут</div>
           </div>
         </a>
+        <div *ngIf="recipe.default" class="warning">
+          <p>Рецепт отсутствует в базе данных.</p>
+        <button class="gemini-button" (click)="onCreateRecipeFromDefault(recipe.name)" [disabled]="loading">
+          {{ loading ? 'Обработка...' : 'Создать рецепт' }}
+        </button>
+      </div>
       </div>
     </div>
   </div>
@@ -51,7 +57,7 @@
                class="recipe-image" />
           <img *ngIf="!recipe.photos || recipe.photos.length === 0"
                src="/static/images/default-recipe.png"
-               alt="Нет фото"
+               alt=" "
                class="recipe-image" />
           <div class="recipe-details">
             <div class="recipe-title">{{ recipe.name }}</div>
@@ -59,6 +65,12 @@
             <div class="recipe-time">Время приготовления: {{ recipe.timeToCook }} минут</div>
           </div>
         </a>
+        <div *ngIf="recipe.default" class="warning">
+          <p>Рецепт отсутствует в базе данных.</p>
+        <button class="gemini-button" (click)="onCreateRecipeFromDefault(recipe.name)" [disabled]="loading">
+          {{ loading ? 'Обработка...' : 'Создать рецепт' }}
+        </button>
+      </div>
       </div>
     </div>
   </div>
@@ -74,7 +86,7 @@
                class="recipe-image" />
           <img *ngIf="!recipe.photos || recipe.photos.length === 0"
                src="/static/images/default-recipe.png"
-               alt="Нет фото"
+               alt=" "
                class="recipe-image" />
           <div class="recipe-details">
             <div class="recipe-title">{{ recipe.name }}</div>
@@ -82,6 +94,12 @@
             <div class="recipe-time">Время приготовления: {{ recipe.timeToCook }} минут</div>
           </div>
         </a>
+        <div *ngIf="recipe.default" class="warning">
+          <p>Рецепт отсутствует в базе данных.</p>
+        <button class="gemini-button" (click)="onCreateRecipeFromDefault(recipe.name)" [disabled]="loading">
+          {{ loading ? 'Обработка...' : 'Создать рецепт' }}
+        </button>
+      </div>
       </div>
     </div>
   </div>

@@ -58,6 +58,19 @@ header {
     background-color: var(--olive-green);
     color: var(--beige);
     border: none;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    margin-right: 30px;
+}
+
+.home-button{
+    background-color: var(--olive-green);
+    color: var(--beige);
+    border: none;
     padding: 10px 20px;
     cursor: pointer;
     border-radius: 20px;
@@ -66,7 +79,8 @@ header {
     font-size: 16px;
     transition: all 0.3s ease;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-    margin-right: 30px;
+
+    margin-left: 850px;
 }
 
 .logout-button:hover {

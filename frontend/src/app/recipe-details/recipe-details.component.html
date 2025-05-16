@@ -21,7 +21,7 @@
       <ng-container *ngIf="recipe.ingredients?.length > 0; else noIngredients">
         <div *ngFor="let ingredient of recipe.ingredients">
           <p>
-            <strong>{{ ingredient.name }}</strong>: {{ ingredient.count }}
+            <strong>{{ ingredient.name }}</strong>: {{ ingredient.count }} {{ingredient.unit}}
           </p>
         </div>
       </ng-container>
@@ -61,8 +61,8 @@
   
     <p><strong>Автор рецепта:</strong> {{ recipe.authorUsername }}</p>
     <button class="delete-button" (click)="onDeleteRecipe()">Удалить рецепт</button>
-    <!-- <button class="button" (click)="onUpdateRecipe()">Обновить рецепт</button>
-   -->
+    <button class="button" (click)="onUpdateRecipe()">Обновить рецепт</button>
+  
     <div *ngIf="errorMessage" style="color: red; font-weight: bold; margin-bottom: 20px;">
       <p>{{ errorMessage }}</p>
     </div>

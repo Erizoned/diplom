@@ -11,6 +11,8 @@ import java.util.Optional;
 public interface RecipeRepository extends JpaRepository<Recipe, Long> {
     @Query(value="SELECT * FROM recipes r WHERE LOWER(r.name) LIKE %:keyword%", nativeQuery = true)
     List<Recipe> findByKeyword(@Param("keyword") String keyword);
+    @Query("SELECT r FROM Recipe r WHERE LOWER(r.name) = LOWER(:name)")
+    List<Recipe> findByName(@Param("name") String name);
     @Query(value = "SELECT * FROM recipes r " +
             "WHERE (:name IS NULL OR LOWER(r.name) LIKE LOWER(:name)) " +
             "AND (:count_portion IS NULL OR r.count_portion = :count_portion) " +
