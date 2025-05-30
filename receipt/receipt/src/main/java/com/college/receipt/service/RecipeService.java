@@ -2,6 +2,7 @@ package com.college.receipt.service;
 
 import com.college.receipt.entities.*;
 import com.college.receipt.repositories.*;
+import com.college.receipt.service.User.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,11 +16,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 import static com.college.receipt.controllers.RecipeController.logger;
 
@@ -36,6 +34,7 @@ public class RecipeService {
     private final UserRepository userRepository;
     private final IngredientRepository ingredientRepository;
     private final UploadedFileRepository uploadedFileRepository;
+    private final UserService userService;
 
     public Recipe createRecipe(Recipe recipe, MultipartFile photoFood, MultipartFile[] stepPhotos, String[] stepDescriptions, String[] ingredientNames , double[] ingredientsCounts) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -45,6 +44,8 @@ public class RecipeService {
         }
         User user = userRepository.findByEmail(userName);
         recipe.setCreatedBy(user);
+        recipe.setRating(0);
+        recipe.setVotes(1);
         Recipe savedRecipe = recipeRepository.save(recipe);
         logger.info("Началась обработка рецепта:{}", recipe.getName());
         for (int i = 0; i < ingredientNames.length; i++){
@@ -200,4 +201,24 @@ public class RecipeService {
         return recipeRepository.findByFilter(null, countPortion, kkal, timeToCook, nationalKitchen, restrictions, theme, typeOfCook, typeOfFood);
     }
 
+    public Recipe addRating(int rating, Long id) {
+        Recipe recipe = findRecipe(id);
+        User user = userService.findAuthenticatedUser();
+        if (recipe.getVotes() == 0) {
+            recipe.setRating(rating);
+            recipe.setVotes(1);
+            logger.info("Первый рейтинг рецепта. {}", rating);
+        }
+        else {
+            recipe.updateRating(rating);
+            logger.info("У рецепта был рейтинг. Текущий рейтинг: {}", recipe.getRating());
+        }
+        Recipe savedRecipe = recipeRepository.save(recipe);
+        logger.info("Рецепту {} был добавлен рейтинг {}", recipe.getName(), recipe.getRating());
+        return savedRecipe;
+    }
+
+    public Recipe findRecipe(Long id){
+        return recipeRepository.findById(id).orElseThrow(() -> new RuntimeException("Рецепт не найден"));
+    }
 }

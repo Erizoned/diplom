@@ -53,6 +53,12 @@ public class Recipe {
     @Column
     private boolean isDefault;
 
+    @Column(nullable = false)
+    private double rating = 0.0;
+
+    @Column(nullable = false)
+    private double votes = 0;
+
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Ingredients> ingredients = new ArrayList<>();
 
@@ -70,6 +76,12 @@ public class Recipe {
     @JsonIgnore
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comments> comments;
+
+    public void updateRating(int newVote) {
+        double totalScore = this.rating * this.votes;
+        this.votes += 1;
+        this.rating = (totalScore + newVote) / this.votes;
+    }
 
     public boolean hasOnlyName() {
         return name != null && !name.isBlank()

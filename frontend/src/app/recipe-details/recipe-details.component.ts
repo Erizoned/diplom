@@ -29,12 +29,17 @@ export class RecipeDetailsComponent implements OnInit, AfterViewInit {
     ingredients: [],
     steps: [],      
     author: { username: '' },
+    rating: 0
   };
 
   errorMessage: string | null = null;
   comments: Array<any> = [];
   newComment: string = '';
   
+  currentRating: number = 0;
+  previewRating: number = 0;
+  showPreview: boolean = false;
+  previewPosition: number = 0;
 
   constructor(
     private route: ActivatedRoute,
@@ -57,6 +62,7 @@ console.log("data:", response.data);
       this.recipe.ingredients = data.ingredients; 
       this.recipe.authorUsername = data.authorUsername;     
       this.comments = data.comments || [];
+      this.currentRating = this.recipe.rating || 0;
       console.log("Рецепт загружен.");
       console.log("Комментарии:", data.comments);
 
@@ -123,6 +129,12 @@ console.log("data:", response.data);
       ease: 'power3.out'
     });
   }
+
+  addRating(rating: number, recipeId: number): void{
+    console.log("Добавлен rating равный: " + rating);
+    this.axiosService.request("POST", `/api/${recipeId}/rating`, null)
+  }
+
   likeComment(commentId: number): void {
     this.axiosService.request("POST", `/api/comment/${commentId}/like`, null)
       .then((response) => {
@@ -131,7 +143,7 @@ console.log("data:", response.data);
         if (comment) {
           comment.likes = updated.likes;
           comment.dislikes = updated.dislikes;
-          comment.reaction = updated.reaction; // для стилизации кнопок (опционально)
+          comment.reaction = updated.reaction;
         }
       })
       .catch(error => {
@@ -209,6 +221,37 @@ console.log("data:", response.data);
       .catch(error => {
         console.error('Ошибка при отправке комментария', error);
         alert('Не удалось отправить комментарий');
+      });
+  }
+
+  onRatingHover(event: MouseEvent): void {
+    const starsContainer = event.currentTarget as HTMLElement;
+    const rect = starsContainer.getBoundingClientRect();
+    this.previewPosition = event.clientX - rect.left;
+  }
+
+  onStarHover(rating: number): void {
+    this.previewRating = rating;
+    this.showPreview = true;
+  }
+
+  onRatingLeave(): void {
+    this.showPreview = false;
+  }
+
+  onRatingClick(rating: number): void {
+    if (!this.id) return;
+    
+    const roundedRating = Math.round(rating * 2) / 2;
+    
+    this.axiosService.request("POST", `/api/recipe/${this.id}/rating`, { rating: roundedRating })
+      .then(response => {
+        this.currentRating = roundedRating;
+        this.recipe.rating = roundedRating;
+      })
+      .catch(error => {
+        console.error('Ошибка при установке рейтинга', error);
+        alert('Не удалось установить рейтинг');
       });
   }
 }

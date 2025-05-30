@@ -1,6 +1,7 @@
 package com.college.receipt.controllers;
 
 import com.college.receipt.DTO.CommentDto;
+import com.college.receipt.DTO.RatingDto;
 import com.college.receipt.DTO.RecipeDto;
 import com.college.receipt.entities.*;
 import com.college.receipt.repositories.*;
@@ -214,6 +215,13 @@ public class RecipeController {
         );
 
         return ResponseEntity.ok().body(response);
+    }
+
+    @PostMapping("/recipe/{id}/rating")
+    public ResponseEntity<Recipe> addRating(@PathVariable("id") Long id, @RequestBody RatingDto ratingDto){
+        int rating = ratingDto.getRating();
+        Recipe recipe = recipeService.addRating(rating, id);
+        return ResponseEntity.ok().body(recipe);
     }
 
     @DeleteMapping("/recipe/{id}/delete")
