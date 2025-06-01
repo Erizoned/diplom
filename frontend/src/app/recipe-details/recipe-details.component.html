@@ -1,27 +1,30 @@
 <div class="container">
     <h1>{{ recipe.name }}</h1>
     <div class="rating-container">
-      <div class="stars" 
-           (mouseleave)="onRatingLeave()"
-           (mouseover)="onRatingHover($event)">
-        <div class="star" 
-             *ngFor="let star of [1,2,3,4,5]; let i = index"
-             [class.filled]="currentRating >= star * 2"
-             [class.half-filled]="currentRating >= (star * 2 - 1) && currentRating < star * 2"
-             (click)="onRatingClick(star * 2)"
-             (mouseover)="onStarHover(star * 2)">
+      <div class="stars" (mouseleave)="onRatingLeave()">
+        <div
+          class="star"
+          *ngFor="let star of [1,2,3,4,5]; let i = index"
+          [class.filled]="currentRating >= (i * 2 + 2)"
+          [class.half-filled]="currentRating === (i * 2 + 1)"
+          (mousemove)="onStarHover($event, i)"
+          (click)="onStarClick($event, i)"
+        >
           ★
         </div>
       </div>
-      <div class="rating-preview" 
-           [class.visible]="showPreview"
-           [style.left.px]="previewPosition">
+      <div
+        class="rating-preview"
+        [class.visible]="showPreview"
+        [style.left.px]="previewPosition"
+      >
         {{ previewRating.toFixed(1) }} из 10
       </div>
-      <div class="current-rating" *ngIf="currentRating > 0">
-        Текущий рейтинг: {{ currentRating.toFixed(1) }} из 10
+      <div class="average-rating" *ngIf="recipe?.avgRating != null">
+        Средний рейтинг: {{ recipe.avgRating.toFixed(1) }} из 10
       </div>
     </div>
+    
     <div class="recipe-description">
       <p>{{ recipe.description }}</p>
     </div>

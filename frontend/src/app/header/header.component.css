@@ -79,8 +79,6 @@ header {
     font-size: 16px;
     transition: all 0.3s ease;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-
-    margin-left: 850px;
 }
 
 .logout-button:hover {

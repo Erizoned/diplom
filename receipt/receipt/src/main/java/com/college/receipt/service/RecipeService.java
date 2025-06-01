@@ -33,7 +33,7 @@ public class RecipeService {
     private final StepRepository stepRepository;
     private final UserRepository userRepository;
     private final IngredientRepository ingredientRepository;
-    private final UploadedFileRepository uploadedFileRepository;
+    private final RatingRepository ratingRepository;
     private final UserService userService;
 
     public Recipe createRecipe(Recipe recipe, MultipartFile photoFood, MultipartFile[] stepPhotos, String[] stepDescriptions, String[] ingredientNames , double[] ingredientsCounts) throws IOException {
@@ -44,8 +44,8 @@ public class RecipeService {
         }
         User user = userRepository.findByEmail(userName);
         recipe.setCreatedBy(user);
-        recipe.setRating(0);
-        recipe.setVotes(1);
+        recipe.setRatings(null);
+        recipe.setAvgRating(0.0);
         Recipe savedRecipe = recipeRepository.save(recipe);
         logger.info("Началась обработка рецепта:{}", recipe.getName());
         for (int i = 0; i < ingredientNames.length; i++){
@@ -201,21 +201,26 @@ public class RecipeService {
         return recipeRepository.findByFilter(null, countPortion, kkal, timeToCook, nationalKitchen, restrictions, theme, typeOfCook, typeOfFood);
     }
 
-    public Recipe addRating(int rating, Long id) {
-        Recipe recipe = findRecipe(id);
+    public Recipe addNewRating(int value, Long recipeId){
+        Recipe recipe = findRecipe(recipeId);
         User user = userService.findAuthenticatedUser();
-        if (recipe.getVotes() == 0) {
-            recipe.setRating(rating);
-            recipe.setVotes(1);
-            logger.info("Первый рейтинг рецепта. {}", rating);
+        Rating rating = ratingRepository.findByUserAndRecipe(user, recipe).orElse(null);
+        if (rating != null){
+            logger.info("Пользователь уже ставил рейтинг, текущее значение: {} заменяется на новое: {}", rating.getRating(), value);
+            rating.setRating(value);
         }
-        else {
-            recipe.updateRating(rating);
-            logger.info("У рецепта был рейтинг. Текущий рейтинг: {}", recipe.getRating());
+        else{
+            logger.info("Пользователь {} впервые ставит рейтинг: {}", user.getUsername(), value);
+            rating = new Rating();
+            rating.setRating(value);
+            rating.setUser(user);
+            rating.setRecipe(recipe);
         }
-        Recipe savedRecipe = recipeRepository.save(recipe);
-        logger.info("Рецепту {} был добавлен рейтинг {}", recipe.getName(), recipe.getRating());
-        return savedRecipe;
+        ratingRepository.save(rating);
+        Double avgRating = ratingRepository.avgRating(recipeId);
+        recipe.setAvgRating(avgRating);
+        logger.info("Средний рейтинг рецепта теперь: {}", recipe.getAvgRating());
+        return recipeRepository.save(recipe);
     }
 
     public Recipe findRecipe(Long id){

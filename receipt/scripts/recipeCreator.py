@@ -37,7 +37,7 @@ def gen_recipe(prompt_text: str) -> dict:
     server_prompt = (
         f"Пользователь сказал: {prompt_text}. "
         "Создай JSON рецепта по этому названию. Ты должен указать: "
-        "(ingredients — список объектов {name, count, unit}, unit - это (гр., мл., шт.), то есть единица измерения ингредиента. ОБЯЗАТЕЛЬНО ДОБАВЛЯЙ unit), "
+        "(ingredients — список объектов {name, count, unit}, unit - это (гр., мл., шт.), то есть единица измерения ингредиента(например, Молоко - 100 мл, Мясо - 10 гр. (гр (грамм) и мл(миллилитры) в данном случае являются Unit)). ОБЯЗАТЕЛЬНО ДОБАВЛЯЙ unit), "
         "steps — список объектов {stepNumber, description}), "
         "и внутри recipe: name, description, kkal, count_portion, restrictions, "
         "national_kitchen, theme, time_to_cook, type_of_cook, type_of_food. "

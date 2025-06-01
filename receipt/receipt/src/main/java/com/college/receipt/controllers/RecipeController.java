@@ -7,6 +7,7 @@ import com.college.receipt.entities.*;
 import com.college.receipt.repositories.*;
 import com.college.receipt.service.RecipeService;
 import com.college.receipt.service.UploadedFileService;
+import com.college.receipt.service.User.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -33,22 +34,22 @@ import java.util.stream.Collectors;
 @RestController
 public class RecipeController {
     private final RecipeRepository recipeRepository;
-    private final UploadedFileService uploadedFileService;
     private final UploadedFileRepository uploadedFileRepository;
     public static final Logger logger = LoggerFactory.getLogger(RecipeController.class);
     private final RecipeService recipeService;
     private final StepRepository stepRepository;
     private final IngredientRepository ingredientRepository;
-    private final CommentsRepository commentsRepository;
+    private final RatingRepository ratingRepository;
+    private final UserService userService;
 
-    public RecipeController(RecipeRepository recipeRepository, UploadedFileService uploadedFileService, UploadedFileRepository uploadedFileRepository, RecipeService recipeService, StepRepository stepRepository, IngredientRepository ingredientRepository, CommentsRepository commentsRepository) {
+    public RecipeController(RecipeRepository recipeRepository, UploadedFileRepository uploadedFileRepository, RecipeService recipeService, StepRepository stepRepository, IngredientRepository ingredientRepository, RatingRepository ratingRepository, UserService userService) {
         this.recipeRepository = recipeRepository;
-        this.uploadedFileService = uploadedFileService;
         this.uploadedFileRepository = uploadedFileRepository;
         this.recipeService = recipeService;
         this.stepRepository = stepRepository;
         this.ingredientRepository = ingredientRepository;
-        this.commentsRepository = commentsRepository;
+        this.ratingRepository = ratingRepository;
+        this.userService = userService;
     }
 
     @GetMapping("/recipes")
@@ -202,16 +203,17 @@ public class RecipeController {
         List<Ingredients> ingredients = ingredientRepository.findByRecipe(recipe);
 
         logger.info("Найдено шагов: {}", steps.size());
-
+        User user = userService.findAuthenticatedUser();
         List<CommentDto> commentsDtos = recipe.getComments().stream().map(CommentDto::new).collect(Collectors.toList());
-
+        Rating rating = ratingRepository.findByUserAndRecipe(user, recipe).orElse(null);
         RecipeDto response = new RecipeDto(
           recipe,
           photoFood,
           steps,
           ingredients,
           recipe.getCreatedBy().getUsername(),
-          commentsDtos
+          commentsDtos,
+          rating
         );
 
         return ResponseEntity.ok().body(response);
@@ -220,7 +222,7 @@ public class RecipeController {
     @PostMapping("/recipe/{id}/rating")
     public ResponseEntity<Recipe> addRating(@PathVariable("id") Long id, @RequestBody RatingDto ratingDto){
         int rating = ratingDto.getRating();
-        Recipe recipe = recipeService.addRating(rating, id);
+        Recipe recipe = recipeService.addNewRating(rating, id);
         return ResponseEntity.ok().body(recipe);
     }
 

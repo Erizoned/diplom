@@ -1,0 +1,46 @@
+<div class="main-container">
+  <div class="profile-info">
+    <div class="profile-header">
+      <h1>Профиль пользователя</h1>
+      <div class="profile-meta">
+        <p><strong>Email:</strong> {{ user.email || 'example@email.com' }}</p>
+        <p><strong>Имя пользователя:</strong> {{ user.username || 'username' }}</p>
+        <p *ngIf="user.diet">
+          <strong>Диета:</strong>
+          <a class="diet-link" [routerLink]="['/diet', user.diet.id]">{{ user.diet.name }}</a>
+        </p>
+        <p *ngIf="!user.diet">
+          <strong>Диета:</strong> не назначена
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="recipes-section">
+    <h2>Созданные рецепты</h2>
+    <div class="recipe-container">
+      <div *ngIf="recipes.length > 0; else noRecipes">
+        <div *ngFor="let recipe of recipes" class="recipe-card">
+          <a [routerLink]="['/recipe', recipe.id]">
+            <img *ngIf="recipe.photos && recipe.photos.length > 0"
+                 [src]="getPhotoUrl(recipe.photos[0].name)"
+                 alt="Фото блюда"
+                 class="recipe-image" />
+            <img *ngIf="!recipe.photos || recipe.photos.length === 0"
+                 src="/static/images/default-recipe.png"
+                 alt="Нет фото"
+                 class="recipe-image" />
+            <div class="recipe-details">
+              <div class="recipe-title">{{ recipe.name }}</div>
+              <div class="recipe-description">{{ recipe.description }}</div>
+              <div class="recipe-time">Время приготовления: {{ recipe.timeToCook }} минут</div>
+            </div>
+          </a>
+        </div>
+      </div>
+      <ng-template #noRecipes>
+        <p>У вас пока нет созданных рецептов.</p>
+      </ng-template>
+    </div>
+  </div>
+</div>

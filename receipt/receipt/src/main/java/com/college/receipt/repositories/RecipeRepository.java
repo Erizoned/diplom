@@ -1,6 +1,7 @@
 package com.college.receipt.repositories;
 
 import com.college.receipt.entities.Recipe;
+import com.college.receipt.entities.User;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -33,4 +34,5 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
                               @Param("theme") String theme,
                               @Param("type_of_cook") String typeOfCook,
                               @Param("type_of_food") String typeOfFood);
+    List<Recipe> findByUser(User user);
 }
