@@ -1,19 +1,25 @@
 package com.college.receipt.controllers;
 
+import com.college.receipt.DTO.DietDto;
+import com.college.receipt.DTO.SimplifiedRecipeDto;
 import com.college.receipt.DTO.SimplifiedUserDto;
-import com.college.receipt.entities.Rating;
-import com.college.receipt.entities.Recipe;
-import com.college.receipt.entities.User;
+import com.college.receipt.entities.*;
+import com.college.receipt.repositories.DietRepository;
 import com.college.receipt.repositories.RatingRepository;
 import com.college.receipt.repositories.RecipeRepository;
 import com.college.receipt.repositories.UserRepository;
 import com.college.receipt.service.User.UserService;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Slf4j
 @RequestMapping("/api")
 @RestController
 public class UserProfileController {
@@ -30,17 +36,51 @@ public class UserProfileController {
     @Autowired
     private RatingRepository ratingRepository;
 
-    @GetMapping("/user/{id}")
-    private ResponseEntity<User> getUser(@PathVariable("id") Long id){
+    @Autowired
+    private DietRepository dietRepository;
+
+    private static final Logger logger = LoggerFactory.getLogger(UserProfileController.class);
+
+    @GetMapping("/user/profile")
+    private ResponseEntity<SimplifiedUserDto> getUser(){
         User user = userService.findAuthenticatedUser();
-        List<Recipe> recipe = recipeRepository.findByUser(user);
-        List<Rating> rating = ratingRepository.findByUserAndRecipe()
+        List<Recipe> recipes = recipeRepository.findByCreatedBy(user);
+        List<SimplifiedRecipeDto> recipeSummaries = recipes.stream()
+                .map(r -> {
+                    String avatar = r.getPhotos().stream()
+                            .filter(UploadedFile::isPhotoFood)
+                            .map(UploadedFile::getFilePath)
+                            .findFirst()
+                            .orElse(null);
+
+                    return new SimplifiedRecipeDto(
+                            r.getId(),
+                            r.getName(),
+                            r.getDescription(),
+                            avatar
+                    );
+                })
+                .collect(Collectors.toList());
+        List<Rating> ratings = ratingRepository.findByUser(user);
+        List<Diet> diets = dietRepository.findByUser(user);
+        List<DietDto> dietDtos = diets.stream()
+                .map(d -> {
+                    return new DietDto(
+                    d.getId(),
+                    d.getRecommendation(),
+                    d.getTerm(),
+                    d.getDateOfCreation()
+                    );
+                }
+                ).toList();
         SimplifiedUserDto response = new SimplifiedUserDto(
                 user.getUsername(),
                 user.getEmail(),
-                recipe,
-
+                recipeSummaries,
+                ratings,
+                dietDtos
         );
-        return ResponseEntity.ok().body(user);
+        logger.info("Запрос на получение пользователя {}", user.getUsername());
+        return ResponseEntity.ok().body(response);
     }
 }

@@ -6,6 +6,7 @@ import { UpdateRecipeComponent } from './update-recipe/update-recipe.component';
 import { RegisterComponent } from './register/register.component';
 import { CreateRecipeComponent } from './create-recipe-form/create-recipe-form.component';
 import { DietPageComponent } from './diet-page/diet-page.component';
+import { ProfileComponent } from './profile/profile.component';
 
 
 export const routes: Routes = [  
@@ -16,5 +17,6 @@ export const routes: Routes = [
     { path: 'user/registration', component: RegisterComponent},
     { path: 'create_recipe', component: CreateRecipeComponent},
     { path: 'diet/:id', component: DietPageComponent},
+    { path: 'profile', component: ProfileComponent},
     { path: '**', redirectTo: 'login', pathMatch: 'full' }, // Перенаправляет на /login, если страница не найдена
   ];

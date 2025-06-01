@@ -21,9 +21,9 @@ public class SimplifiedUserDto {
 
     private String email;
 
-    private List<Recipe> recipes;
+    private List<SimplifiedRecipeDto> recipes;
 
     private List<Rating> ratings;
 
-    private List<Diet> diets;
+    private List<DietDto> diets;
 }

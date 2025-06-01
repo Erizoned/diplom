@@ -1,39 +1,69 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { AxiosService } from '../axios.service';   
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+interface Recipe {
+  id: number;
+  name: string;
+  description: string;
+  avatar?: string;
+}
+
+interface Diet {
+  id: number;
+  recomendation?: string;
+  recommendation?: string;
+  term?: any;
+  dateOfCreation?: any;
+}
+
+interface UserProfile {
+  username: string;
+  email: string;
+}
 
 @Component({
   selector: 'app-profile',
-  imports: [],
+  standalone: true,          
+  imports: [CommonModule,  RouterModule],
   templateUrl: './profile.component.html',
-  styleUrl: './profile.component.css'
+  styleUrls: ['./profile.component.css']
 })
-export class ProfileComponent {
-  user = {
-    email: 'example@email.com',
-    username: 'username',
-    diet: {
-      id: 1,
-      name: 'Средиземноморская диета'
-    }
-  };
+export class ProfileComponent implements OnInit {
+  user: UserProfile | null = null;
+  recipes: Recipe[] = [];
+  diets: Diet[] = [];
+  loading: boolean = true;
+  error: string = '';
 
-  recipes = [
-    {
-      id: 1,
-      name: 'Овсяная каша',
-      description: 'Полезный завтрак для всей семьи',
-      timeToCook: 15,
-      photos: [{ name: 'oatmeal.jpg' }]
-    },
-    {
-      id: 2,
-      name: 'Салат Цезарь',
-      description: 'Классический салат с курицей',
-      timeToCook: 20,
-      photos: []
-    }
-  ];
+  ngOnInit(): void {
+    this.fetchUser();
+  }
 
-  getPhotoUrl(photoName: string): string {
-    return 'http://localhost:8081/file_system?file_name=' + encodeURIComponent(photoName);
+  constructor(private axiosService: AxiosService) {}
+
+  fetchUser() {
+    this.loading = true;
+    this.axiosService.request('GET', '/api/user/profile', {})
+      .then(response => {
+        this.user = {
+          username: response.data.username,
+          email: response.data.email
+        };
+        this.recipes = response.data.recipes || [];
+        this.diets = response.data.diets || [];
+        this.loading = false;
+      })
+      .catch(error => {
+        this.error = 'Ошибка при загрузке профиля';
+        this.loading = false;
+      });
+  }
+
+  getPhotoUrl(avatarPath?: string): string {
+    if (!avatarPath) return '/static/images/default-recipe.png';
+    // Обрезаем путь до имени файла
+    const fileName = avatarPath.split('\\').pop() || avatarPath.split('/').pop();
+    return 'http://localhost:8081/file_system?file_name=' + encodeURIComponent(fileName || '');
   }
 }

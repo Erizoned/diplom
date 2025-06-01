@@ -34,5 +34,5 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
                               @Param("theme") String theme,
                               @Param("type_of_cook") String typeOfCook,
                               @Param("type_of_food") String typeOfFood);
-    List<Recipe> findByUser(User user);
+    List<Recipe> findByCreatedBy(User user);
 }
