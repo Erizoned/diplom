@@ -43,10 +43,8 @@ export class UpdateRecipeComponent implements OnInit, AfterViewInit {
     this.axiosService.request('GET', '/api/recipe/' + this.recipeId, null)
       .then(response => {
         const data = response.data;
-        // Если данные рецепта вложены в data.recipe, берем их оттуда
         const recipeData = data.recipe ? data.recipe : data;
         
-        // Заполняем основные поля рецепта
         this.recipe.id = recipeData.id;
         this.recipe.name = recipeData.name;
         this.recipe.description = recipeData.description;
@@ -55,7 +53,7 @@ export class UpdateRecipeComponent implements OnInit, AfterViewInit {
         this.recipe.kkal = recipeData.kkal;
         this.recipe.timeToCook = recipeData.timeToCook;
 
-        // Заполняем список фото блюда (фильтруем только фото с photoFood === true)
+        // Заполнение списка фото блюда (фильтрация только фото с photoFood === true)
         if (recipeData.photos && recipeData.photos.length > 0) {
           this.recipe.photoFood = recipeData.photos.filter((photo: any) => photo.photoFood);
         } else if (data.photoFood) {
@@ -63,7 +61,7 @@ export class UpdateRecipeComponent implements OnInit, AfterViewInit {
           this.recipe.photoFood = [data.photoFood];
         }
         
-        // Заполняем шаги приготовления (ищем их сначала в data.steps, затем в recipeData.steps)
+        // Заполнение шагов приготовления
         const steps = data.steps ? data.steps : recipeData.steps;
         if (steps && steps.length > 0) {
           steps.forEach((s: any) => {
@@ -73,7 +71,6 @@ export class UpdateRecipeComponent implements OnInit, AfterViewInit {
           });
         }
         
-        // Заполняем ингредиенты (ищем их сначала в data.ingredients, затем в recipeData.ingredients)
         const ingredients = data.ingredients ? data.ingredients : recipeData.ingredients;
         if (ingredients && ingredients.length > 0) {
           ingredients.forEach((ing: any) => {
@@ -95,6 +92,10 @@ export class UpdateRecipeComponent implements OnInit, AfterViewInit {
     if (event.target.files && event.target.files.length > 0) {
       this.photoFoodFile = event.target.files[0];
     }
+  }
+
+  trackByIndex(index: number, item: any): number {
+    return index;
   }
 
   getPhotoUrl(fileName: string): string {

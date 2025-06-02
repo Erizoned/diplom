@@ -75,7 +75,8 @@ public class RecipeCreationTest {
 
         String[] stepDescription = {"Нагреть сковороду","Добавить масло"};
         String[] ingredientNames = {"Яйца","Масло"};
-        Integer[] ingredientCounts = {3, 400};
+        String[] units = {"шт","мл"};
+        double[] ingredientCounts = {3, 400};
 
         Mockito.when(photoFood.getOriginalFilename()).thenReturn("photoFood.jpg");
         Mockito.when(stepPhoto1.getOriginalFilename()).thenReturn("stepPhoto1.jpg");
@@ -99,7 +100,7 @@ public class RecipeCreationTest {
         Mockito.when(recipeRepository.save(any(Recipe.class))).thenAnswer(invocation -> invocation.getArgument(0));
         Mockito.when(userRepository.findByEmail(any())).thenReturn(user);
 
-        Recipe savedRecipe = recipeService.createRecipe(recipe, photoFood,new MultipartFile[]{stepPhoto1, stepPhoto2}, stepDescription, ingredientNames, ingredientCounts);
+        Recipe savedRecipe = recipeService.createRecipe(recipe, photoFood,new MultipartFile[]{stepPhoto1, stepPhoto2}, stepDescription, ingredientNames, ingredientCounts, units);
 
         //Assert
 
@@ -118,7 +119,7 @@ public class RecipeCreationTest {
         MultipartFile[] stepPhotos = {stepPhoto1, stepPhoto2};
         String[] stepDescriptions = {"Нагреть сковороду","Добавить масло"};
         String[] ingredientNames = {"Яйца","Масло"};
-        Integer[] ingredientCounts = {3, 400};
+        double[] ingredientCounts = {3, 400};
 
         User user = User.builder()
                 .username("Антон")
@@ -153,13 +154,13 @@ public class RecipeCreationTest {
                 .theme("Праздничный")
                 .build();
 
-
+        String[] units = {"шт","мл"};
         //Act
 
         when(recipeRepository.save(any(Recipe.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(recipeRepository.findById(anyLong())).thenReturn(Optional.ofNullable(((existingRecipe))));
 
-        Recipe savedRecipe = recipeService.updateRecipe(1L, updatedData, photoFood, stepPhotos, stepDescriptions, ingredientNames, ingredientCounts);
+        Recipe savedRecipe = recipeService.updateRecipe(1L, updatedData, photoFood, stepPhotos, stepDescriptions, ingredientNames, ingredientCounts, units);
 
         // Assert
         assertNotNull(savedRecipe);

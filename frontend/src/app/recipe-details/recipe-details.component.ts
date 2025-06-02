@@ -29,17 +29,21 @@ export class RecipeDetailsComponent implements OnInit, AfterViewInit {
     ingredients: [],
     steps: [],      
     author: { username: '' },
-    rating: 0
+    rating: 0,
   };
 
   errorMessage: string | null = null;
   comments: Array<any> = [];
   newComment: string = '';
-  
+  recipeId: string | null = null;
   currentRating: number = 0;
   previewRating: number = 0;
   showPreview: boolean = false;
   previewPosition: number = 0;
+  currentUsername = '';
+  role: string = '';
+  isAdmin = false;
+  isOwner = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -48,28 +52,66 @@ export class RecipeDetailsComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit(): void {
-    this.id = this.route.snapshot.paramMap.get('id');
-    this.axiosService.request("GET", "/api/recipe/" + this.id, null)
-      .then(response => {
-        const data = response.data;
-        this.recipe = data.recipe;
-        this.recipe.photoFood = data.photoFood;
-        this.recipe.steps = data.steps;
-        this.recipe.ingredients = data.ingredients;
-        this.recipe.authorUsername = data.authorUsername;
-        this.comments = data.comments || [];
-        this.currentRating = data.rating ? data.rating.rating : 0;
-      })
-      .catch(error => {
-        console.error('Ошибка при получении рецепта', error);
-        this.errorMessage = 'Не удалось загрузить рецепт';
-      });
+    this.recipeId = this.route.snapshot.paramMap.get('id');
+    this.fetchCurrentUser();
+    this.fetchRecipe();
   }
+
+  fetchCurrentUser() {
+    this.axiosService.request('GET', '/api/user/profile', {})
+      .then(res => {
+        this.currentUsername = res.data.username;
+        let rolesArr: string[] = [];
+        try {
+          rolesArr = JSON.parse(res.data.role);
+        } catch {
+          rolesArr = res.data.role
+            .replace(/^\[|\]$/g, '')
+            .split(',')
+            .map((r: string) => r.trim().replace(/^"|"$/g, ''));
+        }
+        this.role = rolesArr.join(',');
+        this.isAdmin = rolesArr.includes('ADMIN');
+        this.checkOwnership();
+      })
+      .catch(() => {});
+      console.log("Найден пользователь с именем " + this.currentUsername + "и ролью" + this.role)
+  }
+  
+
+fetchRecipe() {
+  if (!this.recipeId) return;
+  this.axiosService.request("GET", "/api/recipe/" + this.recipeId, null)
+  .then(response => {
+    const data = response.data;
+    this.recipe = data.recipe;
+    this.recipe.photoFood = data.photoFood;
+    this.recipe.steps = data.steps;
+    this.recipe.ingredients = data.ingredients;
+    this.recipe.authorUsername = data.authorUsername;
+    this.comments = data.comments || [];
+    this.currentRating = data.rating ? data.rating.rating : 0;
+  })
+  .catch(error => {
+    console.error('Ошибка при получении рецепта', error);
+    this.errorMessage = 'Не удалось загрузить рецепт';
+  });
+}
+
+checkOwnership() {
+  this.isOwner = this.currentUsername === this.recipe.authorUsername;
+}
+
+
 
   onUpdateRecipe() {
-    this.router.navigate(['/update_recipe', this.id]);
+    this.router.navigate(['/update_recipe', this.recipeId]);
   }
 
+  getAvatarName(): string | undefined {
+    return this.recipe.photoFood?.find((p: any) => p.isPhotoFood)?.name;
+  }
+  
   getPhotoUrl(fileName: string): string {
     return 'http://localhost:8081/file_system?file_name=' + encodeURIComponent(fileName);
  }
@@ -128,6 +170,8 @@ addRating(rating: number, recipeId: number): void {
   this.axiosService.request("POST", `/api/recipe/${recipeId}/rating`, { rating: roundedRating })
     .then(() => {
       this.reloadRecipe();
+      this.fetchCurrentUser()
+
     })
     .catch(error => {
       console.error("Ошибка при добавлении рейтинга:", error);
@@ -135,8 +179,7 @@ addRating(rating: number, recipeId: number): void {
 }
 
 private reloadRecipe(): void {
-  if (!this.id) return;
-  this.axiosService.request("GET", "/api/recipe/" + this.id, null)
+  this.axiosService.request("GET", "/api/recipe/" + this.recipeId, null)
     .then(response => {
       const data = response.data;
       this.recipe = data.recipe;

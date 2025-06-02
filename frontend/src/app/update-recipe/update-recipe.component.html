@@ -45,29 +45,50 @@
       <label for="photoFood">Обновить фото блюда:</label>
       <input type="file" id="photoFood" (change)="onPhotoFoodSelected($event)" accept="image/*">
     </div>
-
     <div id="stepsContainer">
       <h3>Шаги приготовления</h3>
-      <div class="step" *ngFor="let desc of stepDescriptions; let i = index">
+      <div
+        class="step"
+        *ngFor="let desc of stepDescriptions; let i = index; trackBy: trackByIndex"
+      >
         <label>Описание шага:</label>
-        <textarea [(ngModel)]="stepDescriptions[i]" name="stepDescriptions{{ i }}" required></textarea>
+        <textarea
+          [(ngModel)]="stepDescriptions[i]"
+          name="stepDescriptions{{ i }}"
+          required
+        ></textarea>
         <label>Обновить фото шага:</label>
-        <input type="file" (change)="onStepPhotoSelected($event, i)" accept="image/*">
+        <input
+          type="file"
+          (change)="onStepPhotoSelected($event, i)"
+          accept="image/*"
+        >
       </div>
     </div>
-
     <button type="button" (click)="addStep()">Добавить шаг</button>
-
+    
     <div id="ingredientsContainer">
       <h3>Ингредиенты</h3>
-      <div class="ingredient" *ngFor="let ing of ingredientNames; let j = index">
+      <div
+        class="ingredient"
+        *ngFor="let ing of ingredientNames; let j = index; trackBy: trackByIndex"
+      >
         <label>Название ингредиента:</label>
-        <input type="text" [(ngModel)]="ingredientNames[j]" name="ingredientNames{{ j }}" required>
+        <input
+          type="text"
+          [(ngModel)]="ingredientNames[j]"
+          name="ingredientNames{{ j }}"
+          required
+        >
         <label>Количество:</label>
-        <input type="number" [(ngModel)]="ingredientsCounts[j]" name="ingredientsCounts{{ j }}" required>
+        <input
+          type="number"
+          [(ngModel)]="ingredientsCounts[j]"
+          name="ingredientsCounts{{ j }}"
+          required
+        >
       </div>
     </div>
-
     <button type="button" (click)="addIngredient()">Добавить ингредиент</button>
 
     <button type="submit">Обновить рецепт</button>

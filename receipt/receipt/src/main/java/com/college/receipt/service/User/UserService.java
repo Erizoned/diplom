@@ -1,11 +1,12 @@
 package com.college.receipt.service.User;
 
-import com.college.receipt.entities.Role;
-import com.college.receipt.entities.User;
-import com.college.receipt.repositories.RoleRepository;
+import com.college.receipt.DTO.DietDto;
+import com.college.receipt.DTO.SimplifiedRecipeDto;
+import com.college.receipt.DTO.SimplifiedUserDto;
+import com.college.receipt.entities.*;
+import com.college.receipt.repositories.*;
 import com.college.receipt.DTO.UserDto;
 import com.college.receipt.exceptions.UserAlreadyExistException;
-import com.college.receipt.repositories.UserRepository;
 import com.college.receipt.service.JWTService;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
@@ -20,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -42,8 +44,58 @@ public class UserService {
     @Autowired
     private JWTService jwtService;
 
-    public Optional<User> findUserById(Long id){
-        return userRepository.findById(id);
+    @Autowired
+    private RecipeRepository recipeRepository;
+
+    @Autowired
+    private RatingRepository ratingRepository;
+
+    @Autowired
+    private DietRepository dietRepository;
+
+    public SimplifiedUserDto getSimplifiedUser() {
+        User user = findAuthenticatedUser();
+        List<Recipe> recipes = recipeRepository.findByCreatedBy(user);
+        List<SimplifiedRecipeDto> recipeSummaries = recipes.stream()
+                .map(r -> {
+                    String avatar = r.getPhotos().stream()
+                            .filter(UploadedFile::isPhotoFood)
+                            .map(UploadedFile::getFilePath)
+                            .findFirst()
+                            .orElse(null);
+
+                    return new SimplifiedRecipeDto(
+                            r.getId(),
+                            r.getName(),
+                            r.getDescription(),
+                            avatar
+                    );
+                })
+                .collect(Collectors.toList());
+        List<Rating> ratings = ratingRepository.findByUser(user);
+        List<Diet> diets = dietRepository.findByUser(user);
+        List<DietDto> dietDtos = diets.stream()
+                .map(d -> {
+                            return new DietDto(
+                                    d.getId(),
+                                    d.getRecommendation(),
+                                    d.getTerm(),
+                                    d.getDateOfCreation()
+                            );
+                        }
+                ).toList();
+        String role = user.getRoles().toString();
+        SimplifiedUserDto response = new SimplifiedUserDto(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                recipeSummaries,
+                ratings,
+                dietDtos,
+                role
+        );
+        logger.info("Запрос на получение пользователя {}", user.getUsername());
+        return response;
     }
 
     private Set<Role> getRolesFromNames(List<String> roleNames) {
@@ -88,6 +140,7 @@ public class UserService {
             throw new RuntimeException("Пользователь не вошёл в аккаунт");
         }
     }
+
 
     private boolean emailExists(String email) {
         return userRepository.findByEmail(email) != null;

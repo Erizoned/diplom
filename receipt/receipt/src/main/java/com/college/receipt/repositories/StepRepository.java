@@ -11,4 +11,6 @@ public interface StepRepository extends JpaRepository<Steps, Long> {
     List<Steps> findByRecipe(Recipe recipe);
 
     void deleteByRecipeId(Long id);
+
+    List<Steps> findByRecipeId(Long id);
 }

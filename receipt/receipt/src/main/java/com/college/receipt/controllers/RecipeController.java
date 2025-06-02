@@ -63,70 +63,7 @@ public class RecipeController {
                        @RequestParam(value = "typeOfCook", required = false) String typeOfCook,
                        @RequestParam(value = "typeOfFood", required = false) String typeOfFood) {
         logger.info("Открыта главная страница со списком рецептов");
-        if (keyword != null || countPortion != null || kkal != null || timeToCook != null ||
-                nationalKitchen != null || restrictions != null || theme != null ||
-                typeOfCook != null || typeOfFood != null) {
-            logger.info("Фильтрация");
-            List<Recipe> filteredRecipes = recipeRepository.findByFilter(
-                    null,
-                    countPortion,
-                    kkal,
-                    timeToCook,
-                    nationalKitchen,
-                    restrictions,
-                    theme,
-                    typeOfCook,
-                    typeOfFood
-            );
-            if (keyword != null){
-                List<Recipe> keywordRecipe = recipeRepository.findByKeyword(keyword.toLowerCase());
-                keywordRecipe = keywordRecipe.stream().filter(recipe -> !recipe.isDefault()).toList();
-                logger.info("поисковое слово:{}", keyword);
-                return ResponseEntity.ok(keywordRecipe);
-            }
-            logger.info("Применяем фильтры: countPortion={}, kkal={}, timeToCook={}, nationalKitchen={}, restrictions={}, theme={}, typeOfCook={}, typeOfFood={}", countPortion, kkal, timeToCook, nationalKitchen, restrictions, theme, typeOfCook, typeOfFood);
-            logger.info("Найдено отфильтрованных рецептов: {}", filteredRecipes.size());
-            if (filteredRecipes.isEmpty()) {
-                logger.warn("Ошибка, рецепты не найдены");
-                return ResponseEntity.badRequest().body(Collections.emptyList());
-            }
-            else{
-                logger.info("Найдено рецептов: {}", filteredRecipes.size());
-                filteredRecipes = filteredRecipes.stream().filter(recipe -> !recipe.isDefault()).toList();
-                filteredRecipes.forEach(recipe -> logger.info("Рецепт: id={}, name={}", recipe.getId(), recipe.getName()));
-                return ResponseEntity.ok(filteredRecipes);
-            }
-        }
-        else{
-            List<Recipe> recipes = recipeRepository.findAll();
-            recipes = recipes.stream().filter(recipe -> !recipe.isDefault()).toList();
-            return ResponseEntity.ok(recipes);
-        }
-    }
-
-    @GetMapping("/create_recipe")
-    public String createForm(Model model) {
-        logger.info("Открыта страница создания рецептов");
-        model.addAttribute("recipe", new Recipe());
-        return "create_recipe";
-    }
-
-    @GetMapping("/update_recipe/{id}")
-    public String updateRecipe(@PathVariable("id") Long id,Model model) {
-        Recipe savedRecipe = recipeRepository.findById(id).orElseThrow(() -> {
-            logger.error("Рецепт с id={} не найден", id);
-            return new RuntimeException("Recipe not found");
-        });
-
-        UploadedFile photoFood = uploadedFileRepository.findByRecipeAndIsPhotoFoodTrue(savedRecipe);
-        List<Steps> steps = stepRepository.findByRecipe(savedRecipe);
-        List<Ingredients> ingredients = ingredientRepository.findByRecipe(savedRecipe);
-        model.addAttribute("recipe", savedRecipe);
-        model.addAttribute("steps", steps);
-        model.addAttribute("ingredients", ingredients);
-        model.addAttribute("photoFood", photoFood);
-
-    return "update_recipe";
+       return recipeService.getRecipes(keyword, countPortion, kkal, timeToCook, nationalKitchen, restrictions, theme, typeOfCook, typeOfFood);
     }
 
     @PostMapping("/create_recipe")
@@ -137,7 +74,8 @@ public class RecipeController {
             @RequestParam("stepPhotos") MultipartFile[] stepPhotos,
             @RequestParam("stepDescriptions") String[] stepDescriptions,
             @RequestParam("ingredientNames") String[] ingredientNames,
-            @RequestParam("ingredientsCounts") double[] ingredientsCounts
+            @RequestParam("ingredientsCounts") double[] ingredientsCounts,
+            @RequestParam(value = "ingredientUnits", required = false) String[] units
     ){
         Recipe savedRecipe = null;
         if (result.hasErrors()) {
@@ -145,7 +83,7 @@ public class RecipeController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.getAllErrors());
         }
         try {
-            savedRecipe = recipeService.createRecipe(recipe, photoFood, stepPhotos, stepDescriptions, ingredientNames, ingredientsCounts);
+            savedRecipe = recipeService.createRecipe(recipe, photoFood, stepPhotos, stepDescriptions, ingredientNames, ingredientsCounts, units);
             logger.info("Рецепт успешно сохранён: {}", savedRecipe);
         }
         catch (DataIntegrityViolationException e){
@@ -156,8 +94,6 @@ public class RecipeController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
         return ResponseEntity.ok(Map.of("id", savedRecipe.getId()));
-        //Если сломается то вернуть вот это
-//        return ResponseEntity.ok(recipe);
     }
 
 
@@ -170,7 +106,8 @@ public class RecipeController {
             @RequestParam(value = "stepPhotos", required = false) MultipartFile[] stepPhotos,
             @RequestParam(value = "stepDescriptions", required = false) String[] stepDescriptions,
             @RequestParam(value = "ingredientNames", required = false) String[] ingredientNames,
-            @RequestParam(value = "ingredientsCounts", required = false) double[] ingredientsCounts
+            @RequestParam(value = "ingredientsCounts", required = false) double[] ingredientsCounts,
+            @RequestParam(value = "ingredientUnits", required = false) String[] units
             ) {
         logger.info("Попытка изменить рецепт");
         if (result.hasErrors()) {
@@ -178,8 +115,7 @@ public class RecipeController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.getAllErrors());
         }
         try {
-            Recipe updatedRecipe = recipeService.updateRecipe(id, recipe, photoFood, stepPhotos, stepDescriptions, ingredientNames, ingredientsCounts);
-            logger.info("Рецепт успешно обновлён: {}", recipe.getName());
+            Recipe updatedRecipe = recipeService.updateRecipe(id, recipe, photoFood, stepPhotos, stepDescriptions, ingredientNames, ingredientsCounts, units);
             return ResponseEntity.ok(updatedRecipe);
             } catch (Exception e) {
                 logger.error("Внутренняя ошибка сервера: {}", e.getMessage());

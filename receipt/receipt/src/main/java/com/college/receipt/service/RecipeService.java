@@ -17,7 +17,10 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.college.receipt.controllers.RecipeController.logger;
 
@@ -36,7 +39,7 @@ public class RecipeService {
     private final RatingRepository ratingRepository;
     private final UserService userService;
 
-    public Recipe createRecipe(Recipe recipe, MultipartFile photoFood, MultipartFile[] stepPhotos, String[] stepDescriptions, String[] ingredientNames , double[] ingredientsCounts) throws IOException {
+    public Recipe createRecipe(Recipe recipe, MultipartFile photoFood, MultipartFile[] stepPhotos, String[] stepDescriptions, String[] ingredientNames , double[] ingredientsCounts, String[] units) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
         if (userName == null){
@@ -49,9 +52,14 @@ public class RecipeService {
         Recipe savedRecipe = recipeRepository.save(recipe);
         logger.info("Началась обработка рецепта:{}", recipe.getName());
         for (int i = 0; i < ingredientNames.length; i++){
+            String unitValue = "";
+            if (units != null && units.length > i) {
+                unitValue = units[i];
+            }
             Ingredients ingredient = Ingredients.builder()
                     .name(ingredientNames[i])
                     .count(ingredientsCounts[i])
+                    .unit(unitValue)
                     .recipe(savedRecipe)
                     .build();
             savedRecipe.getIngredients().add(ingredient);
@@ -90,7 +98,6 @@ public class RecipeService {
         logger.info("Рецепт {} пользователя {} успешно сохранён!", recipe.getName(), userName);
         return savedRecipe;
     }
-
     public Recipe updateRecipe(
             Long id,
             Recipe recipe,
@@ -98,19 +105,18 @@ public class RecipeService {
             MultipartFile[] stepPhotos,
             String[] stepDescriptions,
             String[] ingredientNames,
-            double[] ingredientsCounts
+            double[] ingredientsCounts,
+            String[] units
     ) throws IOException {
-        logger.info("Айди изменяемого рецепта:{}", id);
-
-        Recipe savedRecipe = recipeRepository.findById(id).orElseThrow(() -> new RuntimeException("Рецепт не найден. Айди рецепта:" + id));
+        Recipe savedRecipe = recipeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Рецепт не найден. Айди рецепта:" + id));
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUserEmail = authentication.getName();
         boolean isOwner = savedRecipe.getCreatedBy().getEmail().equals(currentUserEmail);
         boolean isAdmin = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"));
 
-        if(!isAdmin && !isOwner){
-            logger.warn("Пользователь {} неудачно попытался изменить рецепт: {}", currentUserEmail, recipe.getName());
+        if (!isAdmin && !isOwner) {
             throw new IllegalArgumentException("У пользователя недостаточно прав для редактирования рецепта");
         }
 
@@ -125,14 +131,23 @@ public class RecipeService {
         savedRecipe.setTheme(recipe.getTheme());
         savedRecipe.setDefault(false);
 
+        List<Steps> oldSteps = stepRepository.findByRecipeId(id);
+        Map<Integer, UploadedFile> oldPhotosByStep = oldSteps.stream()
+                .collect(Collectors.toMap(Steps::getStepNumber, Steps::getPhoto));
+
         ingredientRepository.deleteByRecipeId(id);
         stepRepository.deleteByRecipeId(id);
 
         if (ingredientNames != null && ingredientsCounts != null && ingredientNames.length == ingredientsCounts.length) {
             for (int i = 0; i < ingredientNames.length; i++) {
+                String unitValue = "";
+                if (units != null && units.length > i) {
+                    unitValue = units[i];
+                }
                 Ingredients ingredient = Ingredients.builder()
                         .name(ingredientNames[i])
                         .count(ingredientsCounts[i])
+                        .unit(unitValue)
                         .recipe(savedRecipe)
                         .build();
                 savedRecipe.getIngredients().add(ingredient);
@@ -143,27 +158,28 @@ public class RecipeService {
             uploadedFileService.uploadImageToDataSystem(photoFood, savedRecipe, "PHOTOFOOD");
         }
 
-        if (stepDescriptions != null && stepPhotos != null && stepDescriptions.length == stepPhotos.length) {
-            for (int j = 0; j < stepPhotos.length; j++) {
-                MultipartFile stepPhoto = stepPhotos[j];
-                String stepDescription = stepDescriptions[j];
-                Integer stepNumber = j + 1;
+        for (int j = 0; j < stepDescriptions.length; j++) {
+            MultipartFile stepPhoto = (stepPhotos != null && stepPhotos.length > j) ? stepPhotos[j] : null;
+            String stepDescription = stepDescriptions[j];
+            Integer stepNumber = j + 1;
 
-                if (!stepPhoto.isEmpty()) {
-                    UploadedFile savedFile = uploadedFileService.uploadImageToDataSystem(stepPhoto, savedRecipe, "STEPPHOTO");
-
-                    Steps step = Steps.builder()
-                            .stepNumber(stepNumber)
-                            .description(stepDescription)
-                            .recipe(savedRecipe)
-                            .photo(savedFile)
-                            .build();
-                    stepRepository.save(step);
-                }
+            UploadedFile photoEntity;
+            if (stepPhoto != null && !stepPhoto.isEmpty()) {
+                photoEntity = uploadedFileService.uploadImageToDataSystem(stepPhoto, savedRecipe, "STEPPHOTO");
+            } else {
+                photoEntity = oldPhotosByStep.get(stepNumber);
             }
+
+            Steps newStep = Steps.builder()
+                    .stepNumber(stepNumber)
+                    .description(stepDescription)
+                    .recipe(savedRecipe)
+                    .photo(photoEntity)
+                    .build();
+            stepRepository.save(newStep);
         }
+
         recipeRepository.save(savedRecipe);
-        logger.info("Рецепт {} с id {} успешно изменился",savedRecipe.getName(), savedRecipe.getId());
         return savedRecipe;
     }
 
@@ -187,10 +203,6 @@ public class RecipeService {
         List<Recipe> recipes = recipeRepository.findAll();
         System.out.println("Найдено рецептов: " + recipes.size()); // Временный вывод
         return recipes;
-    }
-
-    public Recipe updateRecipe(Recipe recipe){
-        return recipeRepository.save(recipe);
     }
 
     public List<Recipe> findByKeyword(String keyword){
@@ -225,5 +237,47 @@ public class RecipeService {
 
     public Recipe findRecipe(Long id){
         return recipeRepository.findById(id).orElseThrow(() -> new RuntimeException("Рецепт не найден"));
+    }
+
+    public ResponseEntity<List<Recipe>> getRecipes(String keyword, Integer countPortion, Integer kkal, Integer timeToCook, String nationalKitchen, String restrictions, String theme, String typeOfCook, String typeOfFood) {
+        if (keyword != null || countPortion != null || kkal != null || timeToCook != null ||
+                nationalKitchen != null || restrictions != null || theme != null ||
+                typeOfCook != null || typeOfFood != null) {
+            logger.info("Фильтрация");
+            List<Recipe> filteredRecipes = recipeRepository.findByFilter(
+                    null,
+                    countPortion,
+                    kkal,
+                    timeToCook,
+                    nationalKitchen,
+                    restrictions,
+                    theme,
+                    typeOfCook,
+                    typeOfFood
+            );
+            if (keyword != null){
+                List<Recipe> keywordRecipe = recipeRepository.findByKeyword(keyword.toLowerCase());
+                keywordRecipe = keywordRecipe.stream().filter(recipe -> !recipe.isDefault()).toList();
+                logger.info("поисковое слово:{}", keyword);
+                return ResponseEntity.ok(keywordRecipe);
+            }
+            logger.info("Применяем фильтры: countPortion={}, kkal={}, timeToCook={}, nationalKitchen={}, restrictions={}, theme={}, typeOfCook={}, typeOfFood={}", countPortion, kkal, timeToCook, nationalKitchen, restrictions, theme, typeOfCook, typeOfFood);
+            logger.info("Найдено отфильтрованных рецептов: {}", filteredRecipes.size());
+            if (filteredRecipes.isEmpty()) {
+                logger.warn("Ошибка, рецепты не найдены");
+                return ResponseEntity.badRequest().body(Collections.emptyList());
+            }
+            else{
+                logger.info("Найдено рецептов: {}", filteredRecipes.size());
+                filteredRecipes = filteredRecipes.stream().filter(recipe -> !recipe.isDefault()).toList();
+                filteredRecipes.forEach(recipe -> logger.info("Рецепт: id={}, name={}", recipe.getId(), recipe.getName()));
+                return ResponseEntity.ok(filteredRecipes);
+            }
+        }
+        else{
+            List<Recipe> recipes = recipeRepository.findAll();
+            recipes = recipes.stream().filter(recipe -> !recipe.isDefault()).toList();
+            return ResponseEntity.ok(recipes);
+        }
     }
 }

@@ -25,62 +25,11 @@ import java.util.stream.Collectors;
 public class UserProfileController {
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private UserService userService;
-
-    @Autowired
-    private RecipeRepository recipeRepository;
-
-    @Autowired
-    private RatingRepository ratingRepository;
-
-    @Autowired
-    private DietRepository dietRepository;
-
-    private static final Logger logger = LoggerFactory.getLogger(UserProfileController.class);
 
     @GetMapping("/user/profile")
     private ResponseEntity<SimplifiedUserDto> getUser(){
-        User user = userService.findAuthenticatedUser();
-        List<Recipe> recipes = recipeRepository.findByCreatedBy(user);
-        List<SimplifiedRecipeDto> recipeSummaries = recipes.stream()
-                .map(r -> {
-                    String avatar = r.getPhotos().stream()
-                            .filter(UploadedFile::isPhotoFood)
-                            .map(UploadedFile::getFilePath)
-                            .findFirst()
-                            .orElse(null);
-
-                    return new SimplifiedRecipeDto(
-                            r.getId(),
-                            r.getName(),
-                            r.getDescription(),
-                            avatar
-                    );
-                })
-                .collect(Collectors.toList());
-        List<Rating> ratings = ratingRepository.findByUser(user);
-        List<Diet> diets = dietRepository.findByUser(user);
-        List<DietDto> dietDtos = diets.stream()
-                .map(d -> {
-                    return new DietDto(
-                    d.getId(),
-                    d.getRecommendation(),
-                    d.getTerm(),
-                    d.getDateOfCreation()
-                    );
-                }
-                ).toList();
-        SimplifiedUserDto response = new SimplifiedUserDto(
-                user.getUsername(),
-                user.getEmail(),
-                recipeSummaries,
-                ratings,
-                dietDtos
-        );
-        logger.info("Запрос на получение пользователя {}", user.getUsername());
+        SimplifiedUserDto response = userService.getSimplifiedUser();
         return ResponseEntity.ok().body(response);
     }
 }

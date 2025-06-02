@@ -17,6 +17,8 @@ import java.util.List;
 @AllArgsConstructor
 public class SimplifiedUserDto {
 
+    private Long id;
+
     private String username;
 
     private String email;
@@ -26,4 +28,6 @@ public class SimplifiedUserDto {
     private List<Rating> ratings;
 
     private List<DietDto> diets;
+
+    private String role;
 }
