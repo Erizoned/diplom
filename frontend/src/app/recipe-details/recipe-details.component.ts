@@ -44,6 +44,7 @@ export class RecipeDetailsComponent implements OnInit, AfterViewInit {
   role: string = '';
   isAdmin = false;
   isOwner = false;
+  
 
   constructor(
     private route: ActivatedRoute,
@@ -61,6 +62,7 @@ export class RecipeDetailsComponent implements OnInit, AfterViewInit {
     this.axiosService.request('GET', '/api/user/profile', {})
       .then(res => {
         this.currentUsername = res.data.username;
+  
         let rolesArr: string[] = [];
         try {
           rolesArr = JSON.parse(res.data.role);
@@ -70,14 +72,20 @@ export class RecipeDetailsComponent implements OnInit, AfterViewInit {
             .split(',')
             .map((r: string) => r.trim().replace(/^"|"$/g, ''));
         }
+  
         this.role = rolesArr.join(',');
         this.isAdmin = rolesArr.includes('ADMIN');
-        this.checkOwnership();
+        console.log('[fetchCurrentUser] currentUsername:', this.currentUsername);
+        console.log('[fetchCurrentUser] rolesArr:', rolesArr, '→ isAdmin:', this.isAdmin);
+        console.log('---------------------------------------------');
       })
-      .catch(() => {});
-      console.log("Найден пользователь с именем " + this.currentUsername + "и ролью" + this.role)
+      .catch(err => {
+        console.error('[fetchCurrentUser] Ошибка при запросе профиля пользователя:', err);
+      });
+    
+    console.log("Найден пользователь с именем " + this.currentUsername + " и ролью " + this.role);
   }
-  
+    
 
 fetchRecipe() {
   if (!this.recipeId) return;
@@ -91,6 +99,7 @@ fetchRecipe() {
     this.recipe.authorUsername = data.authorUsername;
     this.comments = data.comments || [];
     this.currentRating = data.rating ? data.rating.rating : 0;
+    this.reloadRecipe();
   })
   .catch(error => {
     console.error('Ошибка при получении рецепта', error);
@@ -99,9 +108,13 @@ fetchRecipe() {
 }
 
 checkOwnership() {
-  this.isOwner = this.currentUsername === this.recipe.authorUsername;
-}
+  console.log('[checkOwnership] currentUsername:', this.currentUsername);
+  console.log('[checkOwnership] recipe.authorUsername:', this.recipe.authorUsername);
 
+  this.isOwner = (this.currentUsername === this.recipe.authorUsername);
+
+  console.log('[checkOwnership] → isOwner:', this.isOwner);
+}
 
 
   onUpdateRecipe() {
@@ -189,6 +202,7 @@ private reloadRecipe(): void {
       this.recipe.authorUsername = data.authorUsername;
       this.comments = data.comments || [];
       this.currentRating = data.rating ? data.rating.rating : 0;
+      this.checkOwnership();
     })
     .catch(error => {
       console.error('Ошибка при повторной загрузке рецепта', error);

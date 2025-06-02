@@ -192,3 +192,25 @@
 .warning{
   text-align: center;
 }
+
+.delete-button {
+  display: block;
+  margin: 40px auto 0 auto;
+  padding: 16px 38px;
+  background: linear-gradient(90deg, #f25c05 60%, #c2410c 100%);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.25rem;
+  font-weight: bold;
+  box-shadow: 0 4px 18px rgba(242, 92, 5, 0.13);
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+  letter-spacing: 0.5px;
+}
+.delete-button:hover, .delete-button:focus {
+  background: linear-gradient(90deg, #c2410c 60%, #f25c05 100%);
+  color: #fff;
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 8px 28px rgba(242, 92, 5, 0.18);
+}

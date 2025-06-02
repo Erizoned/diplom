@@ -57,19 +57,25 @@
   
   .recipe-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 15px;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
     padding: 10px;
+    margin-top: 20px;
   }
   
   .recipe-card {
     background: white;
-    border-radius: 15px;
+    border-radius: 18px;
     overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 24px rgba(140, 53, 3, 0.10), 0 1.5px 6px rgba(242, 92, 5, 0.08);
+    transition: box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     cursor: pointer;
+    animation: recipeCardAppear 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, box-shadow;
+    display: flex;
+    flex-direction: column;
+    min-height: 420px;
   }
   
   .recipe-card::before {
@@ -83,47 +89,54 @@
     opacity: 0;
     transition: opacity 0.4s ease;
     z-index: 1;
-    border-radius: 15px;
+    border-radius: 18px;
   }
   
   .recipe-card:hover {
-    transform: translateY(-10px) scale(1.02);
-    box-shadow: 0 20px 30px rgba(0,0,0,0.15);
+    transform: translateY(-10px) scale(1.025);
+    box-shadow: 0 20px 40px rgba(140, 53, 3, 0.18), 0 6px 24px rgba(242, 92, 5, 0.13);
   }
   
   .recipe-card:hover::before {
-    opacity: 0.1;
+    opacity: 0.08;
   }
   
   .recipe-card img {
     width: 100%;
-    height: 200px;
+    height: 210px;
     object-fit: cover;
-    transition: transform 0.6s ease;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    border-bottom: 2px solid var(--orange);
+    background: var(--beige);
   }
   
   .recipe-card:hover img {
-    transform: scale(1.1);
+    transform: scale(1.08);
   }
   
   .recipe-details {
-    padding: 20px;
+    padding: 22px 20px 18px 20px;
     position: relative;
     z-index: 2;
     background: white;
     transition: transform 0.3s ease;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
   
   .recipe-card:hover .recipe-details {
-    transform: translateY(-5px);
+    transform: translateY(-4px);
   }
   
   .recipe-title {
     color: var(--brown);
-    font-size: 1.2rem;
+    font-size: 1.25rem;
     font-weight: bold;
     margin-bottom: 10px;
     transition: color 0.3s ease;
+    letter-spacing: 0.5px;
   }
   
   .recipe-card:hover .recipe-title {
@@ -139,20 +152,22 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
     transition: color 0.3s ease;
+    font-size: 1rem;
   }
   
   .recipe-time {
     color: var(--olive-green);
     font-weight: bold;
-    font-size: 0.9rem;
+    font-size: 1rem;
     display: flex;
     align-items: center;
     gap: 5px;
     transition: transform 0.3s ease;
+    margin-top: auto;
   }
   
   .recipe-card:hover .recipe-time {
-    transform: scale(1.05);
+    transform: scale(1.07);
   }
   
   @keyframes recipeCardAppear {
@@ -166,14 +181,31 @@
     }
   }
   
-  @keyframes newRecipePulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
+  @media (max-width: 900px) {
+    .main-container {
+      max-width: 98vw;
+      margin: 20px 1vw;
+      padding: 10px;
+    }
+    .recipe-container {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
   
-  .recipe-card.new-recipe {
-    animation: newRecipePulse 2s infinite;
+  @media (max-width: 600px) {
+    .recipe-container {
+      grid-template-columns: 1fr;
+    }
+    .recipe-card {
+      min-height: 320px;
+    }
+  }
+  
+  .recipe-card a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    height: 100%;
   }
   
   .filter-container {
@@ -251,23 +283,67 @@
     background: linear-gradient(135deg, var(--gradient-end), var(--gradient-start));
   }
   
-  .recipe-card a {
-    text-decoration: none;
-    color: inherit;
-    display: block;
-  }
-  
   .actions-container {
     margin: 20px 0;
     text-align: left;
   }
   
+  .ai-panel {
+    display: flex;
+    gap: 18px;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(90deg, var(--gradient-start) 0%, var(--gradient-middle) 60%, var(--gradient-end) 100%);
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(242, 92, 5, 0.13), 0 1.5px 6px rgba(140, 53, 3, 0.08);
+    padding: 28px 18px 22px 18px;
+    margin: 32px 0 32px 0;
+    position: relative;
+    animation: aiPanelAppear 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  @keyframes aiPanelAppear {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
   .gemini-button {
-      padding: 8px 14px;
-      font-weight: bold;
-      background: #f97316;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
+    padding: 16px 28px;
+    font-weight: bold;
+    background: #fff;
+    color: var(--orange);
+    border: 2px solid var(--orange);
+    border-radius: 12px;
+    font-size: 1.15rem;
+    box-shadow: 0 2px 10px rgba(242, 92, 5, 0.08);
+    cursor: pointer;
+    transition: background 0.3s, color 0.3s, border-color 0.3s, transform 0.2s, box-shadow 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: 0.5px;
+    outline: none;
+  }
+  
+  .gemini-button:hover, .gemini-button:focus {
+    background: linear-gradient(90deg, var(--gradient-end) 0%, var(--gradient-middle) 60%, var(--gradient-start) 100%);
+    color: #fff;
+    border-color: var(--brown);
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 6px 20px rgba(242, 92, 5, 0.18);
+  }
+  
+  .gemini-button .icon {
+    font-size: 1.3em;
+    margin-right: 6px;
+    display: inline-flex;
+    align-items: center;
+  }
+  
+  @media (max-width: 900px) {
+    .ai-panel {
+      flex-direction: column;
+      gap: 14px;
+      padding: 18px 6vw;
+    }
   }

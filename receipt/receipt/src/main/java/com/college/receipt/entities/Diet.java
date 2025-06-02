@@ -1,6 +1,8 @@
 package com.college.receipt.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,11 +16,11 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class Diet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
 
     @ManyToMany
     @JoinTable(
@@ -26,6 +28,7 @@ public class Diet {
             joinColumns = @JoinColumn(name = "diet_id"),
             inverseJoinColumns = @JoinColumn(name = "recipe_id")
     )
+    @Size(max = 3, message = "Можно указать не более 3 рецептов для завтрака")
     private List<Recipe> recipesForBreakfast;
 
     @ManyToMany
@@ -34,6 +37,7 @@ public class Diet {
             joinColumns = @JoinColumn(name = "diet_id"),
             inverseJoinColumns = @JoinColumn(name = "recipe_id")
     )
+    @Size(max = 3, message = "Можно указать не более 3 рецептов для обеда")
     private List<Recipe> recipesForLunch;
 
     @ManyToMany
@@ -42,12 +46,15 @@ public class Diet {
             joinColumns = @JoinColumn(name = "diet_id"),
             inverseJoinColumns = @JoinColumn(name = "recipe_id")
     )
+    @Size(max = 3, message = "Можно указать не более 3 рецептов для ужина")
     private List<Recipe> recipesForDiner;
 
     @Column(length = 1000)
     private String recommendation;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "diets" })
     private User user;
 
     private LocalDate term;

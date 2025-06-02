@@ -140,7 +140,8 @@ html, body {
 body {
   font-family: 'Arial', sans-serif;
   background: linear-gradient(135deg, var(--gradient-start), var(--gradient-middle), var(--gradient-end));
-  min-height: 100vh;
+  min-height: 100%;
+  background-attachment: fixed;
 }
 
 header {

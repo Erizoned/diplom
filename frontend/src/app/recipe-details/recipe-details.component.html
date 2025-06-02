@@ -76,7 +76,6 @@
     <div class="details">
       <p><strong>Тема блюда:</strong> {{ recipe.theme }}</p>
       <p><strong>Тип блюда:</strong> {{ recipe.typeOfFood }}</p>
-      <p><strong>Национальная кухня:</strong> {{ recipe.nationalKitchen }}</p>
       <p><strong>Тип приготовления:</strong> {{ recipe.typeOfCook }}</p>
       <p><strong>Ограничения:</strong> {{ recipe.restrictions }}</p>
       <p><strong>Количество порций:</strong> {{ recipe.countPortion }}</p>
@@ -88,17 +87,20 @@
     <div class="update-recipe-container">
       <h1>Обновить рецепт</h1>
       <form (ngSubmit)="onUpdateRecipe()">
-    <button class="delete-button" (click)="onDeleteRecipe()">Удалить рецепт</button>
-    <button class="button" (click)="onUpdateRecipe()">Обновить рецепт</button>
-    <div *ngIf="errorMessage" style="color: red; font-weight: bold; margin-bottom: 20px;">
-      <p>{{ errorMessage }}</p>
+        <div *ngIf="isAdmin || isOwner">
+          <button type="button" class="delete-button" (click)="onDeleteRecipe()">
+            Удалить рецепт
+          </button>
+          <button type="submit" class="button">
+            Обновить рецепт
+          </button>
+        </div>
+        <div *ngIf="errorMessage" style="color: red; font-weight: bold; margin-bottom: 20px;">
+          <p>{{ errorMessage }}</p>
+        </div>
+      </form>
     </div>
-    <div *ngIf="isAdmin || isOwner">
-      <button type="button" (click)="onDeleteRecipe()">Удалить рецепт</button>
-      <button type="submit">Обновить рецепт</button>
-    </div>
-  </form>
-</div>
+    
     <!-- Секция комментариев -->
     <h2>Комментарии:</h2>
     <div class="comment-form">

@@ -40,26 +40,51 @@ interface Diet {
   styleUrl: './diet-page.component.css'
 })
 export class DietPageComponent implements OnInit {
+onDeleteDiet() {
+  const id = this.route.snapshot.paramMap.get('id');
+
+  this.axiosService.request("DELETE", "/api/diet/delete/" + id, null)
+  .then(response => {
+    if (response.status === 200) {
+        alert("Диета успешно удалена.");
+    }
+})
+.catch(error => {
+  if (error.response && error.response.status === 403) {
+      alert(error.response.data); // "У вас недостаточно прав для удаления рецепта"
+  } else if (error.response && error.response.status === 404) {
+      alert(error.response.data); // "Рецепт с id: X не найден"
+  } else {
+      alert("Не удалось удалить диету. Пожалуйста, попробуйте снова.");
+  }
+});
+}
+
   loading: boolean = false;
   error: string = '';
   recipeId: number | null = null;
+  loadingMap: { [recipeId: number]: boolean } = {};
 
-onCreateRecipeFromDefault(prompt: string) {
-  if (!prompt.trim()) return;
-  this.loading = true;
-  this.error = '';
-
-  this.axiosService.request('POST', '/api/script/create_recipe', { prompt: prompt })
-    .then((response) => {
-      this.recipeId = response.data;
-      console.log("Рецепт: " + this.recipeId);
-    })
-    .catch((error) => {
-      this.error = 'Ошибка при обработке промпта';
-      console.error(error);
-      this.loading = false;
-    });
-}
+  onCreateRecipeFromDefault(prompt: string, recipeId: number) {
+    if (!prompt.trim()) return;
+    this.loadingMap[recipeId] = true;
+    this.error = '';
+  
+    this.axiosService.request('POST', '/api/script/create_recipe', { prompt: prompt })
+      .then((response) => {
+        this.recipeId = response.data;
+        window.location.reload();
+        console.log("Рецепт: " + this.recipeId);
+      })
+      .catch((error) => {
+        this.error = 'Ошибка при обработке промпта';
+        console.error(error);
+      })
+      .finally(() => {
+        this.loadingMap[recipeId] = false;
+      });
+  }
+  
   diet: Diet | null = null;
 
   constructor(

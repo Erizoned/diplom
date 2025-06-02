@@ -38,9 +38,12 @@
         </a>
         <div *ngIf="recipe.default" class="warning">
           <p>Рецепт отсутствует в базе данных.</p>
-        <button class="gemini-button" (click)="onCreateRecipeFromDefault(recipe.name)" [disabled]="loading">
-          {{ loading ? 'Обработка...' : 'Создать рецепт' }}
-        </button>
+          <button class="gemini-button"
+          (click)="onCreateRecipeFromDefault(recipe.name, recipe.id)"
+          [disabled]="loadingMap[recipe.id]">
+    {{ loadingMap[recipe.id] ? 'Обработка...' : 'Создать рецепт' }}
+  </button>
+  
       </div>
       </div>
     </div>
@@ -67,9 +70,12 @@
         </a>
         <div *ngIf="recipe.default" class="warning">
           <p>Рецепт отсутствует в базе данных.</p>
-        <button class="gemini-button" (click)="onCreateRecipeFromDefault(recipe.name)" [disabled]="loading">
-          {{ loading ? 'Обработка...' : 'Создать рецепт' }}
-        </button>
+          <button class="gemini-button"
+          (click)="onCreateRecipeFromDefault(recipe.name, recipe.id)"
+          [disabled]="loadingMap[recipe.id]">
+    {{ loadingMap[recipe.id] ? 'Обработка...' : 'Создать рецепт' }}
+  </button>
+  
       </div>
       </div>
     </div>
@@ -96,15 +102,19 @@
         </a>
         <div *ngIf="recipe.default" class="warning">
           <p>Рецепт отсутствует в базе данных.</p>
-        <button class="gemini-button" (click)="onCreateRecipeFromDefault(recipe.name)" [disabled]="loading">
-          {{ loading ? 'Обработка...' : 'Создать рецепт' }}
-        </button>
+          <button class="gemini-button"
+          (click)="onCreateRecipeFromDefault(recipe.name, recipe.id)"
+          [disabled]="loadingMap[recipe.id]">
+    {{ loadingMap[recipe.id] ? 'Обработка...' : 'Создать рецепт' }}
+  </button>
       </div>
       </div>
     </div>
   </div>
 </div>
-
+<button type="button" class="delete-button" (click)="onDeleteDiet()">
+  Удалить диету
+</button>
 <div class="loading" *ngIf="!diet">
   <p>Загрузка диеты...</p>
 </div>

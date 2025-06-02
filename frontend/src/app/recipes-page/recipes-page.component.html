@@ -85,18 +85,17 @@
     </a>
   </div>
 
-  <button (click)="openGemini()" class="gemini-button">
-    Поиск рецептов с помощью ИИ
-  </button>
-
-  <button (click)="openRecipeCreator()" class="gemini-button">
-    Создание ИИ рецепта.
-  </button>
-  
-
-  <button (click)="openDietCreator()" class="gemini-button">
-    Создание диеты.
-  </button>
+  <div class="ai-panel">
+    <button (click)="openGemini()" class="gemini-button">
+      <span class="icon">🤖</span> Поиск рецептов с помощью ИИ
+    </button>
+    <button (click)="openRecipeCreator()" class="gemini-button">
+      <span class="icon">✨</span> Создание ИИ рецепта
+    </button>
+    <button (click)="openDietCreator()" class="gemini-button">
+      <span class="icon">🥗</span> Создание диеты
+    </button>
+  </div>
 
   <div class="recipe-container">
     <div *ngFor="let recipe of recipes; let i = index" class="recipe-card" [ngClass]="{'new-recipe': recipe.new}">

@@ -1,50 +1,49 @@
-import { Component, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { MatDialog } from '@angular/material/dialog';
+import { Component } from '@angular/core';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+import { AxiosService } from '../axios.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AxiosService } from '../axios.service';
 
 @Component({
   selector: 'app-gemini-search',
   standalone: true,
   templateUrl: './create-diet.component.html',
-  imports: [CommonModule, FormsModule, MatDialogModule],
+  imports: [CommonModule, FormsModule, MatDialogModule]
 })
 export class CreateDietComponent {
   prompt: string = '';
-  recipes: any[] = [];
   loading: boolean = false;
   error: string = '';
+  recipes: any[] = []; 
 
   constructor(
     private dialogRef: MatDialogRef<CreateDietComponent>,
     private axiosService: AxiosService,
-    private matDialog: MatDialog
+    private router: Router
   ) {}
 
-  ngOnInit() {
-    console.log('Диалог открыт');
-  }
-  
+  ngOnInit() {}
+
   sendPrompt() {
     if (!this.prompt.trim()) return;
     this.loading = true;
     this.error = '';
-    this.recipes = [];
-  
-    this.axiosService.request('POST', '/api/script/diet', { prompt: this.prompt })
+
+    this.axiosService
+      .request('POST', '/api/script/diet', { prompt: this.prompt })
       .then((response) => {
-        console.log(this.recipes);
-        this.dialogRef.close(response.data); 
+        const createdDiet = response.data;
+        const newDietId = createdDiet.id;
+        this.dialogRef.close(createdDiet);
+        this.router.navigate(['/diet', newDietId]);
+        this.loading = false;
       })
-      .catch((error) => {
-        this.error = 'Ошибка при обработке промпта';
-        console.error(error);
+      .catch(() => {
+        this.error = 'Ошибка при создании диеты';
         this.loading = false;
       });
   }
-  
 
   close() {
     this.dialogRef.close();

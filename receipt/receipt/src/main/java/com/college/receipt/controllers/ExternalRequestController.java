@@ -176,52 +176,44 @@ public class ExternalRequestController {
         return ResponseEntity.badRequest().contentType(MediaType.valueOf("text/plain; charset=UTF-8")).body("Пользователь не авторизован");
     }
 
+
     @PostMapping("/diet")
     public ResponseEntity<?> createDiet(@RequestBody Map<String, String> request) throws IOException {
         String prompt = request.get("prompt");
-        logger.info("Получен промпт: {}", prompt);
-        String scriptPath = Paths.get("scripts","diet.py").toAbsolutePath().toString();
+        String scriptPath = Paths.get("scripts", "diet.py").toAbsolutePath().toString();
         String pythonPath = Paths.get("venv", "Scripts", "python.exe").toAbsolutePath().toString();
-        ProcessBuilder pb = new ProcessBuilder(
-                pythonPath, scriptPath, prompt
-        );
+
+        ProcessBuilder pb = new ProcessBuilder(pythonPath, scriptPath, prompt);
         pb.redirectErrorStream(true);
         Process process = pb.start();
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         StringBuilder response = new StringBuilder();
         String line;
-        while ((line = reader.readLine()) != null){
-            logger.info("script: {}", line);
+        while ((line = reader.readLine()) != null) {
             response.append(line);
         }
 
         String answer = response.toString();
-
         String[] parts = answer.split("!");
-        if (parts.length < 2){
-            logger.error("Ошибка при создании рекомендаций. В ответе отсутствует восклицательный знак.");
-            return ResponseEntity.badRequest().contentType(MediaType.valueOf("text/plain; charset=UTF-8")).body("Неверный формат ответа от скрипта.");
+        if (parts.length < 2) {
+            return ResponseEntity.badRequest()
+                    .contentType(MediaType.valueOf("text/plain; charset=UTF-8"))
+                    .body("Неверный формат ответа от скрипта.");
         }
 
-        List<String> listOfRecipes = Arrays.stream(answer.split("!")[0].toLowerCase().split(",")).map(String::trim).filter(s ->!s.isEmpty()).toList();
+        List<String> allKeys = Arrays.stream(parts[0].toLowerCase().split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList());
 
-        List<String> listOfRecipesBreakfast = listOfRecipes.stream().limit(3).toList();
+        List<String> keysBreakfast = allKeys.stream().limit(3).collect(Collectors.toList());
+        List<String> keysLunch     = allKeys.stream().skip(3).limit(3).collect(Collectors.toList());
+        List<String> keysDinner    = allKeys.stream().skip(6).limit(3).collect(Collectors.toList());
 
-        List<String> listOfRecipesLunch = listOfRecipes.stream().skip(3).limit(3).toList();
+        String recommendation = parts[1];
 
-        List<String> listOfRecipesDiner = listOfRecipes.stream().skip(6).limit(3).toList();
-
-        String recommendation = answer.split("!")[1];
-
-        logger.info("Нейросеть предложила следующие рецепты на завтрак: {}, обед: {} и ужин: {}, с рекомендацией {}", listOfRecipesBreakfast, listOfRecipesLunch, listOfRecipesDiner, recommendation);
-
-        List<Recipe> recipes = listOfRecipes.stream().map(recipeRepository::findByKeyword).filter(Objects::nonNull).flatMap(List::stream).toList();
-
-        logger.info("Найдено {} рецептов для диеты: {}", recipes.size() , recipes);
-
-        Diet diet = dietService.createDiet(listOfRecipesBreakfast, listOfRecipesLunch, listOfRecipesDiner, recommendation);
-
+        Diet diet = dietService.createDiet(keysBreakfast, keysLunch, keysDinner, recommendation);
         return ResponseEntity.ok().body(diet);
     }
 

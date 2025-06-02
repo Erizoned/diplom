@@ -35,38 +35,72 @@ public class DietService {
     public void updateRecipeInDiet(Long recipeId, Long newRecipeId){
         Recipe oldRecipe = recipeRepository.findById(recipeId).orElseThrow(() -> new RuntimeException("Рецепт не найден"));
         Recipe newRecipe = recipeRepository.findById(newRecipeId).orElseThrow(() -> new RuntimeException("Рецепт не найден"));
-        Diet diet = dietRepository.findByRecipe(oldRecipe);
+        List<Diet> diets = dietRepository
+                .findAllByRecipesForBreakfastContainsOrRecipesForLunchContainsOrRecipesForDinerContains(
+                        oldRecipe, oldRecipe, oldRecipe
+                );
         logger.info("Обновление рецепта {} с id {} на id {}", oldRecipe.getName(), oldRecipe.getId(), newRecipe.getId());
-        boolean found = false;
-
-        if (diet.getRecipesForBreakfast().contains(oldRecipe)) {
-            diet.getRecipesForBreakfast().remove(oldRecipe);
-            diet.getRecipesForBreakfast().add(newRecipe);
-            found = true;
+        if (diets.isEmpty()) {
+            throw new RuntimeException("Рецепт не найден ни в одной диете");
         }
 
-        if (diet.getRecipesForLunch().contains(oldRecipe)) {
-            diet.getRecipesForLunch().remove(oldRecipe);
-            diet.getRecipesForLunch().add(newRecipe);
-            found = true;
-        }
+        for (Diet diet : diets) {
+            boolean replaced = false;
 
-        if (diet.getRecipesForDiner().contains(oldRecipe)) {
-            diet.getRecipesForDiner().remove(oldRecipe);
-            diet.getRecipesForDiner().add(newRecipe);
-            found = true;
-        }
+            if (diet.getRecipesForBreakfast().remove(oldRecipe)) {
+                diet.getRecipesForBreakfast().add(newRecipe);
+                replaced = true;
+            }
+            if (diet.getRecipesForLunch().remove(oldRecipe)) {
+                diet.getRecipesForLunch().add(newRecipe);
+                replaced = true;
+            }
+            if (diet.getRecipesForDiner().remove(oldRecipe)) {
+                diet.getRecipesForDiner().add(newRecipe);
+                replaced = true;
+            }
 
-        if (!found) {
-            throw new RuntimeException("Рецепт не найден ни в одном из приёмов пищи");
+            if (replaced) {
+                dietRepository.save(diet);
+            }
         }
-
         recipeRepository.delete(oldRecipe);
-        dietRepository.save(diet);
+    }
+    public Diet createDiet(List<String> recipeKeysB, List<String> recipeKeysL, List<String> recipeKeysD, String recommendation) {
+        List<Recipe> recipeListBreakfast = searchRecipeInList(recipeKeysB)
+                .stream()
+                .distinct()
+                .limit(3)
+                .collect(Collectors.toList());
+
+        List<Recipe> recipeListLunch = searchRecipeInList(recipeKeysL)
+                .stream()
+                .distinct()
+                .limit(3)
+                .collect(Collectors.toList());
+
+        List<Recipe> recipeListDinner = searchRecipeInList(recipeKeysD)
+                .stream()
+                .distinct()
+                .limit(3)
+                .collect(Collectors.toList());
+
+        User user = userService.findAuthenticatedUser();
+
+        Diet diet = Diet.builder()
+                .recipesForBreakfast(recipeListBreakfast)
+                .recipesForLunch(recipeListLunch)
+                .recipesForDiner(recipeListDinner)
+                .recommendation(recommendation)
+                .user(user)
+                .term(LocalDate.now().plusDays(30))
+                .dateOfCreation(LocalDate.now())
+                .build();
+
+        return dietRepository.save(diet);
     }
 
-    public List<Recipe> searchRecipeInList(List<String> recipeList){
-
+    public List<Recipe> searchRecipeInList(List<String> recipeList) {
         return recipeList.stream().flatMap(keyword -> {
             List<Recipe> found = recipeRepository.findByKeyword(keyword);
             if (found == null || found.isEmpty()) {
@@ -76,34 +110,11 @@ public class DietService {
                 r.setDescription("default");
                 r.setTheme("default");
                 r.setDefault(true);
-
                 Recipe saved = recipeRepository.save(r);
                 return Stream.of(saved);
-            }
-            else{
+            } else {
                 return found.stream();
             }
-        }).toList();
-    }
-
-    public Diet createDiet(List<String> recipeListB, List<String> recipeListL, List<String> recipeListD, String rec){
-
-        List<Recipe> recipeListBreakfast = searchRecipeInList(recipeListB);
-        List<Recipe> recipeListLunch = searchRecipeInList(recipeListL);
-        List<Recipe> recipeListDinner = searchRecipeInList(recipeListD);
-
-        User user = userService.findAuthenticatedUser();
-        Diet diet = Diet.builder()
-                .recipesForBreakfast(recipeListBreakfast)
-                .recipesForLunch(recipeListLunch)
-                .recipesForDiner(recipeListDinner)
-                .recommendation(rec)
-                .user(user)
-                .term(LocalDate.now().plusDays(30))
-                .dateOfCreation(LocalDate.now())
-                .build();
-
-        logger.info("Диета успешно создана: {}, {}, {}", diet.getRecipesForBreakfast(), diet.getRecipesForLunch(), diet.getRecipesForDiner());
-        return dietRepository.save(diet);
+        }).collect(Collectors.toList());
     }
 }

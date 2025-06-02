@@ -133,6 +133,7 @@ def post_recipe(recipe: dict):
         "stepDescriptions": [st["description"] for st in recipe.get("steps", [])],
         "ingredientNames": [ing["name"] for ing in recipe.get("ingredients", [])],
         "ingredientsCounts": [str(ing["count"]) for ing in recipe.get("ingredients", [])],
+        "ingredientUnits": [str(ing["unit"]) for ing in recipe.get("ingredients", [])],
     }
     headers = {"Authorization": f"Bearer {os.getenv('JWT_TOKEN')}"}
     print(">>> files:", [f[0] for f in files])
