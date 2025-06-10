@@ -84,6 +84,19 @@ onDeleteDiet() {
         this.loadingMap[recipeId] = false;
       });
   }
+
+  onDeleteRecipe(recipeId: number, recipeName: string, event: MouseEvent) {
+    event.stopPropagation();
+    event.preventDefault();
+    const body = { recipeName };
+    this.axiosService.request('POST', `/api/script/diet/default/${recipeId}`, body)
+      .then(() => {
+        window.location.reload();
+      })
+      .catch(() => {
+        alert('Ошибка при удалении рецепта');
+      });
+  }
   
   diet: Diet | null = null;
 

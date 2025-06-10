@@ -60,4 +60,19 @@ public class Diet {
     private LocalDate term;
 
     private LocalDate dateOfCreation;
+
+
+    public String getRecipeRoleInDiet(Recipe recipe, Diet diet){
+        if(diet.getRecipesForBreakfast().contains(recipe)){
+            return "завтрак";
+        }
+        if(diet.getRecipesForLunch().contains(recipe)){
+            return "обед";
+        }
+        if (diet.getRecipesForDiner().contains(recipe)){
+            return "ужин";
+        }
+        return "Не найдено";
+    }
 }
+

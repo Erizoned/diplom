@@ -9,6 +9,34 @@ from google.genai import types
 import json
 import textwrap
 from deep_translator import GoogleTranslator
+from pydantic import BaseModel
+from typing import List
+
+class Ingredient(BaseModel):
+    name: str
+    count: int
+    unit: str
+
+class Step(BaseModel):
+    stepNumber: int
+    description: str
+
+class RecipeMeta(BaseModel):
+    name: str
+    description: str
+    kkal: int
+    countPortion: int
+    restrictions: str
+    nationalKitchen: str
+    theme: str
+    timeToCook: int
+    typeOfCook: str
+    typeOfFood: str
+
+class FullRecipe(BaseModel):
+    recipe: RecipeMeta
+    ingredients: List[Ingredient]
+    steps: List[Step]
 
 # Настройка переводчика и клиента GenAI
 translator = GoogleTranslator(source='auto', target='en')
@@ -29,31 +57,31 @@ if not JWT_TOKEN:
 
 urlForCreation = "http://localhost:8081/api/create_recipe"
 
-# Вспомогательная функция для блоков Markdown
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
-# Генерация JSON-рецепта
 def gen_recipe(prompt_text: str) -> dict:
     server_prompt = (
         f"Пользователь сказал: {prompt_text}. "
         "Создай JSON рецепта по этому названию. Ты должен указать: "
-        "(ingredients — список объектов {name, count, unit}, unit - это (гр., мл., шт.), то есть единица измерения ингредиента(например, Молоко - 100 мл, Мясо - 10 гр. (гр (грамм) и мл(миллилитры) в данном случае являются Unit)). ОБЯЗАТЕЛЬНО ДОБАВЛЯЙ unit), "
-        "steps — список объектов {stepNumber, description}), "
+        "(ingredients — список объектов {name, count, unit}, unit - это (гр., мл., шт.)), "
+        "steps — список объектов {stepNumber, description}, "
         "и внутри recipe: name, description, kkal, count_portion, restrictions, "
         "national_kitchen, theme, time_to_cook, type_of_cook, type_of_food. "
         "Все числовые поля — integer. Поля с пробелами оформляй в camelCase. Все поля типа type_of_cook, type_of_food,  national_kitchen и так далее должны быть на русском"
-        "Strictly respond with raw JSON only, no markdown code fences or backticks."
+        "Strictly respond with raw JSON only."
+        "Ни в коем случае не создавай не существующие рецепты. Создавай только то, что может быть приготовлено в реальной жизни и не противеречит логике(например, свинные крылышки). Если пользователь попросил создать рецепт чего-то запрещённого, опасного или несуществующего, то просто возвращай null"
     )
+
     response = client.models.generate_content(
         model="gemini-1.5-flash",
-        contents=server_prompt
+        contents=server_prompt,
+        config={
+            "response_mime_type": "application/json",
+            "response_schema": FullRecipe,  
+        }
     )
-    try:
-        return json.loads(response.text)
-    except json.JSONDecodeError as e:
-        print("Failed to parse JSON:", e)
-        print("Response was:", response.text)
-        sys.exit(1)
+
+    return response.parsed.model_dump()
 
 def sanitize_filename(name: str) -> str:
     return re.sub(r'[<>:"/\\|?*]', '', name.replace(' ', '_'))[:100]

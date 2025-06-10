@@ -66,6 +66,7 @@ public class DietService {
         }
         recipeRepository.delete(oldRecipe);
     }
+    
     public Diet createDiet(List<String> recipeKeysB, List<String> recipeKeysL, List<String> recipeKeysD, String recommendation) {
         List<Recipe> recipeListBreakfast = searchRecipeInList(recipeKeysB)
                 .stream()
@@ -105,16 +106,45 @@ public class DietService {
             List<Recipe> found = recipeRepository.findByKeyword(keyword);
             if (found == null || found.isEmpty()) {
                 logger.info("Рецепт из списка диеты не найден, создаётся заглушка...");
-                Recipe r = new Recipe();
-                r.setName(keyword);
-                r.setDescription("default");
-                r.setTheme("default");
-                r.setDefault(true);
-                Recipe saved = recipeRepository.save(r);
+                Recipe saved = createDefaultRecipe(keyword);
                 return Stream.of(saved);
             } else {
                 return found.stream();
             }
         }).collect(Collectors.toList());
+    }
+
+    public Recipe createDefaultRecipe(String name){
+        Recipe r = new Recipe();
+        r.setName(name);
+        r.setDescription("default");
+        r.setTheme("default");
+        r.setDefault(true);
+        return recipeRepository.save(r);
+    }
+
+    public void changeDefaultRecipe(Long recipeId, String name) {
+        Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() -> new RuntimeException("Рецепт не найден"));
+        Diet diet = dietRepository.findByRecipe(recipe);
+        String recipeRole = diet.getRecipeRoleInDiet(recipe, diet);
+        Recipe newRecipe = createDefaultRecipe(name);
+        switch (recipeRole){
+            case "завтрак" -> {
+                diet.getRecipesForBreakfast().remove(recipe);
+                diet.getRecipesForBreakfast().add(newRecipe);
+            }
+            case "обед" -> {
+                diet.getRecipesForLunch().remove(recipe);
+                diet.getRecipesForLunch().add(newRecipe);
+            }
+            case "ужин" -> {
+                diet.getRecipesForDiner().remove(recipe);
+                diet.getRecipesForDiner().add(newRecipe);
+            }
+            default -> logger.error("Рецепт не существует ни в одном из рационов диеты");
+        }
+        recipeRepository.delete(recipe);
+        dietRepository.save(diet);
+        logger.info("Рецепт успешно заменён");
     }
 }

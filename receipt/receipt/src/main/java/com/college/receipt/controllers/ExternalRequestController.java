@@ -5,9 +5,11 @@ import com.college.receipt.entities.Diet;
 import com.college.receipt.entities.Ingredients;
 import com.college.receipt.entities.Recipe;
 import com.college.receipt.entities.UploadedFile;
+import com.college.receipt.repositories.DietRepository;
 import com.college.receipt.repositories.IngredientRepository;
 import com.college.receipt.repositories.RecipeRepository;
 import com.college.receipt.service.DietService;
+import com.college.receipt.service.GeminiService;
 import com.college.receipt.service.RecipeService;
 import com.college.receipt.service.UploadedFileService;
 import com.college.receipt.service.User.UserService;
@@ -42,6 +44,9 @@ public class ExternalRequestController {
     private static final Logger logger = LoggerFactory.getLogger(ExternalRequestController.class);
 
     @Autowired
+    private DietRepository dietRepository;
+
+    @Autowired
     private RecipeRepository recipeRepository;
 
     @Autowired
@@ -58,6 +63,9 @@ public class ExternalRequestController {
 
     @Autowired
     private UploadedFileService uploadedFileService;
+
+    @Autowired
+    private GeminiService geminiService;
 
     @PostMapping("/show_image")
     public ResponseEntity<?> showGeneratedImage(@RequestParam("image") MultipartFile file) throws IOException {
@@ -117,28 +125,7 @@ public class ExternalRequestController {
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String jwtToken = authHeader.substring(7);
-            String scriptPath = Paths.get("scripts", "recipeCreator.py").toAbsolutePath().toString();
-            String pythonPath = Paths.get("venv", "Scripts", "python.exe").toAbsolutePath().toString();
-            ProcessBuilder pb = new ProcessBuilder(
-                    pythonPath, scriptPath, prompt
-            );
-            Map<String, String> env = pb.environment();
-            env.put("UNSPLASH_ACCESS_KEY", unsplashKey);
-            env.put("GOOGLE_API_KEY", googleKey);
-            env.put("HF_TOKEN", hfKey);
-            env.put("JWT_TOKEN", jwtToken);
-            pb.redirectErrorStream(true);
-            Process process = pb.start();
-            StringBuilder out = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8)
-            )) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    logger.info("script: {}", line);
-                    out.append(line).append("\n");
-                }
-            }
+            StringBuilder out = geminiService.startScript(prompt, "recipeCreator.py", null, jwtToken);
             Pattern pattern = Pattern.compile("ID[:\\s]+(\\d+)");
             Matcher matcher  = pattern.matcher(out);
             Long recipeId = null;
@@ -149,24 +136,11 @@ public class ExternalRequestController {
             else {
                 logger.error("Айди рецепта не найден!");
             }
-
-            int exitCode;
-            try {
-                exitCode = process.waitFor();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                logger.error("Задача была прервана во время исполнения скрипта:", e);
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(MediaType.valueOf("text/plain; charset=UTF-8")).body("Скрипт прерван");
-            }
-            if (exitCode != 0) {
-                logger.error("Скрипт питона завершился с кодом {}", exitCode);
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(MediaType.valueOf("text/plain; charset=UTF-8")).body("Ошибка скрипта, код ошибки: " + exitCode);
-            }
             if (recipeId != null){
                 Recipe newRecipe = recipeRepository.findById(recipeId).orElseThrow(() -> new RuntimeException("Рецепт не найден"));
                 List<Recipe> oldRecipeList = recipeRepository.findByName(newRecipe.getName());
                 Recipe oldRecipe = oldRecipeList.stream().min(Comparator.comparing(Recipe::getId)).orElse(null);
-                if (oldRecipe != null){
+                if (oldRecipe != null && !Objects.equals(oldRecipe.getId(), recipeId)){
                     logger.info("Старый рецепт найден. Замена на новый.");
                     dietService.updateRecipeInDiet(oldRecipe.getId(), recipeId);
                 }
@@ -180,20 +154,7 @@ public class ExternalRequestController {
     @PostMapping("/diet")
     public ResponseEntity<?> createDiet(@RequestBody Map<String, String> request) throws IOException {
         String prompt = request.get("prompt");
-        String scriptPath = Paths.get("scripts", "diet.py").toAbsolutePath().toString();
-        String pythonPath = Paths.get("venv", "Scripts", "python.exe").toAbsolutePath().toString();
-
-        ProcessBuilder pb = new ProcessBuilder(pythonPath, scriptPath, prompt);
-        pb.redirectErrorStream(true);
-        Process process = pb.start();
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        StringBuilder response = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            response.append(line);
-        }
-
+        StringBuilder response = geminiService.startScript(prompt, "diet.py", null, null);
         String answer = response.toString();
         String[] parts = answer.split("!");
         if (parts.length < 2) {
@@ -279,6 +240,17 @@ public class ExternalRequestController {
         }catch (Exception e){
             logger.error("Ошибка при разборе JSON или фильтрации: ", e);
             return ResponseEntity.badRequest().body("Ошибка парсинга или фильтрации");
+        }
+    }
+
+    @PostMapping("/diet/default/{id}")
+    public void createNewDefaultRecipe(@PathVariable("id") Long id,@RequestBody Map<String, String> prompt, HttpServletRequest request) throws IOException {
+        String recipeName = prompt.get("recipeName");
+        logger.info("Получен промпт: {}. Создаётся новый дефолтный рецепт для диеты", recipeName);
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String jwtToken = authHeader.substring(7);
+            geminiService.startScript(recipeName, "dietRecipes.py", id, jwtToken);
         }
     }
 }

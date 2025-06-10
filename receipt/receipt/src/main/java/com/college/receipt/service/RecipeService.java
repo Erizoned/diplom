@@ -98,6 +98,7 @@ public class RecipeService {
         logger.info("Рецепт {} пользователя {} успешно сохранён!", recipe.getName(), userName);
         return savedRecipe;
     }
+
     public Recipe updateRecipe(
             Long id,
             Recipe recipe,

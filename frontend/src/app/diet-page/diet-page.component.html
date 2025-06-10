@@ -21,6 +21,7 @@
     <h2>Завтрак</h2>
     <div class="recipe-container">
       <div *ngFor="let recipe of diet.recipesForBreakfast" class="recipe-card">
+        <button class="close-btn" (click)="onDeleteRecipe(recipe.id, recipe.name, $event)">×</button>
         <a [routerLink]="['/recipe', recipe.id]">
           <img *ngIf="recipe.photos  && recipe.photos.length > 0"
                [src]="getPhotoUrl(recipe.photos[0].name)"
@@ -53,6 +54,7 @@
     <h2>Обед</h2>
     <div class="recipe-container">
       <div *ngFor="let recipe of diet.recipesForLunch" class="recipe-card">
+        <button class="close-btn" (click)="onDeleteRecipe(recipe.id, recipe.name, $event)">×</button>
         <a [routerLink]="['/recipe', recipe.id]">
           <img *ngIf="recipe.photos && recipe.photos.length > 0"
                [src]="getPhotoUrl(recipe.photos[0].name)"
@@ -85,6 +87,7 @@
     <h2>Ужин</h2>
     <div class="recipe-container">
       <div *ngFor="let recipe of diet.recipesForDiner" class="recipe-card">
+        <button class="close-btn" (click)="onDeleteRecipe(recipe.id, recipe.name, $event)">×</button>
         <a [routerLink]="['/recipe', recipe.id]">
           <img *ngIf="recipe.photos && recipe.photos.length > 0"
                [src]="getPhotoUrl(recipe.photos[0].name)"
