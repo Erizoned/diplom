@@ -143,7 +143,9 @@ public class DietService {
             }
             default -> logger.error("Рецепт не существует ни в одном из рационов диеты");
         }
-        recipeRepository.delete(recipe);
+        if (recipe.isDefault()){
+            recipeRepository.delete(recipe);
+        }
         dietRepository.save(diet);
         logger.info("Рецепт успешно заменён");
     }

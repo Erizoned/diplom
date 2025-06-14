@@ -4,6 +4,7 @@ import gsap from 'gsap';
 import { AxiosService } from '../axios.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Recipe } from '../recipes-page/recipes-page.component';
 
 @Component({
   selector: 'app-recipe-details',
@@ -93,7 +94,7 @@ fetchRecipe() {
   .then(response => {
     const data = response.data;
     this.recipe = data.recipe;
-    this.recipe.photoFood = data.photoFood;
+    this.recipe.photos = data.photoFood;
     this.recipe.steps = data.steps;
     this.recipe.ingredients = data.ingredients;
     this.recipe.authorUsername = data.authorUsername;
@@ -128,6 +129,15 @@ checkOwnership() {
   getPhotoUrl(fileName: string): string {
     return 'http://localhost:8081/file_system?file_name=' + encodeURIComponent(fileName);
  }
+
+ getPhotoFood(): string | null {
+  if (!this.recipe.photos || this.recipe.photos.length === 0) {
+    return null;
+  }
+  const photo = this.recipe.photos.find((p: any) => p.isPhotoFood);
+  return photo ? photo.name : null;
+}
+
 
   ngAfterViewInit(): void {
     gsap.from('h1', {

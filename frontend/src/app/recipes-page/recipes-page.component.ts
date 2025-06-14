@@ -19,7 +19,7 @@ photoFood: any;
   name: string;
   description: string;
   timeToCook: number;
-  photos?: { name: string }[];
+  photos?: { name: string, isPhotoFood?: boolean }[];
   new?: boolean;
 }
 
@@ -114,6 +114,13 @@ export class RecipesPageComponent implements OnInit, AfterViewInit {
 
   getPhotoUrl(fileName: string): string {
      return 'http://localhost:8081/file_system?file_name=' + encodeURIComponent(fileName);
+  }
+  
+  getPhotoFood(recipe: Recipe): string | null {
+    if (!recipe.photos || recipe.photos.length === 0) return null;
+  
+    const photo = recipe.photos.find(p => p.isPhotoFood);
+    return photo ? photo.name : null;
   }
   
 

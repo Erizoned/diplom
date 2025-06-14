@@ -5,6 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AxiosService } from '../axios.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-gemini-search',
@@ -21,7 +22,8 @@ export class GeminiCreateRecipeComponent {
   constructor(
     private dialogRef: MatDialogRef<GeminiCreateRecipeComponent>,
     private axiosService: AxiosService,
-    private matDialog: MatDialog
+    private matDialog: MatDialog,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -38,6 +40,7 @@ export class GeminiCreateRecipeComponent {
         this.recipeId = response.data;
         console.log("Рецепт: " + this.recipeId);
         this.dialogRef.close(response.recipe); 
+        this.router.navigate(['/recipe', this.recipeId]);
       })
       .catch((error) => {
         this.error = 'Ошибка при обработке промпта';

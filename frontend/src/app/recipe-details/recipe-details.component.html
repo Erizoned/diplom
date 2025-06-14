@@ -30,15 +30,21 @@
     </div>
   
     <h2>Фото блюда:</h2>
-    <div class="photos">
-      <img *ngIf="recipe.photos && recipe.photos.length > 0"
-      [src]="getPhotoUrl(recipe.photos[0].name)"
-      alt="Фото блюда"
-      class="recipe-image" />
- <img *ngIf="!recipe.photos || recipe.photos.length === 0"
-      src="/static/images/default-recipe.png"
-      alt="Нет фото"
-      class="recipe-image" />
+      <div class="photos">
+          <ng-container *ngIf="getPhotoFood() as photoName; else defaultPhoto">
+            <img
+              [src]="getPhotoUrl(photoName)"
+              alt="Фото блюда"
+              class="recipe-image"
+            >
+      </ng-container>
+      <ng-template #defaultPhoto>
+        <img
+          src="/static/images/default-recipe.png"
+          alt="Нет фото"
+          class="recipe-image"
+        >
+      </ng-template>
     </div>
   
     <h2>Ингредиенты:</h2>
