@@ -43,7 +43,7 @@ public class DietController {
 
     @PostMapping("/create/recipe/default/{id}")
     public void changeDefaultRecipe(@PathVariable("id") Long id, @RequestParam String name){
-        logger.info("Запрос на создание рецепта-заглушки");
+        logger.info("Запрос на замену рецепта");
         dietService.changeDefaultRecipe(id, name);
     }
 }

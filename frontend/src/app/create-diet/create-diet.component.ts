@@ -36,6 +36,7 @@ export class CreateDietComponent {
         const createdDiet = response.data;
         const newDietId = createdDiet.id;
         this.dialogRef.close(createdDiet);
+        console.log('Навигация на диету', newDietId); 
         this.router.navigate(['/diet', newDietId]);
         this.loading = false;
       })

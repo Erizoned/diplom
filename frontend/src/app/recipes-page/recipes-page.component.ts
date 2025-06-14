@@ -23,6 +23,13 @@ photoFood: any;
   new?: boolean;
 }
 
+export interface Diet {
+  id: number;
+  name: string;
+  description: string;
+  timeToCook: number;
+}
+
 
 @Component({
   selector: 'app-recipes-page',
@@ -44,6 +51,7 @@ export class RecipesPageComponent implements OnInit, AfterViewInit {
   };
   
   recipes: Recipe[] = [];
+  diet: Diet[] = [];
 
   filterVisible = false;
 
@@ -69,11 +77,11 @@ export class RecipesPageComponent implements OnInit, AfterViewInit {
       disableClose: false
     });
   
-    dialogRef.afterClosed().subscribe((result: any[]) => {
+    dialogRef.afterClosed().subscribe((result: any) => {
       if (result) {
         this.recipes = result;
-        console.log('Айди созданного рецепта:', result);
-        this.router.navigate(['/recipe', result]); 
+        console.log('Айди созданного рецепта:', result.id);
+        this.router.navigate(['/recipe', result.id]); 
       }
     });
   }
@@ -84,11 +92,11 @@ export class RecipesPageComponent implements OnInit, AfterViewInit {
       disableClose: false
     });
   
-    dialogRef.afterClosed().subscribe((result: any[]) => {
+    dialogRef.afterClosed().subscribe((result: any) => {
       if (result) {
-        this.recipes = result;
-        console.log('Айди созданной диеты:', result);
-        this.router.navigate(['/diet', result]); 
+        this.diet = result;
+        console.log('Айди созданной диеты:', result.id);
+        this.router.navigate(['/diet', result.id]); 
       }
     });
     }

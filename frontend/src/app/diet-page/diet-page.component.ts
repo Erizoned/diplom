@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import axios from 'axios';
 import { HeaderComponent } from '../header/header.component';
 import { AxiosService } from '../axios.service';
@@ -23,6 +23,7 @@ interface User {
 
 interface Diet {
   id: number;
+  name: string;
   recipesForBreakfast: Recipe[];
   recipesForLunch: Recipe[];
   recipesForDiner: Recipe[];
@@ -40,30 +41,32 @@ interface Diet {
   styleUrl: './diet-page.component.css'
 })
 export class DietPageComponent implements OnInit {
-onDeleteDiet() {
-  const id = this.route.snapshot.paramMap.get('id');
+  onDeleteDiet() {
+    const id = this.route.snapshot.paramMap.get('id');
 
-  this.axiosService.request("DELETE", "/api/diet/delete/" + id, null)
-  .then(response => {
-    if (response.status === 200) {
+    this.axiosService.request("DELETE", "/api/diet/delete/" + id, null)
+    .then(response => {
+      if (response.status === 200) {
         alert("Диета успешно удалена.");
-    }
-})
-.catch(error => {
-  if (error.response && error.response.status === 403) {
-      alert(error.response.data); // "У вас недостаточно прав для удаления рецепта"
-  } else if (error.response && error.response.status === 404) {
-      alert(error.response.data); // "Рецепт с id: X не найден"
-  } else {
-      alert("Не удалось удалить диету. Пожалуйста, попробуйте снова.");
+        this.router.navigate(['/recipes']);
+      }
+    })
+    .catch(error => {
+      if (error.response && error.response.status === 403) {
+        alert(error.response.data);
+      } else if (error.response && error.response.status === 404) {
+        alert(error.response.data);
+      } else {
+        alert("Не удалось удалить диету. Пожалуйста, попробуйте снова.");
+      }
+    });
   }
-});
-}
 
   loading: boolean = false;
   error: string = '';
   recipeId: number | null = null;
   loadingMap: { [recipeId: number]: boolean } = {};
+  dietId: number | null = null;
 
   onCreateRecipeFromDefault(prompt: string, recipeId: number) {
     if (!prompt.trim()) return;
@@ -89,7 +92,7 @@ onDeleteDiet() {
     event.stopPropagation();
     event.preventDefault();
     const body = { recipeName };
-    this.axiosService.request('POST', `/api/script/diet/default/${recipeId}`, body)
+    this.axiosService.request('POST', `/api/script/diet/${this.dietId}/default/${recipeId}`, body)
       .then(() => {
         window.location.reload();
       })
@@ -103,6 +106,7 @@ onDeleteDiet() {
   constructor(
     private axiosService: AxiosService,
     private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -118,6 +122,7 @@ onDeleteDiet() {
     this.axiosService.request("GET", `/api/diet/${dietId}`, null)
       .then(response => {
         this.diet = response.data;
+        this.dietId = dietId;
         console.log("Диета загружена.");
       })
       .catch(error => {

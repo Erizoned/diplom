@@ -3,7 +3,7 @@
 <div class="main-container" *ngIf="diet">
   <div class="diet-info">
     <div class="diet-header">
-      <h1>Диета</h1>
+      <h1>{{ diet.name }}</h1>
       <div class="diet-meta">
         <p><strong>Автор:</strong> {{ diet.user.username }}</p>
         <p><strong>Дата создания:</strong> {{ formatDate(diet.dateOfCreation) }}</p>
@@ -28,7 +28,7 @@
                alt="Фото блюда"
                class="recipe-image" />
           <img *ngIf="!recipe.photos || recipe.photos.length === 0"
-               src="/static/images/default-recipe.png"
+               src="/images/default-recipe.png"
                alt=" "
                class="recipe-image" />
           <div class="recipe-details">
@@ -61,7 +61,7 @@
                alt="Фото блюда"
                class="recipe-image" />
           <img *ngIf="!recipe.photos || recipe.photos.length === 0"
-               src="/static/images/default-recipe.png"
+               src="/images/default-recipe.png"
                alt=" "
                class="recipe-image" />
           <div class="recipe-details">
@@ -94,7 +94,7 @@
                alt="Фото блюда"
                class="recipe-image" />
           <img *ngIf="!recipe.photos || recipe.photos.length === 0"
-               src="/static/images/default-recipe.png"
+               src="/images/default-recipe.png"
                alt=" "
                class="recipe-image" />
           <div class="recipe-details">

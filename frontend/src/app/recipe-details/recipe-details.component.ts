@@ -248,23 +248,24 @@ private reloadRecipe(): void {
     this.axiosService.request("DELETE", "/api/recipe/" + id + "/delete", null)
     .then(response => {
       if (response.status === 200) {
-          alert("Рецепт успешно удален.");
+        alert("Рецепт успешно удален.");
+        this.router.navigate(['/recipes']);
       }
-  })
-  .catch(error => {
-    if (error.response && error.response.status === 403) {
-        alert(error.response.data); // "У вас недостаточно прав для удаления рецепта"
-    } else if (error.response && error.response.status === 404) {
-        alert(error.response.data); // "Рецепт с id: X не найден"
-    } else {
+    })
+    .catch(error => {
+      if (error.response && error.response.status === 403) {
+        alert(error.response.data);
+      } else if (error.response && error.response.status === 404) {
+        alert(error.response.data);
+      } else {
         alert("Не удалось удалить рецепт. Пожалуйста, попробуйте снова.");
-    }
-  });
+      }
+    });
   }
 
 
   goBack(): void {
-    this.router.navigate(['/']);
+    this.router.navigate(['/recipes']);
   }
 
   addComment(): void {

@@ -72,43 +72,6 @@ public class ExternalRequestController {
         UploadedFile newImage = uploadedFileService.uploadRegularFile(file);
         return ResponseEntity.ok(newImage);
     }
-
-    @PostMapping("/create_image")
-    public ResponseEntity<?> generateImage() throws IOException {
-        String scriptPath = Paths.get("scripts", "generateImage.py").toAbsolutePath().toString();
-        String pythonPath = Paths.get("venv", "Scripts", "python.exe").toAbsolutePath().toString();
-        ProcessBuilder pb = new ProcessBuilder(
-                pythonPath, scriptPath
-        );
-        pb.redirectErrorStream(true);
-        Process process = pb.start();
-        StringBuilder out = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8)
-        )) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                logger.info("script: {}", line);
-                out.append(line).append("\n");
-            }
-        }
-
-        int exitCode;
-        try {
-            exitCode = process.waitFor();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            logger.error("Задача была прервана во время исполнения скрипта:", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(MediaType.valueOf("text/plain; charset=UTF-8")).body("Скрипт прерван");
-        }
-        if (exitCode != 0) {
-            logger.error("Скрипт питона завершился с кодом {}", exitCode);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(MediaType.valueOf("text/plain; charset=UTF-8")).body("Ошибка скрипта, код ошибки: " + exitCode);
-        }
-        return ResponseEntity.ok().contentType(MediaType.valueOf("text/plain; charset=UTF-8")).body("Изображение успешно сгенерировано " + out);
-
-    }
-
     @Value("${hf.token}")
     private String hfKey;
 
@@ -125,7 +88,7 @@ public class ExternalRequestController {
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String jwtToken = authHeader.substring(7);
-            StringBuilder out = geminiService.startScript(prompt, "recipeCreator.py", null, jwtToken);
+            StringBuilder out = geminiService.startScript(prompt, "recipeCreator.py", null, jwtToken, null);
             Pattern pattern = Pattern.compile("ID[:\\s]+(\\d+)");
             Matcher matcher  = pattern.matcher(out);
             Long recipeId = null;
@@ -154,15 +117,14 @@ public class ExternalRequestController {
     @PostMapping("/diet")
     public ResponseEntity<?> createDiet(@RequestBody Map<String, String> request) throws IOException {
         String prompt = request.get("prompt");
-        StringBuilder response = geminiService.startScript(prompt, "diet.py", null, null);
+        StringBuilder response = geminiService.startScript(prompt, "diet.py", null, null, null);
         String answer = response.toString();
         String[] parts = answer.split("!");
-        if (parts.length < 2) {
+        if (parts.length < 3) {
             return ResponseEntity.badRequest()
                     .contentType(MediaType.valueOf("text/plain; charset=UTF-8"))
                     .body("Неверный формат ответа от скрипта.");
         }
-
         List<String> allKeys = Arrays.stream(parts[0].toLowerCase().split(","))
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
@@ -173,8 +135,9 @@ public class ExternalRequestController {
         List<String> keysDinner    = allKeys.stream().skip(6).limit(3).collect(Collectors.toList());
 
         String recommendation = parts[1];
-
-        Diet diet = dietService.createDiet(keysBreakfast, keysLunch, keysDinner, recommendation);
+        String name = parts[2];
+        logger.info("Создаётся диета с названием {} и рекомендацией: {}", name, recommendation);
+        Diet diet = dietService.createDiet(keysBreakfast, keysLunch, keysDinner, recommendation, name);
         return ResponseEntity.ok().body(diet);
     }
 
@@ -243,14 +206,15 @@ public class ExternalRequestController {
         }
     }
 
-    @PostMapping("/diet/default/{id}")
-    public void createNewDefaultRecipe(@PathVariable("id") Long id,@RequestBody Map<String, String> prompt, HttpServletRequest request) throws IOException {
+    @PostMapping("/diet/{dietId}/default/{id}")
+    public void createNewDefaultRecipe(@PathVariable("dietId") Long dietId, @PathVariable("id") Long id,@RequestBody Map<String, String> prompt, HttpServletRequest request) throws IOException {
         String recipeName = prompt.get("recipeName");
-        logger.info("Получен промпт: {}. Создаётся новый дефолтный рецепт для диеты", recipeName);
+        String dietName = dietRepository.findById(dietId).orElseThrow(() -> new RuntimeException("диета не найдена")).getName();
+        logger.info("Получен промпт: {}. Создаётся новый дефолтный рецепт для диеты: {}", recipeName, dietName);
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String jwtToken = authHeader.substring(7);
-            geminiService.startScript(recipeName, "dietRecipes.py", id, jwtToken);
+            geminiService.startScript(recipeName, "dietRecipes.py", id, jwtToken, dietName);
         }
     }
 }

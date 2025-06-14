@@ -113,14 +113,14 @@ def enrich_with_images(recipe: dict) -> dict:
     title_eng = translator.translate(recipe["recipe"]["name"])
     for step in recipe.get("steps", []):
         eng = translator.translate(step["description"])
-        newPrompt = f"A clean, realistic illustration of one step of cooking {title_eng}: {eng}. No text, no labels."
+        newPrompt = f"A clean, realistic illustration of one step of cooking {title_eng}: {eng}. No text, no labels. Picture must be connected with {title_eng} "
         print("Запрос для изображения:", newPrompt)
         img = generate_image(newPrompt)
         if img:
             name, data = img
             step["image_name"] = name
             step["image_data"] = data
-    newTitlePrompt = f"A realistic image of the dish: {title_eng}. Do not include any text or labels."
+    newTitlePrompt = f"A realistic image of the dish: {title_eng}. Do not include any text or labels. Picture must be connected with {title_eng}"
     cover = generate_image(newTitlePrompt)
     if cover:
         cn, cd = cover

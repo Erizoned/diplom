@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -67,7 +66,7 @@ public class DietService {
         recipeRepository.delete(oldRecipe);
     }
     
-    public Diet createDiet(List<String> recipeKeysB, List<String> recipeKeysL, List<String> recipeKeysD, String recommendation) {
+    public Diet createDiet(List<String> recipeKeysB, List<String> recipeKeysL, List<String> recipeKeysD, String recommendation, String name) {
         List<Recipe> recipeListBreakfast = searchRecipeInList(recipeKeysB)
                 .stream()
                 .distinct()
@@ -89,6 +88,7 @@ public class DietService {
         User user = userService.findAuthenticatedUser();
 
         Diet diet = Diet.builder()
+                .name(name)
                 .recipesForBreakfast(recipeListBreakfast)
                 .recipesForLunch(recipeListLunch)
                 .recipesForDiner(recipeListDinner)

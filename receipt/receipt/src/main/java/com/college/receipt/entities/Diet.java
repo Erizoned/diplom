@@ -22,6 +22,8 @@ public class Diet {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String name;
+
     @ManyToMany
     @JoinTable(
             name = "diet_breakfast",
