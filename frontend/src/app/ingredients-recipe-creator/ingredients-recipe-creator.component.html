@@ -1,0 +1,38 @@
+<div class="dialog-container">
+  <h2>Создание рецепта из ингредиентов</h2>
+  <div class="form-group" *ngIf="!recipes.length">
+    <label for="ingredients">Введите имеющиеся ингредиенты (через запятую):</label>
+    <textarea
+      id="ingredients"
+      [(ngModel)]="ingredients"
+      placeholder="Например: картофель, морковь, лук, куриная грудка"
+      rows="4"
+    ></textarea>
+  </div>
+  <div class="error" *ngIf="error">{{ error }}</div>
+  
+  <div class="recipes-container" *ngIf="recipes.length">
+    <button (click)="createRecipe()" [disabled]="loading" class="repeat-button">
+      <span class="icon">🔄</span> Повторить поиск
+    </button>
+    <div *ngFor="let recipe of recipes" class="recipe-card">
+      <div class="recipe-details">
+        <div class="recipe-title">{{ recipe.name }}</div>
+      </div>
+      <div class="warning">
+        <button class="gemini-button"
+          (click)="onCreateRecipeFromDefault(recipe.name, recipe.id)"
+          [disabled]="loadingMap[recipe.id]">
+          {{ loadingMap[recipe.id] ? 'Обработка...' : 'Создать рецепт' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="buttons">
+    <button (click)="close()" class="cancel-button">Отмена</button>
+    <button *ngIf="!recipes.length" (click)="createRecipe()" [disabled]="loading" class="submit-button">
+      {{ loading ? 'Создание...' : 'Создать рецепт' }}
+    </button>
+  </div>
+</div>

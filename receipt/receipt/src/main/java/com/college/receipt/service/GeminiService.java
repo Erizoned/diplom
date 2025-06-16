@@ -58,7 +58,7 @@ public class GeminiService {
             logger.error("Задача была прервана во время исполнения скрипта:", e);
         }
         if (exitCode != 0) {
-            logger.error("Скрипт питона завершился с кодом {}", exitCode);
+            logger.error("Ошибка: {}", exitCode);
         }
         return out;
     }

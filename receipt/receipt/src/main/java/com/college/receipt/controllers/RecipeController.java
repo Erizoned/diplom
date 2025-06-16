@@ -24,10 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import jakarta.validation.Valid;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequestMapping("/api")
@@ -161,6 +158,7 @@ public class RecipeController {
         Recipe recipe = recipeService.addNewRating(rating, id);
         return ResponseEntity.ok().body(recipe);
     }
+
 
     @DeleteMapping("/recipe/{id}/delete")
     public ResponseEntity<String> deleteRecipe(@PathVariable("id") Long id) {

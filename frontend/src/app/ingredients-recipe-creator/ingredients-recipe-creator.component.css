@@ -1,0 +1,192 @@
+.dialog-container {
+  padding: 20px;
+  max-height: 80vh;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 12px;
+}
+
+h2 {
+  color: #8C3503;
+  margin-bottom: 20px;
+  font-size: 1.5em;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  color: #4A4A1A;
+  font-weight: 500;
+}
+
+textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #4A4A1A;
+  border-radius: 8px;
+  font-size: 14px;
+  resize: vertical;
+  transition: all 0.3s ease;
+  background: #fff;
+}
+
+textarea:focus {
+  border-color: #F25C05;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(242, 92, 5, 0.1);
+}
+
+.error {
+  color: #F25C05;
+  margin-bottom: 15px;
+  padding: 10px;
+  background: #fff3e0;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.cancel-button {
+  background: #fff;
+  border: 2px solid #4A4A1A;
+  color: #4A4A1A;
+}
+
+.submit-button {
+  background: #F25C05;
+  border: none;
+  color: white;
+}
+
+.submit-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.recipes-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.recipe-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  border: 1px solid #eee;
+}
+
+.recipe-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.recipe-title {
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #8C3503;
+  margin-bottom: 8px;
+}
+
+.recipe-description {
+  color: #4A4A1A;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.warning {
+  background: #fff3e0;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 15px;
+  border: 1px solid #ffe0b2;
+}
+
+.warning p {
+  color: #F25C05;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.gemini-button {
+  background: #F25C05;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.gemini-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.gemini-button:hover:not(:disabled) {
+  background: #e54d00;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(242, 92, 5, 0.2);
+}
+
+.repeat-button {
+  background: #4A4A1A;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.repeat-button:hover:not(:disabled) {
+  background: #3a3a15;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 74, 26, 0.2);
+}
+
+.repeat-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.repeat-button .icon {
+  font-size: 1.2em;
+}

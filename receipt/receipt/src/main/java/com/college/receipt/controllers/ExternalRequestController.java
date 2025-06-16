@@ -1,5 +1,6 @@
 package com.college.receipt.controllers;
 
+import com.college.receipt.DTO.IngredientDto;
 import com.college.receipt.DTO.RecipeDto;
 import com.college.receipt.entities.Diet;
 import com.college.receipt.entities.Ingredients;
@@ -215,6 +216,26 @@ public class ExternalRequestController {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String jwtToken = authHeader.substring(7);
             geminiService.startScript(recipeName, "dietRecipes.py", id, jwtToken, dietName);
+        }
+    }
+
+    @PostMapping("/create_recipe_from_ingredients")
+    public ResponseEntity<?> createRecipeFromIngredients(@RequestBody Map<String, List<IngredientDto>> body) throws IOException {
+        List<IngredientDto> ing = body.get("ingredients");
+        String prompt = ing.stream().map(IngredientDto::getName).collect(Collectors.joining(","));
+        logger.info("Попытка создать рецепт из следующих ингредиентов:{}", prompt);
+        StringBuilder out = geminiService.startScript(prompt, "recipeFromIngredients.py", null, null, null);
+        String recipes = out.toString();
+        logger.info("Вывод скрипта: {}", recipes);
+        if (!recipes.contains("Errno") && !recipes.contains("Traceback")){
+            logger.info("Создаются заглушки для рецептов: {}",recipes);
+            List<String> listOfRecipes = Arrays.stream(recipes.split(",")).toList();
+            List<Recipe> defaultRecipes = recipeService.createDefaultRecipes(listOfRecipes);
+            return ResponseEntity.ok().body(defaultRecipes);
+        }
+        else {
+            logger.error("В скрипте произошла ошибка");
+            return ResponseEntity.badRequest().body("Произошла Ошибка");
         }
     }
 }

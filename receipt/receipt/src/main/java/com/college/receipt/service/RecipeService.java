@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -289,5 +290,22 @@ public class RecipeService {
             recipes = recipes.stream().filter(recipe -> !recipe.isDefault()).toList();
             return ResponseEntity.ok(recipes);
         }
+    }
+
+    public Recipe createOneDefaultRecipe(String name){
+        Recipe r = new Recipe();
+        r.setName(name);
+        r.setDescription("default");
+        r.setTheme("default");
+        r.setDefault(true);
+        return recipeRepository.save(r);
+    }
+
+    public List<Recipe> createDefaultRecipes(List<String> recipes){
+        List<Recipe> defaultRecipes = new ArrayList<>();
+        for (String recipe : recipes) {
+            defaultRecipes.add(createOneDefaultRecipe(recipe));
+        }
+        return defaultRecipes;
     }
 }

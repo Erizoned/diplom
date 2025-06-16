@@ -10,6 +10,7 @@ import { GeminiSearchComponent } from '../gemini-search/gemini-search.component'
 import { GeminiCreateRecipeComponent } from '../gemini-create-recipe/gemini-create-recipe.component';
 import { CreateDietComponent} from '../create-diet/create-diet.component';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { IngredientsRecipeCreatorComponent } from '../ingredients-recipe-creator/ingredients-recipe-creator.component';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -100,6 +101,21 @@ export class RecipesPageComponent implements OnInit, AfterViewInit {
       }
     });
     }
+
+  openIngredientsRecipeCreator() {
+    const dialogRef = this.dialog.open(IngredientsRecipeCreatorComponent, {
+      width: '500px',
+      disableClose: false
+    });
+  
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result) {
+        this.recipes = result;
+        console.log('Айди созданного рецепта:', result.id);
+        this.router.navigate(['/recipe', result.id]); 
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.axiosService.request("GET", "/api/recipes", null)
