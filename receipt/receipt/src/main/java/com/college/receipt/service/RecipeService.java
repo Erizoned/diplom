@@ -40,6 +40,7 @@ public class RecipeService {
     private final RatingRepository ratingRepository;
     private final UserService userService;
     private final DietRepository dietRepository;
+    private final DietService dietService;
 
     public Recipe createRecipe(Recipe recipe, MultipartFile photoFood, MultipartFile[] stepPhotos, String[] stepDescriptions, String[] ingredientNames , double[] ingredientsCounts, String[] units) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -186,8 +187,8 @@ public class RecipeService {
         return savedRecipe;
     }
 
+    @Transactional
     public ResponseEntity<String> deleteRecipe(Long id){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findAuthenticatedUser();
         String currentUserEmail = user.getEmail();
         Recipe recipe = recipeRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Рецепт с id: " + id + " не найден"));
@@ -197,16 +198,9 @@ public class RecipeService {
             logger.warn("Пользователь {} попытался удалить рецепт {}, но у него недостаточно прав.", currentUserEmail, recipe.getName());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("У вас недостаточно прав для удаления рецепта");
         }
-        List<Diet> allDiets = dietRepository.findAll();
-        for (Diet diet : allDiets) {
-            diet.getRecipesForBreakfast().removeIf(r -> r.getId().equals(id));
-            diet.getRecipesForLunch().removeIf(r -> r.getId().equals(id));
-            diet.getRecipesForDiner().removeIf(r -> r.getId().equals(id));
-        }
-        dietRepository.saveAll(allDiets);
+        dietService.changeDefaultRecipe(id, recipe.getName());
         recipeRepository.deleteById(id);
         logger.info("Пользователь {} удалил рецепт {}", currentUserEmail, recipe.getName());
-
         return ResponseEntity.ok("Рецепт успешно удалён");
     }
 

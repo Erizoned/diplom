@@ -210,12 +210,16 @@ public class ExternalRequestController {
     @PostMapping("/diet/{dietId}/default/{id}")
     public void createNewDefaultRecipe(@PathVariable("dietId") Long dietId, @PathVariable("id") Long id,@RequestBody Map<String, String> prompt, HttpServletRequest request) throws IOException {
         String recipeName = prompt.get("recipeName");
-        String dietName = dietRepository.findById(dietId).orElseThrow(() -> new RuntimeException("диета не найдена")).getName();
-        logger.info("Получен промпт: {}. Создаётся новый дефолтный рецепт для диеты: {}", recipeName, dietName);
+        logger.info("Айди диеты: {}", dietId);
+        Diet diet = dietRepository.findById(dietId).orElseThrow(() -> new RuntimeException("диета не найдена"));
+        logger.info("Получен промпт: {}. Создаётся новый дефолтный рецепт для диеты: {}", recipeName, diet.getName());
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String jwtToken = authHeader.substring(7);
-            geminiService.startScript(recipeName, "dietRecipes.py", id, jwtToken, dietName);
+            geminiService.startScript(recipeName, "dietRecipes.py", id, jwtToken, diet.getName());
+        }
+        else {
+            logger.error("Ошибка. Пользователь не авторизован");
         }
     }
 

@@ -23,6 +23,7 @@ public class GeminiService {
     private static final Logger logger = LoggerFactory.getLogger(GeminiService.class);
 
     public StringBuilder startScript(String prompt, String scriptName, Long id, String jwtToken, String dietName) throws IOException {
+        logger.info("Запуск python-скрипта...");
         String scriptPath = Paths.get("scripts", scriptName).toAbsolutePath().toString();
         String pythonPath = Paths.get("venv", "Scripts", "python.exe").toAbsolutePath().toString();
         List<String> command = new ArrayList<>();
@@ -30,6 +31,7 @@ public class GeminiService {
         command.add(scriptPath);
         command.add(prompt);
         if (id != null && dietName != null && !dietName.isEmpty()){
+            logger.info("Запускается скрипт создания дефолтного рецепта для диеты {} с айди: {}", dietName, id);
             command.add(id.toString());
             command.add(dietName);
         }

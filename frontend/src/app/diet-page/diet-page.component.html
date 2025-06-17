@@ -23,18 +23,18 @@
       <div *ngFor="let recipe of diet.recipesForBreakfast" class="recipe-card">
         <button class="close-btn" (click)="onDeleteRecipe(recipe.id, recipe.name, $event)">×</button>
         <a [routerLink]="['/recipe', recipe.id]">
-          <img *ngIf="recipe.photos  && recipe.photos.length > 0"
-               [src]="getPhotoUrl(recipe.photos[0].name)"
+          <img *ngIf="getPhotoFood(recipe)"
+               [src]="getPhotoUrl(getPhotoFood(recipe)!)"
                alt="Фото блюда"
                class="recipe-image" />
-          <img *ngIf="!recipe.photos || recipe.photos.length === 0"
+          <img *ngIf="!getPhotoFood(recipe)"
                src="/images/default-recipe.png"
                alt=" "
                class="recipe-image" />
           <div class="recipe-details">
             <div class="recipe-title">{{ recipe.name }}</div>
-            <div class="recipe-description">{{ recipe.description }}</div>
-            <div class="recipe-time">Время приготовления: {{ recipe.timeToCook }} минут</div>
+            <div class="recipe-description" *ngIf="!recipe.default">{{ recipe.description }}</div>
+            <div class="recipe-time" *ngIf="!recipe.default">Время приготовления: {{ recipe.timeToCook }} минут</div>
           </div>
         </a>
         <div *ngIf="recipe.default" class="warning">
@@ -56,18 +56,18 @@
       <div *ngFor="let recipe of diet.recipesForLunch" class="recipe-card">
         <button class="close-btn" (click)="onDeleteRecipe(recipe.id, recipe.name, $event)">×</button>
         <a [routerLink]="['/recipe', recipe.id]">
-          <img *ngIf="recipe.photos && recipe.photos.length > 0"
-               [src]="getPhotoUrl(recipe.photos[0].name)"
+          <img *ngIf="getPhotoFood(recipe)"
+               [src]="getPhotoUrl(getPhotoFood(recipe)!)"
                alt="Фото блюда"
                class="recipe-image" />
-          <img *ngIf="!recipe.photos || recipe.photos.length === 0"
+          <img *ngIf="!getPhotoFood(recipe)"
                src="/images/default-recipe.png"
                alt=" "
                class="recipe-image" />
           <div class="recipe-details">
             <div class="recipe-title">{{ recipe.name }}</div>
-            <div class="recipe-description">{{ recipe.description }}</div>
-            <div class="recipe-time">Время приготовления: {{ recipe.timeToCook }} минут</div>
+            <div class="recipe-description" *ngIf="!recipe.default">{{ recipe.description }}</div>
+            <div class="recipe-time" *ngIf="!recipe.default">Время приготовления: {{ recipe.timeToCook }} минут</div>
           </div>
         </a>
         <div *ngIf="recipe.default" class="warning">
@@ -89,18 +89,18 @@
       <div *ngFor="let recipe of diet.recipesForDiner" class="recipe-card">
         <button class="close-btn" (click)="onDeleteRecipe(recipe.id, recipe.name, $event)">×</button>
         <a [routerLink]="['/recipe', recipe.id]">
-          <img *ngIf="recipe.photos && recipe.photos.length > 0"
-               [src]="getPhotoUrl(recipe.photos[0].name)"
+          <img *ngIf="getPhotoFood(recipe)"
+               [src]="getPhotoUrl(getPhotoFood(recipe)!)"
                alt="Фото блюда"
                class="recipe-image" />
-          <img *ngIf="!recipe.photos || recipe.photos.length === 0"
+          <img *ngIf="!getPhotoFood(recipe)"
                src="/images/default-recipe.png"
                alt=" "
                class="recipe-image" />
           <div class="recipe-details">
             <div class="recipe-title">{{ recipe.name }}</div>
-            <div class="recipe-description">{{ recipe.description }}</div>
-            <div class="recipe-time">Время приготовления: {{ recipe.timeToCook }} минут</div>
+            <div class="recipe-description" *ngIf="!recipe.default">{{ recipe.description }}</div>
+            <div class="recipe-time" *ngIf="!recipe.default">Время приготовления: {{ recipe.timeToCook }} минут</div>
           </div>
         </a>
         <div *ngIf="recipe.default" class="warning">
@@ -118,6 +118,7 @@
 <button type="button" class="delete-button" (click)="onDeleteDiet()">
   Удалить диету
 </button>
+
 <div class="loading" *ngIf="!diet">
   <p>Загрузка диеты...</p>
 </div>

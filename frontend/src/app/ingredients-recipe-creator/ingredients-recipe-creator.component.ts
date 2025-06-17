@@ -58,6 +58,15 @@ export class IngredientsRecipeCreatorComponent {
       });
   }
 
+  searchRecipe(recipeName: string) {
+    this.dialogRef.close();
+    this.router.navigate(['/recipes'], {
+      queryParams: {
+        keyword: recipeName
+      }
+    });
+  }
+
   onCreateRecipeFromDefault(recipeName: string, recipeId: number) {
     this.loadingMap[recipeId] = true;
     

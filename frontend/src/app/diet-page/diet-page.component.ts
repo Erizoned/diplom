@@ -10,7 +10,7 @@ interface Recipe {
   id: number;
   name: string;
   description: string;
-  photos: { name: string }[];
+  photos: { name: string, isPhotoFood?: boolean }[];
   timeToCook: number;
   default: boolean;
 }
@@ -132,6 +132,13 @@ export class DietPageComponent implements OnInit {
 
   getPhotoUrl(photoName: string): string {
    return 'http://localhost:8081/file_system?file_name=' + encodeURIComponent(photoName);
+  }
+
+  getPhotoFood(recipe: Recipe): string | null {
+    if (!recipe.photos || recipe.photos.length === 0) return null;
+  
+    const photo = recipe.photos.find(p => p.isPhotoFood);
+    return photo ? photo.name : null;
   }
 
   formatDate(dateString: string): string {

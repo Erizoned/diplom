@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { HeaderComponent } from '../header/header.component';
@@ -56,7 +56,7 @@ export class RecipesPageComponent implements OnInit, AfterViewInit {
 
   filterVisible = false;
 
-  constructor(private router: Router, private axiosService: AxiosService, private dialog: MatDialog) {}
+  constructor(private router: Router, private axiosService: AxiosService, private dialog: MatDialog, private route: ActivatedRoute) {}
 
   openGemini() {
     const dialogRef = this.dialog.open(GeminiSearchComponent, {
@@ -118,13 +118,17 @@ export class RecipesPageComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.axiosService.request("GET", "/api/recipes", null)
-    .then(response => {
-      this.recipes = response.data;
-      console.log("Рецепты загружены.");
-    })
-    .catch(error => {
-      console.error('Ошибка при получении рецептов', error);
+    this.route.queryParams.subscribe(params => {
+      if (params['keyword']) {
+        this.keyword = params['keyword'];
+        this.axiosService.request("GET", `/api/recipes?keyword=${encodeURIComponent(this.keyword)}`, null)
+          .then(response => this.recipes = response.data)
+          .catch(error => console.error('Ошибка при поиске:', error));
+      } else {
+        this.axiosService.request("GET", "/api/recipes", null)
+          .then(response => this.recipes = response.data)
+          .catch(error => console.error('Ошибка при загрузке рецептов', error));
+      }
     });
   }
 

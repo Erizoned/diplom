@@ -25,6 +25,11 @@
           [disabled]="loadingMap[recipe.id]">
           {{ loadingMap[recipe.id] ? 'Обработка...' : 'Создать рецепт' }}
         </button>
+        <button class="search-button"
+          (click)="searchRecipe(recipe.name)"
+          [disabled]="loadingMap[recipe.id]">
+          <span class="icon">🔍</span> Найти рецепт на сайте
+        </button>
       </div>
     </div>
   </div>

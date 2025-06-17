@@ -123,30 +123,51 @@ public class DietService {
         return recipeRepository.save(r);
     }
 
+    private String determineRecipeRole(Diet d, Recipe recipe) {
+        Long id = recipe.getId();
+        if (d.getRecipesForBreakfast().stream().anyMatch(r -> r.getId().equals(id))) {
+            return "завтрак";
+        }
+        if (d.getRecipesForLunch().stream().anyMatch(r -> r.getId().equals(id))) {
+            return "обед";
+        }
+        if (d.getRecipesForDiner().stream().anyMatch(r -> r.getId().equals(id))) {
+            return "ужин";
+        }
+        return null;
+    }
+
+
     public void changeDefaultRecipe(Long recipeId, String name) {
         Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() -> new RuntimeException("Рецепт не найден"));
-        Diet diet = dietRepository.findByRecipe(recipe);
-        String recipeRole = diet.getRecipeRoleInDiet(recipe, diet);
-        Recipe newRecipe = createDefaultRecipe(name);
-        switch (recipeRole){
-            case "завтрак" -> {
-                diet.getRecipesForBreakfast().remove(recipe);
-                diet.getRecipesForBreakfast().add(newRecipe);
+        List<Diet> diets = dietRepository.findAllByRecipe(recipe);
+        Recipe newRecipe = recipeRepository.findByName(name).stream().filter(r -> !r.getId().equals(recipeId))
+                .findFirst()
+                .orElseGet(() -> createDefaultRecipe(name));
+        for (Diet d : diets) {
+            String role = determineRecipeRole(d, recipe);
+            if (role == null) {
+                logger.error("Рецепт {} не нашёлся ни в одном рационе диеты: {}", recipe.getName(), d.getName());
+                continue;
             }
-            case "обед" -> {
-                diet.getRecipesForLunch().remove(recipe);
-                diet.getRecipesForLunch().add(newRecipe);
+            List<Recipe> listToEdit;
+            switch (role) {
+                case "завтрак" -> listToEdit = d.getRecipesForBreakfast();
+                case "обед" -> listToEdit = d.getRecipesForLunch();
+                case "ужин" -> listToEdit = d.getRecipesForDiner();
+                default -> throw new IllegalStateException("Неизвестная роль: " + role);
             }
-            case "ужин" -> {
-                diet.getRecipesForDiner().remove(recipe);
-                diet.getRecipesForDiner().add(newRecipe);
+            for (int i = 0; i < listToEdit.size(); i++) {
+                if (listToEdit.get(i).getId().equals(recipeId)) {
+                    listToEdit.set(i, newRecipe);
+                    break;
+                }
             }
-            default -> logger.error("Рецепт не существует ни в одном из рационов диеты");
+            dietRepository.save(d);
         }
-        if (recipe.isDefault()){
+        if (recipe.isDefault()) {
             recipeRepository.delete(recipe);
         }
-        dietRepository.save(diet);
         logger.info("Рецепт успешно заменён");
     }
 }

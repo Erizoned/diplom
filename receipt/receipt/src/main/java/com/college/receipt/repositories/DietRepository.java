@@ -13,6 +13,8 @@ import java.util.List;
 public interface DietRepository extends JpaRepository<Diet, Long> {
     @Query("SELECT d FROM Diet d WHERE :recipe MEMBER OF d.recipesForBreakfast OR :recipe MEMBER OF d.recipesForLunch OR :recipe MEMBER OF d.recipesForDiner")
     Diet findByRecipe(@Param("recipe") Recipe recipe);
+    @Query("SELECT d FROM Diet d WHERE :recipe MEMBER OF d.recipesForBreakfast OR :recipe MEMBER OF d.recipesForLunch OR :recipe MEMBER OF d.recipesForDiner")
+    List<Diet> findAllByRecipe(@Param("recipe") Recipe recipe);
     List<Diet> findAllByRecipesForBreakfastContainsOrRecipesForLunchContainsOrRecipesForDinerContains(
             Recipe breakfastRecipe,
             Recipe lunchRecipe,
