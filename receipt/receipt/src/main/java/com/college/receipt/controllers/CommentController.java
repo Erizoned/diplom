@@ -83,13 +83,21 @@ public class CommentController {
         result.put("reaction", "disliked");
         return ResponseEntity.ok().body(result);
     }
-    @DeleteMapping("/comment/{id}")
+
+    @DeleteMapping("/comment/delete/{id}")
     private ResponseEntity<String> deleteComment(@PathVariable("id") Long id){
         Comments comment = commentsRepository.findById(id).orElseThrow(() -> new RuntimeException("Комментарий не найден"));
+        commentsService.checkOwnership(comment);
         commentsRepository.delete(comment);
-
         logger.info("Комментарий {} от рецепта {} удалён.", comment.getId(),comment.getRecipe().getName());
-
         return ResponseEntity.ok().body("Комментарий удалён");
+    }
+
+    @PutMapping("/comment/update/{id}")
+    private ResponseEntity<Comments> updateComment(@PathVariable("id") Long id, @RequestBody CommentDto commentDto){
+        String newContent = commentDto.getContent();
+        Comments comment = commentsRepository.findById(id).orElseThrow(() -> new RuntimeException("Комментарий не найден"));
+        logger.info("Комментарий c id: {} был успешно обновлён", comment.getId());
+        return ResponseEntity.ok().body(commentsService.updateComment(comment, newContent));
     }
 }

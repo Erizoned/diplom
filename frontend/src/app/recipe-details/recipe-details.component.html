@@ -119,24 +119,38 @@
     </div>
     <div class="comments-section">
       <ng-container *ngIf="comments !== undefined && comments.length > 0; else noComments">
-        <div *ngFor="let comment of comments" class="comment">
+        <div *ngFor="let comment of comments; let ci = index" class="comment">
           <div class="comment-header">
             <strong>{{ comment.author || 'Вы' }}</strong>
+            <ng-container *ngIf="currentUsername === comment.author || isAdmin">
+              <button class="menu-button" (click)="toggleCommentMenu(ci, $event)">⋯</button>
+              <div class="comment-menu" *ngIf="openedMenuIndex === ci">
+                <button (click)="startEditComment(comment)">Обновить</button>
+                <button (click)="deleteComment(comment.id)">Удалить</button>
+              </div>
+            </ng-container>
           </div>
           <div class="comment-content">
-            <p>{{ comment.content }}</p>
+            <ng-container *ngIf="editingCommentId === comment.id; else showCommentContent">
+              <input [(ngModel)]="editingCommentContent" class="comment-edit-input" />
+              <button (click)="updateComment(comment.id)">Сохранить</button>
+              <button (click)="cancelEditComment()">Отмена</button>
+            </ng-container>
+            <ng-template #showCommentContent>
+              <p>{{ comment.content }}</p>
+            </ng-template>
           </div>
           <div class="comment-actions">
             <span class="likes" 
-            [class.active]="comment.reaction === 'liked'"
-            (click)="likeComment(comment.id)">
-        <span class="like-count">{{ comment.likes || 0 }}</span> 👍
-      </span>
-      <span class="dislikes" 
-            [class.active]="comment.reaction === 'disliked'"
-            (click)="dislikeComment(comment.id)">
-        <span class="dislike-count">{{ comment.dislikes || 0 }}</span> 👎
-      </span>
+              [class.active]="comment.reaction === 'liked'"
+              (click)="likeComment(comment.id)">
+              <span class="like-count">{{ comment.likes || 0 }}</span> 👍
+            </span>
+            <span class="dislikes" 
+              [class.active]="comment.reaction === 'disliked'"
+              (click)="dislikeComment(comment.id)">
+              <span class="dislike-count">{{ comment.dislikes || 0 }}</span> 👎
+            </span>
           </div>          
         </div>
       </ng-container>

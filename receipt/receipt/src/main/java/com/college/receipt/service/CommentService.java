@@ -117,4 +117,15 @@ public class CommentService {
         }
         commentsRepository.save(comment);
     }
+
+    public boolean checkOwnership(Comments comment){
+        User currentUser = userService.findAuthenticatedUser();
+        logger.info("Создатель комментария: {}. Пользователь, пытающийся изменить/удалить комментарий: {}", comment.getAuthor().getEmail() ,currentUser.getEmail());
+        return currentUser.getUsername().equals(comment.getAuthor().getEmail()) || currentUser.getRoles().stream().anyMatch(role -> "ADMIN".equals(role.getName()));
+    }
+
+    public Comments updateComment(Comments comment, String newContent) {
+        comment.setContent(newContent);
+        return commentsRepository.save(comment);
+    }
 }

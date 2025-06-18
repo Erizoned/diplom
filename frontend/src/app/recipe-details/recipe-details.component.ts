@@ -45,6 +45,9 @@ export class RecipeDetailsComponent implements OnInit, AfterViewInit {
   role: string = '';
   isAdmin = false;
   isOwner = false;
+  openedMenuIndex: number | null = null;
+  editingCommentId: number | null = null;
+  editingCommentContent: string = '';
   
 
   constructor(
@@ -343,6 +346,57 @@ private reloadRecipe(): void {
   
   onRatingLeave(): void {
     this.showPreview = false;
+  }
+
+  toggleCommentMenu(index: number, event: MouseEvent): void {
+    event.stopPropagation();
+    if (this.openedMenuIndex === index) {
+      this.openedMenuIndex = null;
+    } else {
+      this.openedMenuIndex = index;
+    }
+  }
+
+  startEditComment(comment: any): void {
+    this.editingCommentId = comment.id;
+    this.editingCommentContent = comment.content;
+    this.openedMenuIndex = null;
+  }
+
+  cancelEditComment(): void {
+    this.editingCommentId = null;
+    this.editingCommentContent = '';
+  }
+
+  updateComment(commentId: number): void {
+    if (!this.editingCommentContent.trim()) return;
+   this.axiosService.request(
+  'PUT',
+  `/api/comment/update/${commentId}`,
+  { content: this.editingCommentContent }
+)
+      .then(response => {
+        const updated = response.data;
+        const comment = this.comments.find(c => c.id === commentId);
+        if (comment) {
+          comment.content = updated.content || this.editingCommentContent;
+        }
+        this.cancelEditComment();
+      })
+      .catch(error => {
+        alert('Ошибка при обновлении комментария');
+      });
+  }
+
+  deleteComment(commentId: number): void {
+    if (!confirm('Удалить комментарий?')) return;
+    this.axiosService.request('DELETE', `/api/comment/delete/${commentId}`, null)
+      .then(() => {
+        this.comments = this.comments.filter(c => c.id !== commentId);
+      })
+      .catch(error => {
+        alert('Ошибка при удалении комментария');
+      });
   }
 
 }
