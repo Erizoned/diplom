@@ -22,7 +22,7 @@ public class GeminiService {
 
     private static final Logger logger = LoggerFactory.getLogger(GeminiService.class);
 
-    public StringBuilder startScript(String prompt, String scriptName, Long id, String jwtToken, String dietName) throws IOException {
+    public StringBuilder startScript(String prompt, String scriptName, Long id, String jwtToken, String dietName, String recipeName, String recipeRole, String recipes) throws IOException {
         logger.info("Запуск python-скрипта...");
         String scriptPath = Paths.get("scripts", scriptName).toAbsolutePath().toString();
         String pythonPath = Paths.get("venv", "Scripts", "python.exe").toAbsolutePath().toString();
@@ -34,6 +34,9 @@ public class GeminiService {
             logger.info("Запускается скрипт создания дефолтного рецепта для диеты {} с айди: {}", dietName, id);
             command.add(id.toString());
             command.add(dietName);
+            command.add(recipeName);
+            command.add(recipeRole);
+            command.add(recipes);
         }
         ProcessBuilder pb = new ProcessBuilder(command);
         Map<String, String> env = pb.environment();
@@ -41,6 +44,7 @@ public class GeminiService {
             env.put("JWT_TOKEN", jwtToken);
         }
         pb.redirectErrorStream(true);
+        pb.environment().put("PYTHONIOENCODING", "utf-8");
         Process process = pb.start();
         StringBuilder out = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(

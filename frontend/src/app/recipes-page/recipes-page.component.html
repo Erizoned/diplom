@@ -6,6 +6,16 @@
         <input id="search" type="text" name="keyword" [(ngModel)]="keyword" placeholder="Поиск рецептов..." />
         <button type="submit" class="search-button">Найти</button>
         <button type="button" class="filter-button" (click)="toggleDiv()">Фильтры</button>
+        <div class="sort-dropdown-container">
+          <button type="button" class="sort-button" (click)="toggleSortDropdown()">
+            Сортировка по рейтингу
+            <span [class.open]="sortDropdownOpen">▼</span>
+          </button>
+          <div class="sort-dropdown" *ngIf="sortDropdownOpen">
+            <button type="button" (click)="sortByRatingDesc(); sortDropdownOpen=false">По убыванию</button>
+            <button type="button" (click)="sortByRatingAsc(); sortDropdownOpen=false">По возрастанию</button>
+          </div>
+        </div>
       </div>
     </form>
 

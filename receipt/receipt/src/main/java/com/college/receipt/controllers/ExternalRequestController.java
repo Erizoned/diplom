@@ -89,7 +89,7 @@ public class ExternalRequestController {
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String jwtToken = authHeader.substring(7);
-            StringBuilder out = geminiService.startScript(prompt, "recipeCreator.py", null, jwtToken, null);
+            StringBuilder out = geminiService.startScript(prompt, "recipeCreator.py", null, jwtToken, null, null, null, null);
             Pattern pattern = Pattern.compile("ID[:\\s]+(\\d+)");
             Matcher matcher  = pattern.matcher(out);
             Long recipeId = null;
@@ -101,6 +101,7 @@ public class ExternalRequestController {
                 logger.error("Айди рецепта не найден!");
             }
             if (recipeId != null){
+                logger.info("Логика добавления рецепта в диету");
                 Recipe newRecipe = recipeRepository.findById(recipeId).orElseThrow(() -> new RuntimeException("Рецепт не найден"));
                 List<Recipe> oldRecipeList = recipeRepository.findByName(newRecipe.getName());
                 Recipe oldRecipe = oldRecipeList.stream().min(Comparator.comparing(Recipe::getId)).orElse(null);
@@ -118,7 +119,7 @@ public class ExternalRequestController {
     @PostMapping("/diet")
     public ResponseEntity<?> createDiet(@RequestBody Map<String, String> request) throws IOException {
         String prompt = request.get("prompt");
-        StringBuilder response = geminiService.startScript(prompt, "diet.py", null, null, null);
+        StringBuilder response = geminiService.startScript(prompt, "diet.py", null, null, null, null, null, null);
         String answer = response.toString();
         String[] parts = answer.split("!");
         if (parts.length < 3) {
@@ -213,10 +214,21 @@ public class ExternalRequestController {
         logger.info("Айди диеты: {}", dietId);
         Diet diet = dietRepository.findById(dietId).orElseThrow(() -> new RuntimeException("диета не найдена"));
         logger.info("Получен промпт: {}. Создаётся новый дефолтный рецепт для диеты: {}", recipeName, diet.getName());
+        Recipe recipe = recipeRepository.findById(id).orElseThrow(() -> new RuntimeException("Рецепт не найден"));
+        String recipeRole = diet.getRecipeRoleInDiet(recipe, diet);
+        List<Recipe> recipes = new ArrayList<>();
+        switch (recipeRole) {
+            case "завтрак" -> recipes = diet.getRecipesForBreakfast();
+            case "обед" -> recipes = diet.getRecipesForLunch();
+            case "ужин" -> recipes = diet.getRecipesForDiner();
+            default -> throw new IllegalStateException("Неизвестная роль: " + recipeRole);
+        }
+        String listOfRecipes = String.join(", ", recipes.stream().map(Recipe::getName).toList());
+        logger.info("Рецепт находится в разделе {} в списке рецептов: {}", recipeRole, listOfRecipes);
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String jwtToken = authHeader.substring(7);
-            geminiService.startScript(recipeName, "dietRecipes.py", id, jwtToken, diet.getName());
+            geminiService.startScript(recipeName, "dietRecipes.py", id, jwtToken, diet.getName(), recipeName, recipeRole, listOfRecipes);
         }
         else {
             logger.error("Ошибка. Пользователь не авторизован");
@@ -228,7 +240,7 @@ public class ExternalRequestController {
         List<IngredientDto> ing = body.get("ingredients");
         String prompt = ing.stream().map(IngredientDto::getName).collect(Collectors.joining(","));
         logger.info("Попытка создать рецепт из следующих ингредиентов:{}", prompt);
-        StringBuilder out = geminiService.startScript(prompt, "recipeFromIngredients.py", null, null, null);
+        StringBuilder out = geminiService.startScript(prompt, "recipeFromIngredients.py", null, null, null, null, null, null);
         String recipes = out.toString();
         logger.info("Вывод скрипта: {}", recipes);
         if (!recipes.contains("Errno") && !recipes.contains("Traceback")){

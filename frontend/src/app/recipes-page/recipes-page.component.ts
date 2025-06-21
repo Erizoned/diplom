@@ -20,6 +20,7 @@ photoFood: any;
   name: string;
   description: string;
   timeToCook: number;
+  avgRating?: number;
   photos?: { name: string, isPhotoFood?: boolean }[];
   new?: boolean;
 }
@@ -55,6 +56,7 @@ export class RecipesPageComponent implements OnInit, AfterViewInit {
   diet: Diet[] = [];
 
   filterVisible = false;
+  sortDropdownOpen = false;
 
   constructor(private router: Router, private axiosService: AxiosService, private dialog: MatDialog, private route: ActivatedRoute) {}
 
@@ -297,4 +299,18 @@ export class RecipesPageComponent implements OnInit, AfterViewInit {
       });
   }
   
+  sortByRatingDesc() {
+    this.recipes = this.recipes
+      .slice() 
+      .sort((a, b) => (b.avgRating ?? 0) - (a.avgRating ?? 0));
+  }
+  sortByRatingAsc() {
+    this.recipes = this.recipes
+      .slice() 
+      .sort((a, b) => (a.avgRating ?? 0) -  (b.avgRating ?? 0));
+  }
+
+  toggleSortDropdown() {
+    this.sortDropdownOpen = !this.sortDropdownOpen;
+  }
 }

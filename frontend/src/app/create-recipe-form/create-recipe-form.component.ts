@@ -30,6 +30,7 @@ export class CreateRecipeComponent implements OnInit, AfterViewInit {
   stepDescriptions: string[] = [];
   ingredientNames: string[] = [];
   ingredientsCounts: number[] = [];
+  ingredientsUnits: string[] = [];
 
   constructor(
     private router: Router,
@@ -75,6 +76,7 @@ export class CreateRecipeComponent implements OnInit, AfterViewInit {
   addIngredient() {
     this.ingredientNames.push('');
     this.ingredientsCounts.push(0);
+    this.ingredientsUnits.push('г');
   }
 
   onCreateRecipe() {
@@ -109,6 +111,9 @@ export class CreateRecipeComponent implements OnInit, AfterViewInit {
     });
     this.ingredientsCounts.forEach(count => {
       formData.append('ingredientsCounts', count.toString());
+    });
+    this.ingredientsUnits.forEach(unit => {
+      formData.append('ingredientsUnits', unit);
     });
 
     this.axiosService.request(

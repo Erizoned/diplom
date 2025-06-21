@@ -7,6 +7,7 @@ import com.college.receipt.entities.User;
 import com.college.receipt.repositories.DietRepository;
 import com.college.receipt.repositories.RecipeRepository;
 import com.college.receipt.service.User.UserService;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -170,4 +171,44 @@ public class DietService {
         }
         logger.info("Рецепт успешно заменён");
     }
+
+    @Transactional
+    public void replaceRecipeInDiet(Long dietId, Long oldRecipeId, String newName) {
+        Diet diet = dietRepository.findById(dietId)
+                .orElseThrow(() -> new RuntimeException("Диета не найдена: " + dietId));
+
+        Recipe oldRecipe = recipeRepository.findById(oldRecipeId)
+                .orElseThrow(() -> new RuntimeException("Рецепт не найден: " + oldRecipeId));
+
+        Recipe newRecipe = recipeRepository.findByName(newName).stream()
+                .filter(r -> !r.getId().equals(oldRecipeId))
+                .findFirst()
+                .orElseGet(() -> {
+                    Recipe r = new Recipe();
+                    r.setName(newName);
+                    r.setDescription("default");
+                    r.setTheme("default");
+                    r.setDefault(true);
+                    return recipeRepository.save(r);
+                });
+
+        List<Recipe> listToEdit;
+        if (diet.getRecipesForBreakfast().removeIf(r -> r.getId().equals(oldRecipeId))) {
+            listToEdit = diet.getRecipesForBreakfast();
+        } else if (diet.getRecipesForLunch   ().removeIf(r -> r.getId().equals(oldRecipeId))) {
+            listToEdit = diet.getRecipesForLunch();
+        } else if (diet.getRecipesForDiner   ().removeIf(r -> r.getId().equals(oldRecipeId))) {
+            listToEdit = diet.getRecipesForDiner();
+        } else {
+            throw new RuntimeException("Рецепт не привязан к этой диете");
+        }
+
+        listToEdit.add(newRecipe);
+        dietRepository.save(diet);
+
+        if (oldRecipe.isDefault()) {
+            recipeRepository.delete(oldRecipe);
+        }
+    }
 }
+

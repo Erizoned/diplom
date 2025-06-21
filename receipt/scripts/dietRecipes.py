@@ -24,11 +24,19 @@ if not JWT_TOKEN:
 
 urlForCreation = "http://localhost:8081/api/create/recipe/default/{id}"
 
-def gen_default_recipe(prompt_text: str) -> dict:
+def gen_default_recipe(diet_name: str,
+                       old_recipe: str,
+                       recipe_role: str,
+                       recipes_list: str) -> str:
     server_prompt = (
-        f"У пользователя есть диета: {prompt_text}. Придумай для неё ОДИН рецепт, который будет подходить для цели диеты. В ответе должно быть только название ОДНОГО рецепта."
+        f"У пользователя диета «{diet_name}». "
+        f"Пользователю не понравился рецепт «{old_recipe}». "
+        f"Придумай для этой диеты ОДИН новый рецепт для приёма пищи «{recipe_role}». "
+        f"В этом разделе уже есть: {recipes_list}. "
+        "НИ В КОЕМ СЛУЧАЕ не повторяй существующие блюда — выведи только название одного уникального рецепта."
+        "Старайся делать не слишком длинные и подробные названия рецептов"
     )
-
+    print(server_prompt)
     response = client.models.generate_content(
         model="gemini-1.5-flash",
         contents=server_prompt
@@ -44,8 +52,10 @@ def post_recipe(recipe_name: str, diet_id: str):
     }
     resp = requests.post(url, headers=headers)
 if __name__ == "__main__":
-    prompt = sys.argv[1]
-    diet_id = sys.argv[2]
-    dietName = sys.argv[3]
-    recipe = gen_default_recipe(dietName)
+    old_recipe   = sys.argv[1] 
+    diet_id      = sys.argv[2]
+    diet_name    = sys.argv[3]
+    recipe_role  = sys.argv[5]
+    recipes_list = sys.argv[6]
+    recipe = gen_default_recipe(diet_name, old_recipe, recipe_role, recipes_list)
     post_recipe(recipe, diet_id)

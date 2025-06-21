@@ -149,6 +149,20 @@
           name="ingredientsCounts{{i}}"
           required
         />
+        <label>Тип:</label>
+        <select
+          [(ngModel)]="ingredientsUnits[i]"
+          name="ingredientsUnits{{i}}"
+          required
+        >
+          <option value="г">г</option>
+          <option value="мл">мл</option>
+          <option value="шт.">шт.</option>
+          <option value="ст.л.">ст.л.</option>
+          <option value="ч.л.">ч.л.</option>
+          <option value="по вкусу">по вкусу</option>
+          <option value="другое">другое</option>
+        </select>
       </div>
     </div>
     <button type="button" (click)="addIngredient()">Добавить ингредиент</button>
