@@ -39,20 +39,29 @@
     box-shadow: 0 0 0 3px rgba(242, 92, 5, 0.2);
   }
   
-  .search-button, .filter-button {
-    padding: 10px 20px;
-    background-color: var(--orange);
-    color: white;
-    border: none;
-    border-radius: 8px;
+  .search-button, .filter-button, .sort-button {
+    padding: 12px 26px;
+    background: #fff;
+    color: var(--orange);
+    border: 2px solid var(--orange);
+    border-radius: 10px;
     font-weight: bold;
+    font-size: 16px;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    transition: background 0.2s, color 0.2s, border 0.2s, box-shadow 0.2s, transform 0.15s;
+    box-shadow: 0 2px 8px rgba(242, 92, 5, 0.10);
+    margin-right: 6px;
+    outline: none;
   }
-  
-  .search-button:hover, .filter-button:hover {
-    background-color: var(--brown);
-    transform: translateY(-2px);
+  .search-button:last-child, .filter-button:last-child, .sort-button:last-child {
+    margin-right: 0;
+  }
+  .search-button:hover, .filter-button:hover, .sort-button:hover, .sort-button:focus {
+    background: var(--orange);
+    color: #fff;
+    border-color: var(--brown);
+    box-shadow: 0 6px 20px rgba(242, 92, 5, 0.18);
+    transform: translateY(-2px) scale(1.04);
   }
   
   .recipe-container {
@@ -263,24 +272,27 @@
   
   .create-recipe-button {
     display: inline-block;
-    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-    color: white;
-    padding: 15px 30px;
-    border-radius: 8px;
-    font-weight: bold;
+    background: #fff;
+    color: var(--orange);
+    padding: 16px 32px;
+    border-radius: 14px;
+    font-weight: 700;
     text-decoration: none;
-    transition: all 0.3s ease;
-    margin-bottom: 30px;
-    border: none;
+    transition: all 0.2s;
+    margin-bottom: 32px;
+    border: 2px solid var(--orange);
     cursor: pointer;
-    font-size: 16px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    font-size: 18px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 15px rgba(242, 92, 5, 0.10);
   }
-  
   .create-recipe-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-    background: linear-gradient(135deg, var(--gradient-end), var(--gradient-start));
+    background: var(--orange);
+    color: #fff;
+    border-color: var(--brown);
+    box-shadow: 0 8px 24px rgba(242, 92, 5, 0.18);
+    transform: translateY(-2px) scale(1.04);
   }
   
   .actions-container {
@@ -354,46 +366,13 @@
     margin-left: 10px;
   }
   
-  .sort-button {
-    padding: 10px 22px;
-    background: var(--orange);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-weight: bold;
-    font-size: 15px;
-    cursor: pointer;
-    transition: background 0.2s, box-shadow 0.2s, color 0.2s;
-    box-shadow: 0 2px 8px rgba(242, 92, 5, 0.10);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    position: relative;
-  }
-  
-  .sort-button:hover, .sort-button:focus {
-    background: var(--brown);
-    color: #fff;
-  }
-  
-  .sort-button span {
-    margin-left: 8px;
-    font-size: 1.1em;
-    transition: transform 0.2s;
-    display: inline-block;
-  }
-  
-  .sort-button span.open {
-    transform: rotate(180deg);
-  }
-  
   .sort-dropdown {
     position: absolute;
     top: 110%;
     left: 0;
     min-width: 180px;
     background: #fff;
-    border: 1.5px solid var(--orange);
+    border: 2px solid var(--orange);
     border-radius: 10px;
     box-shadow: 0 6px 24px rgba(242, 92, 5, 0.13);
     z-index: 20;
@@ -404,9 +383,10 @@
   }
   
   .sort-dropdown button {
-    background: none;
+    color: var(--orange);
+    background: #fff;
     border: none;
-    color: var(--brown);
+    font-weight: 600;
     font-size: 1rem;
     padding: 12px 20px;
     text-align: left;
@@ -417,8 +397,8 @@
   }
   
   .sort-dropdown button:hover {
-    background: var(--beige);
-    color: var(--orange);
+    background: var(--orange);
+    color: #fff;
   }
   
   @keyframes fadeInMenu {
@@ -440,5 +420,12 @@
     .sort-dropdown {
       min-width: 100%;
       left: 0;
+    }
+    .search-button, .filter-button, .sort-button {
+      width: 100%;
+      margin-bottom: 8px;
+    }
+    .create-recipe-button {
+      width: 100%;
     }
   }

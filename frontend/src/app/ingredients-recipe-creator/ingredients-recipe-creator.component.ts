@@ -45,11 +45,24 @@ export class IngredientsRecipeCreatorComponent {
       name: name.trim()
     }));
 
-    this.axiosService.request('POST', '/api/script/create_recipe_from_ingredients', { ingredients: ingredientsList })
-      .then((response) => {
-        this.recipes = response.data;
+    this.axiosService
+      .request('POST', '/api/script/create_recipe_from_ingredients', { ingredients: ingredientsList })
+      .then(response => {
+        const data = response.data || [];
+        // считаем "нулевым" и пустую строку, и строку "null"
+        const hasInvalid = data.some((r: any) => {
+          const name = (r.name as string) || '';
+          return !name.trim() || name.trim().toLowerCase() === 'null';
+        });
+
+        if (hasInvalid) {
+          this.error = 'Ошибка, вы ввели несуществующие ингредиенты';
+          this.recipes = [];
+        } else {
+          this.recipes = data;
+        }
       })
-      .catch((error) => {
+      .catch(error => {
         this.error = 'Ошибка при создании рецепта';
         console.error(error);
       })
@@ -61,22 +74,21 @@ export class IngredientsRecipeCreatorComponent {
   searchRecipe(recipeName: string) {
     this.dialogRef.close();
     this.router.navigate(['/recipes'], {
-      queryParams: {
-        keyword: recipeName
-      }
+      queryParams: { keyword: recipeName }
     });
   }
 
   onCreateRecipeFromDefault(recipeName: string, recipeId: number) {
     this.loadingMap[recipeId] = true;
-    
-    this.axiosService.request('POST', '/api/script/create_recipe', { prompt: recipeName })
-      .then((response) => {
+
+    this.axiosService
+      .request('POST', '/api/script/create_recipe', { prompt: recipeName })
+      .then(response => {
         this.dialogRef.close();
         this.router.navigate(['/recipe', response.data.id]);
       })
-      .catch((error) => {
-        this.error = 'Ошибка при создании рецепта';
+      .catch(error => {
+        this.error = 'Ошибка со стороны Gemini: не удалось создать рецепт.';
         console.error(error);
       })
       .finally(() => {
@@ -87,4 +99,4 @@ export class IngredientsRecipeCreatorComponent {
   close() {
     this.dialogRef.close();
   }
-} 
+}

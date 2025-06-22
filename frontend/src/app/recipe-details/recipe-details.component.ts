@@ -99,6 +99,7 @@ fetchRecipe() {
     this.recipe = data.recipe;
     this.recipe.photos = data.photoFood;
     this.recipe.steps = data.steps;
+    this.recipe.nationalKitchen = data.recipe.nationalKitchen;
     this.recipe.ingredients = data.ingredients;
     this.recipe.authorUsername = data.authorUsername;
     this.comments = data.comments || [];

@@ -10,7 +10,7 @@ body {
     margin: 0;
     padding: 0;
     font-family: 'Arial', sans-serif;
-    padding-top: 80px; 
+    padding-top: 80px;
 }
 
 .main-container {
@@ -87,6 +87,12 @@ header {
     box-shadow: 0 6px 20px rgba(242, 92, 5, 0.4);
 }
 
+.header-spacer {
+  height: 30px;
+  width: 100%;
+  display: block;
+}
+
 @media (max-width: 768px) {
 
     .main-container {
@@ -102,5 +108,9 @@ header {
         margin-top: 10px;
         justify-content: space-between;
         width: 100%;
+    }
+
+    .header-spacer {
+        height: 120px;
     }
 }

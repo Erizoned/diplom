@@ -87,6 +87,9 @@
       <p><strong>Количество порций:</strong> {{ recipe.countPortion }}</p>
       <p><strong>Калорийность (ккал):</strong> {{ recipe.kkal }}</p>
       <p><strong>Время приготовления:</strong> {{ recipe.timeToCook }} минут</p>
+      <p *ngIf="recipe.nationalKitchen">
+        <strong>Национальная кухня:</strong> {{ recipe.nationalKitchen }}
+      </p>
     </div>
   
     <p><strong>Автор рецепта:</strong> {{ recipe.authorUsername }}</p>

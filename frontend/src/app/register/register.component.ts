@@ -12,19 +12,20 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent {
-  // Поля формы
+  redirectLogin() {
+    this.router.navigate(['/login']);
+  }
+
   login: string = "";
   email: string = "";
   password: string = "";
   matchingPassword: string = "";
-
-  // Для отображения возможной ошибки
   error: string = "";
 
   constructor(private axiosService: AxiosService, private router: Router) {}
 
+
   onSubmitRegister(): void {
-    // Формируем объект с данными пользователя
     const userData = {
       username: this.login,
       email: this.email,
@@ -32,11 +33,11 @@ export class RegisterComponent {
       matchingPassword: this.matchingPassword
     };
 
-    // Отправляем POST-запрос на сервер
+
+
     this.axiosService.request("POST", "/register", userData)
       .then(response => {
         console.log("Регистрация прошла успешно:", response.data);
-        // После успешной регистрации можно перенаправить на страницу логина
         this.router.navigate(['/login']);
       })
       .catch(error => {

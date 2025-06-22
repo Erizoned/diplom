@@ -68,6 +68,7 @@ def gen_recipe(prompt_text: str) -> dict:
         "и внутри recipe: name, description, kkal, count_portion, restrictions, "
         "national_kitchen, theme, time_to_cook, type_of_cook, type_of_food. "
         "Все числовые поля — integer. Поля с пробелами оформляй в camelCase. Все поля типа type_of_cook, type_of_food,  national_kitchen и так далее должны быть на русском"
+        "theme - это обозначение темы блюда (завтрак, обед, ужин) и только"
         "Strictly respond with raw JSON only."
         "Ни в коем случае не создавай не существующие рецепты. Создавай только то, что может быть приготовлено в реальной жизни и не противеречит логике(например, свинные крылышки). Если пользователь попросил создать рецепт чего-то запрещённого, опасного или несуществующего, то просто возвращай null"
     )

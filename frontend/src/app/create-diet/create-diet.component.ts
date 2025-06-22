@@ -41,7 +41,7 @@ export class CreateDietComponent {
         this.loading = false;
       })
       .catch(() => {
-        this.error = 'Ошибка при создании диеты';
+        this.error = 'Ошибка при создании диеты: Возможно вы указали что-то, что может причинить вред вам или окружающим';
         this.loading = false;
       });
   }

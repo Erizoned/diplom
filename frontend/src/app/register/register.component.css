@@ -5,104 +5,169 @@
     --white: #FFFFFF;
     --gray-light: #F2D0C9;
     --text-color: #0D0D0D;
-  }
-  
-  /* 
-    Контейнер, в котором будет и градиентный фон, и центрирование по вертикали и горизонтали.
-  */
-  .registration-page {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh; /* Заполняем всю высоту экрана */
-    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-middle), var(--gradient-end));
-    margin: 0; /* Убедитесь, что нет отступов, если где-то не сброшен margin */
-  }
-  
+    --accent: #F25C05;
+    --accent-dark: #8C3503;
+    --success: #4CAF50;
+    --danger: #dc3545;
+}
+
+.registration-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+}
+
+.registration-page::before {
+  content: '';
+  position: absolute;
+  top: -80px;
+  left: -80px;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, var(--white) 0%, transparent 80%);
+  opacity: 0.25;
+  z-index: 1;
+}
+.registration-page::after {
+  content: '';
+  position: absolute;
+  bottom: -100px;
+  right: -100px;
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, var(--gray-light) 0%, transparent 80%);
+  opacity: 0.18;
+  z-index: 1;
+}
+
+.registration-card {
+  background: #fff;
+  width: 420px;
+  padding: 44px 38px 32px 38px;
+  border-radius: 22px;
+  box-shadow: 0 12px 48px 0 rgba(0,0,0,0.18), 0 2px 8px rgba(242, 92, 5, 0.10);
+  border: 2.5px solid #f25c05;
+  position: relative;
+  z-index: 2;
+  animation: fadeInCard 0.7s cubic-bezier(0.4,0,0.2,1);
+}
+@keyframes fadeInCard {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+h1 {
+  color: #0D0D0D;
+  text-align: center;
+  margin-bottom: 32px;
+  font-size: 2.1rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  position: relative;
+  text-shadow: 0 2px 8px rgba(242, 92, 5, 0.10);
+}
+h1::after {
+  content: '';
+  display: block;
+  margin: 12px auto 0 auto;
+  width: 60px;
+  height: 3px;
+  border-radius: 2px;
+  background: #f25c05;
+}
+
+.form-group {
+  margin-bottom: 22px;
+  position: relative;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  color: #8C3503;
+  font-weight: 700;
+  font-size: 1.08rem;
+  letter-spacing: 0.2px;
+}
+
+input {
+  width: 90%;
+  padding: 14px 16px;
+  border: 2px solid #f25c05;
+  background: #fff;
+  border-radius: 12px;
+  font-size: 16px;
+  transition: border 0.3s, box-shadow 0.3s;
+  color: #0D0D0D;
+  outline: none;
+  box-shadow: 0 1.5px 6px rgba(242, 92, 5, 0.08);
+}
+input:focus {
+  border-color: #8C3503;
+  box-shadow: 0 0 0 2px #8C3503;
+}
+
+.button {
+  width: 100%;
+  padding: 15px 0;
+  border: none;
+  border-radius: 12px;
+  background: #f25c05;
+  color: #fff;
+  font-size: 1.15rem;
+  font-weight: 800;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  margin: 10px 0 0 0;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+  box-shadow: 0 4px 16px rgba(242, 92, 5, 0.13);
+  letter-spacing: 0.5px;
+}
+.button:hover, .button:focus {
+  background: #8C3503;
+  color: #fff;
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 24px rgba(140, 53, 3, 0.13);
+}
+
+.button-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 16px 0 0 0;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 15px;
+  margin-top: 5px;
+  text-align: center;
+}
+
+.login-link {
+  text-align: center;
+  margin-top: 24px;
+}
+.login-link a {
+  color: #f25c05;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.2s;
+}
+.login-link a:hover {
+  color: #8C3503;
+}
+
+@media (max-width: 600px) {
   .registration-card {
-    background: var(--white);
-    width: 400px;
-    padding: 40px;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    position: relative;
-    overflow: hidden;
+    width: 98vw;
+    padding: 18px 4vw 18px 4vw;
+    border-radius: 12px;
   }
-  
   h1 {
-    color: var(--text-color);
-    text-align: center;
-    margin-bottom: 30px;
-    font-size: 24px;
-    font-weight: 600;
+    font-size: 1.3rem;
   }
-  
-  .form-group {
-    margin-bottom: 20px;
-  }
-  
-  label {
-    display: block;
-    margin-bottom: 8px;
-    color: var(--text-color);
-    font-weight: bold;
-  }
-  
-  input {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    background: var(--gray-light);
-    border-radius: 10px;
-    font-size: 16px;
-    transition: all 0.3s ease;
-  }
-  
-  input:focus {
-    box-shadow: 0 0 0 2px var(--gradient-middle);
-    outline: none;
-  }
-  
-  .button {
-    width: 100%;
-    padding: 15px;
-    border: none;
-    border-radius: 10px;
-    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-    color: var(--white);
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    text-align: center;
-    text-decoration: none;
-    display: block;
-    margin: 10px 0;
-    transition: all 0.3s ease;
-  }
-  
-  .button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(102, 115, 2, 0.4);
-  }
-  
-  .error-message {
-    color: #dc3545;
-    font-size: 14px;
-    margin-top: 5px;
-  }
-  
-  .login-link {
-    text-align: center;
-    margin-top: 20px;
-  }
-  
-  .login-link a {
-    color: var(--gradient-middle);
-    text-decoration: none;
-    font-weight: bold;
-  }
-  
-  .login-link a:hover {
-    color: var(--gradient-end);
-  }
+}
   

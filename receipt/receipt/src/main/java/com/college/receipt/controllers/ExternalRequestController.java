@@ -99,6 +99,7 @@ public class ExternalRequestController {
             }
             else {
                 logger.error("Айди рецепта не найден!");
+                return ResponseEntity.badRequest().body("Ошибка на стороне Gemini");
             }
             if (recipeId != null){
                 logger.info("Логика добавления рецепта в диету");

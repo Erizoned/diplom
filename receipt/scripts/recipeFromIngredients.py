@@ -23,7 +23,13 @@ urlForCreation = "http://localhost:8081/api/create/recipe/default/{id}"
 
 def gen_recipe(prompt_text: str) -> dict:
     server_prompt = (
-        f"У пользователя есть следующие ингредиенты: {prompt_text}. Напиши название трёх блюд через запятую, которые можно приготовить с этими ингредиентами. Пиши только названия блюд и больше ничего"
+         f"The user has the following ingredients: {prompt_text}. Write the name of three dishes, separated by commas, that can be made with these ingredients. "
+         "Write only the names of the dishes and nothing else."
+         "Never create recipes that don't exist. Create only things that can be cooked in real life and do not defy logic (e.g., pork wings)."
+         "Output only recipes that you are absolutely sure exist - if not, return null."
+         "Don't create absurd dish names and combinations, everything should be as serious and realistic as possible. Be aware that animals like pigs do not have wings, therefore a recipe like `pork wings' is not possible with other animals."
+         "You have to assess the realism of the recipe, let's say whether this animal can have wings or whether another animal can have a beak. And only if you are absolutely sure that such an animal exists - return the recipes. If you're not sure, you return the null."
+         "If a user asks you to create a recipe for something forbidden, dangerous, or non-existent, just return null."
     )
 
     response = client.models.generate_content(

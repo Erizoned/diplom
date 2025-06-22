@@ -44,12 +44,13 @@
           required
         />
       </div>
-  
+      <div class="button-wrapper">
       <button type="submit" class="button">Зарегистрироваться</button>
+    </div>
     </form>
   
-    <div class="login-link" class="button">
-      <a routerLink="/login">Уже есть аккаунт? Войти</a>
+    <div class="button-wrapper">
+      <a (click)="redirectLogin()"  class="button">Уже есть аккаунт? Войти</a>
     </div>
   </div>
 </div>

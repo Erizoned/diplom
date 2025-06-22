@@ -113,11 +113,11 @@
   <div class="recipe-container">
     <div *ngFor="let recipe of recipes; let i = index" class="recipe-card" [ngClass]="{'new-recipe': recipe.new}">
       <a [routerLink]="['/recipe', recipe.id]">
-        <img *ngIf="recipe.photos && recipe.photos.length > 0"
-             [src]="getPhotoUrl(recipe.photos[0].name)"
+        <img *ngIf="getPhotoFood(recipe)"
+             [src]="getPhotoUrl(getPhotoFood(recipe)!)"
              alt="Фото блюда"
              class="recipe-image" />
-        <img *ngIf="!recipe.photos || recipe.photos.length === 0"
+        <img *ngIf="!getPhotoFood(recipe)"
              src="/static/images/default-recipe.png"
              alt="Нет фото"
              class="recipe-image" />
